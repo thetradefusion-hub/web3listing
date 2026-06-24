@@ -25,35 +25,35 @@ export function AdminHeader({ profile }: { profile: Profile }) {
   const roleLabel = roleLabels[profile.role] || profile.role.replace(/_/g, " ");
 
   return (
-    <header className="sticky top-0 z-20 border-b border-[#E2E8F0] bg-white/80 px-4 py-4 backdrop-blur-md sm:px-6 md:px-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-1 items-start gap-3">
-          <MobileMenuButton className="mt-0.5 shrink-0 md:hidden" />
-          <SidebarToggleButton className="mt-0.5" />
+    <header className="sticky top-0 z-20 border-b border-[#E2E8F0] bg-white/80 px-4 py-2.5 backdrop-blur-md sm:px-5 md:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <MobileMenuButton className="shrink-0 md:hidden" />
+          <SidebarToggleButton />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-lg font-semibold text-[#0F172A] sm:text-xl">Admin Dashboard</h1>
+              <h1 className="text-base font-semibold text-[#0F172A] lg:text-lg">Admin Dashboard</h1>
               <Badge
                 variant="outline"
-                className="h-6 border-[#C7D2FE] bg-[#EEF2FF] text-[#635BFF]"
+                className="h-5 border-[#C7D2FE] bg-[#EEF2FF] px-1.5 text-[10px] text-[#635BFF]"
               >
                 {roleLabel}
               </Badge>
             </div>
-            <p className="mt-0.5 text-sm text-[#64748B]">
+            <p className="mt-0.5 hidden text-xs text-[#64748B] xl:block">
               Welcome back, {displayName} — here is your system overview.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <NotificationBell userId={profile.id} variant="agent" />
 
-          <div className="flex items-center gap-2 rounded-xl border border-[#E2E8F0] bg-white px-2.5 py-1.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#635BFF] text-xs font-semibold text-white">
+          <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-2 py-1">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#635BFF] text-[10px] font-semibold text-white">
               {getInitials(displayName)}
             </div>
-            <span className="hidden max-w-[140px] truncate text-sm font-medium text-[#0F172A] sm:block">
+            <span className="hidden max-w-[120px] truncate text-xs font-medium text-[#0F172A] sm:block">
               {displayName}
             </span>
           </div>

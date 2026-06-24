@@ -11,7 +11,10 @@
     "db:fix-auth": "node scripts/run-sql.mjs supabase/migrations/003_fix_auth_signup.sql",
     "db:catalog": "node scripts/run-sql.mjs supabase/migrations/002_services_catalog.sql",
     "db:payments-fix": "node scripts/run-sql.mjs supabase/migrations/004_payments_fix.sql",
-    "db:commission-fix": "node scripts/run-sql.mjs supabase/migrations/005_commission_credit_fix.sql",
+    "db:service-details": "node scripts/run-sql.mjs supabase/migrations/006_service_details.sql",
+    "db:seed-binance": "node scripts/run-sql.mjs supabase/migrations/007_seed_binance_ecosystem.sql",
+    "db:order-delivery": "node scripts/run-sql.mjs supabase/migrations/008_order_delivery.sql",
+    "db:seed-delivery-demo": "node scripts/run-sql.mjs supabase/migrations/009_seed_demo_delivery.sql",
     "db:generate-catalog": "node scripts/generate-services-catalog.js",
     "create-admin": "node scripts/create-admin.mjs"
   },

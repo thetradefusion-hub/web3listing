@@ -36,3 +36,15 @@ export function getServicePriceHeadline(service: Pick<Service, "pricing_model" |
   }
   return "Custom Quote";
 }
+
+export function getServiceCommissionPreview(
+  service: Pick<Service, "pricing_model" | "price" | "commission_type" | "commission_value">
+) {
+  if (service.pricing_model !== "fixed" || service.price == null) {
+    return null;
+  }
+  if (service.commission_type === "percentage") {
+    return (service.price * service.commission_value) / 100;
+  }
+  return service.commission_value;
+}

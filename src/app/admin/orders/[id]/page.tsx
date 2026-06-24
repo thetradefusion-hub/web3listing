@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OrderTimeline } from "@/components/shared/order-timeline";
 import { QuotationBuilder } from "@/components/admin/quotation-builder";
-import { OrderStatusUpdater, PaymentVerifier, DeliverableUploader } from "@/components/admin/admin-actions";
+import { OrderStatusUpdater, PaymentVerifier } from "@/components/admin/admin-actions";
+import { DeliveryManager } from "@/components/admin/delivery-manager";
 import type { OrderStatus } from "@/types/database";
 import {
   AdminPageShell,
@@ -29,10 +30,11 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const service = rel(order.services);
   const agent = rel(order.profiles);
 
-  const [{ data: payment }, { data: quotation }, { data: deliverables }] = await Promise.all([
+  const [{ data: payment }, { data: quotation }, { data: deliverables }, { data: proofs }] = await Promise.all([
     supabase.from("payments").select("*").eq("order_id", id).order("created_at", { ascending: false }).limit(1).single(),
     supabase.from("quotations").select("*").eq("order_id", id).order("created_at", { ascending: false }).limit(1).single(),
-    supabase.from("deliverables").select("*").eq("order_id", id),
+    supabase.from("deliverables").select("*").eq("order_id", id).order("sort_order"),
+    supabase.from("order_proofs").select("*").eq("order_id", id).order("sort_order"),
   ]);
 
   return (
@@ -107,9 +109,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       )}
 
       <AdminPanel>
-        <AdminPanelHeader title="Upload Deliverables" />
+        <AdminPanelHeader title="Delivery Management" description="Proofs, files, team notes, and completion details for the agent delivery page" />
         <AdminPanelBody>
-          <DeliverableUploader orderId={id} />
+          <DeliveryManager order={order} proofs={proofs || []} deliverables={deliverables || []} />
         </AdminPanelBody>
       </AdminPanel>
 

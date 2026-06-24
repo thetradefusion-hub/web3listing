@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -14,16 +13,12 @@ import {
   BarChart3,
   UserCheck,
   FileText,
-  Sparkles,
-  ArrowUpRight,
 } from "lucide-react";
 import { signOut } from "@/lib/actions";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
 import {
   PortalSidebarBrand,
-  PortalSidebarCard,
   PortalSidebarFooter,
-  PortalSidebarIconAction,
   PortalSidebarLogout,
   PortalSidebarNav,
   PortalSidebarNavItem,
@@ -114,36 +109,6 @@ export function AdminSidebar({
       </PortalSidebarNav>
 
       <PortalSidebarFooter collapsed={collapsed}>
-        {collapsed ? (
-          <PortalSidebarIconAction
-            href="/admin/reports"
-            label="View Reports"
-            icon={BarChart3}
-            onClick={onNavigate}
-          />
-        ) : (
-          <PortalSidebarCard>
-            <div className="flex items-start gap-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-300">
-                <Sparkles className="h-3.5 w-3.5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Operations</p>
-                <p className="mt-0.5 text-xs font-semibold leading-snug text-slate-200">
-                  Agents, orders & finance
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/admin/reports"
-              onClick={onNavigate}
-              className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-900/25 transition hover:opacity-90"
-            >
-              View Reports
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          </PortalSidebarCard>
-        )}
         <PortalSidebarLogout onLogout={handleLogout} collapsed={collapsed} />
       </PortalSidebarFooter>
     </PortalSidebarShell>

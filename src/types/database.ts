@@ -123,6 +123,7 @@ export interface Service {
   demo_link: string | null;
   demo_files: string[] | null;
   proof_of_work: string | null;
+  proof_of_work_url: string | null;
   pricing_model: PricingModel;
   price: number | null;
   service_fee: number | null;
@@ -137,6 +138,15 @@ export interface Service {
   requires_third_party_ack: boolean;
   is_active: boolean;
   sort_order: number;
+  badge: "hot" | "popular" | "new" | null;
+  logo_url: string | null;
+  overview: string | null;
+  whats_included: string[] | null;
+  supported_platforms: string[] | null;
+  process_steps: { title: string; description?: string }[] | null;
+  listing_type: string | null;
+  networks: string | null;
+  refund_policy: string | null;
   service_categories?: ServiceCategory;
 }
 
@@ -151,6 +161,11 @@ export interface Order {
   requirements: string | null;
   progress_notes: string | null;
   delivery_date: string | null;
+  team_notes: string | null;
+  completion_report_url: string | null;
+  actual_tat: string | null;
+  started_at: string | null;
+  completed_at: string | null;
   third_party_ack: boolean;
   created_at: string;
   updated_at: string;
@@ -194,7 +209,30 @@ export interface Deliverable {
   description: string | null;
   file_url: string | null;
   external_link: string | null;
+  file_size: string | null;
+  file_type: string | null;
+  sort_order: number;
   uploaded_by: string | null;
+  created_at: string;
+}
+
+export interface OrderProof {
+  id: string;
+  order_id: string;
+  title: string;
+  proof_type: "screenshot" | "document" | "link";
+  url: string;
+  thumbnail_url: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface OrderReview {
+  id: string;
+  order_id: string;
+  agent_id: string;
+  rating: number;
+  review_text: string | null;
   created_at: string;
 }
 

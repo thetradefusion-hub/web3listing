@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
+import { isCommissionEligibleStatus } from "@/lib/commission";
 import { OrderStatusBadge } from "@/components/agent/dashboard/ui";
 import {
   AgentPageShell,
@@ -68,9 +69,15 @@ export default async function AgentOrdersPage() {
                         </td>
                         <td className="hidden text-[#94A3B8] sm:table-cell">{service?.estimated_tat || "—"}</td>
                         <td className="text-right">
-                          <Link href={`/agent/orders/${order.id}`} className="text-sm font-medium text-[#635BFF] hover:underline">
-                            View
-                          </Link>
+                          {isCommissionEligibleStatus(order.status) ? (
+                            <Link href={`/agent/orders/${order.id}/delivery`} className="text-sm font-medium text-[#059669] hover:underline">
+                              Delivery
+                            </Link>
+                          ) : (
+                            <Link href={`/agent/orders/${order.id}`} className="text-sm font-medium text-[#635BFF] hover:underline">
+                              View
+                            </Link>
+                          )}
                         </td>
                       </tr>
                     );

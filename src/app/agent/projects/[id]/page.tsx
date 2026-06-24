@@ -1,18 +1,8 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
-import { ProjectForm } from "@/components/agent/project-form";
-import {
-  AgentPageShell,
-  AgentPageHeader,
-  AgentPanel,
-  AgentPanelHeader,
-  AgentPanelBody,
-  AgentPrimaryButton,
-  AgentBadge,
-  projectStatusVariant,
-} from "@/components/agent/ui";
+import { ProjectDetailView } from "@/components/agent/projects/project-detail-view";
+import { AgentPageShell, rel } from "@/components/agent/ui";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,42 +18,43 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   if (!project) notFound();
 
+  const [{ data: orders }, { data: services }, { data: manager }] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("*, services(*, service_categories(name, slug))")
+      .eq("project_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("services")
+      .select("*, service_categories(name, slug)")
+      .eq("is_active", true)
+      .order("sort_order")
+      .limit(48),
+    profile?.account_manager_id
+      ? supabase.from("account_managers").select("telegram_link").eq("id", profile.account_manager_id).single()
+      : supabase.from("account_managers").select("telegram_link").eq("is_active", true).limit(1).single(),
+  ]);
+
+  const ordersWithServices =
+    orders?.map((o) => ({
+      ...o,
+      services: rel(o.services),
+    })) || [];
+
+  const servicesWithCategory =
+    services?.map((s) => ({
+      ...s,
+      service_categories: rel(s.service_categories),
+    })) || [];
+
   return (
-    <AgentPageShell className="mx-auto max-w-4xl">
-      <AgentPageHeader
-        title={project.project_name}
-        description={`${project.token_name} · ${project.blockchain_network}`}
-        badge={<AgentBadge variant={projectStatusVariant(project.status)}>{project.status}</AgentBadge>}
+    <AgentPageShell>
+      <ProjectDetailView
+        project={project}
+        orders={ordersWithServices}
+        services={servicesWithCategory}
+        managerTelegramLink={manager?.telegram_link}
       />
-
-      {project.status === "draft" ? (
-        <AgentPanel>
-          <AgentPanelHeader title="Edit Project" />
-          <AgentPanelBody>
-            <ProjectForm project={project} />
-          </AgentPanelBody>
-        </AgentPanel>
-      ) : (
-        <AgentPanel>
-          <AgentPanelBody className="grid gap-4 md:grid-cols-2">
-            {[
-              ["Symbol", project.token_symbol],
-              ["Contract", project.contract_address || "—"],
-              ["Website", project.website_url || "—"],
-              ["Email", project.official_email || "—"],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{label}</p>
-                <p className="mt-1 text-sm font-medium text-slate-800">{value}</p>
-              </div>
-            ))}
-          </AgentPanelBody>
-        </AgentPanel>
-      )}
-
-      <AgentPrimaryButton href={`/agent/services?project=${project.id}`}>
-        Select Service for This Project
-      </AgentPrimaryButton>
     </AgentPageShell>
   );
 }

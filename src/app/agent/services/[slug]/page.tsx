@@ -1,26 +1,15 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
-import { PricingBadge } from "@/components/shared/pricing-badge";
-import { ServicePricingCard } from "@/components/shared/service-pricing-card";
-import { OrderForm } from "@/components/agent/order-form";
-import { formatCurrency } from "@/lib/commission";
-import {
-  AgentPageShell,
-  AgentPageHeader,
-  AgentPanel,
-  AgentPanelHeader,
-  AgentPanelBody,
-  AgentPrimaryButton,
-  rel,
-} from "@/components/agent/ui";
+import { ServiceDetailView } from "@/components/agent/services/service-detail-view";
+import { rel } from "@/components/agent/ui";
 
 export default async function AgentServiceDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ project?: string }>;
+  searchParams: Promise<{ project?: string; order?: string }>;
 }) {
   const { slug } = await params;
   const { project: projectId } = await searchParams;
@@ -29,110 +18,53 @@ export default async function AgentServiceDetailPage({
 
   const { data: service } = await supabase
     .from("services")
-    .select("*, service_categories(name)")
+    .select("*, service_categories(name, slug)")
     .eq("slug", slug)
+    .eq("is_active", true)
     .single();
 
   if (!service) notFound();
 
   const category = rel(service.service_categories);
 
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("agent_id", profile!.id)
-    .in("status", ["submitted", "approved"]);
+  const [{ data: projects }, { data: recentOrders }, { data: manager }] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("*")
+      .eq("agent_id", profile!.id)
+      .in("status", ["submitted", "approved"]),
+    supabase
+      .from("orders")
+      .select("id, updated_at, projects(project_name, token_symbol)")
+      .eq("service_id", service.id)
+      .in("status", ["completed", "delivered", "closed"])
+      .order("updated_at", { ascending: false })
+      .limit(4),
+    profile?.account_manager_id
+      ? supabase.from("account_managers").select("telegram_link").eq("id", profile.account_manager_id).single()
+      : supabase.from("account_managers").select("telegram_link").eq("is_active", true).limit(1).single(),
+  ]);
+
+  const recentListings =
+    recentOrders?.map((o) => {
+      const project = rel(o.projects);
+      return {
+        id: o.id,
+        project_name: project?.project_name || "Project",
+        token_symbol: project?.token_symbol || null,
+        completed_at: o.updated_at,
+      };
+    }) || [];
 
   return (
-    <AgentPageShell className="mx-auto max-w-4xl">
-      <AgentPageHeader
-        title={service.name}
-        description={category?.name}
-        badge={<PricingBadge model={service.pricing_model} />}
-      />
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-4 lg:col-span-2">
-          <AgentPanel>
-            <AgentPanelHeader title="Description" />
-            <AgentPanelBody>
-              <p className="text-sm leading-relaxed text-slate-600">{service.description}</p>
-            </AgentPanelBody>
-          </AgentPanel>
-
-          {service.proof_of_work && (
-            <AgentPanel>
-              <AgentPanelHeader title="Proof of Work" />
-              <AgentPanelBody>
-                <p className="text-sm text-slate-600">{service.proof_of_work}</p>
-              </AgentPanelBody>
-            </AgentPanel>
-          )}
-
-          {service.pricing_model === "quote" && (
-            <AgentPanel>
-              <AgentPanelHeader title="Quote Flow" />
-              <AgentPanelBody>
-                <ol className="space-y-2 text-sm text-slate-600">
-                  <li>1. Select service and submit requirements</li>
-                  <li>2. Admin reviews and gets vendor pricing</li>
-                  <li>3. Quote generated with margin added</li>
-                  <li>4. Payment link sent — pay to start work</li>
-                </ol>
-              </AgentPanelBody>
-            </AgentPanel>
-          )}
-
-          <AgentPanel>
-            <AgentPanelHeader title="Service Details" />
-            <AgentPanelBody className="grid gap-3 text-sm">
-              {[
-                ["TAT", service.estimated_tat],
-                ["Payment Terms", service.payment_terms],
-                [
-                  "Commission",
-                  service.commission_type === "percentage"
-                    ? `${service.commission_value}%`
-                    : formatCurrency(service.commission_value),
-                ],
-              ].map(([label, value]) => (
-                <div key={label} className="flex justify-between border-b border-slate-50 pb-2 last:border-0">
-                  <span className="text-slate-500">{label}</span>
-                  <span className="font-medium text-slate-800">{value || "—"}</span>
-                </div>
-              ))}
-              {service.demo_link && (
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Demo</span>
-                  <a
-                    href={service.demo_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-violet-600 hover:underline"
-                  >
-                    View Demo
-                  </a>
-                </div>
-              )}
-            </AgentPanelBody>
-          </AgentPanel>
-        </div>
-
-        <AgentPanel className="h-fit">
-          <AgentPanelBody>
-            <ServicePricingCard service={service}>
-              {projects && projects.length > 0 ? (
-                <OrderForm service={service} projects={projects} defaultProjectId={projectId} />
-              ) : (
-                <div className="space-y-3 text-center">
-                  <p className="text-sm text-slate-500">Create and submit a project first</p>
-                  <AgentPrimaryButton href="/agent/projects/new">Create Project</AgentPrimaryButton>
-                </div>
-              )}
-            </ServicePricingCard>
-          </AgentPanelBody>
-        </AgentPanel>
-      </div>
-    </AgentPageShell>
+    <ServiceDetailView
+      service={service}
+      categoryName={category?.name || "Services"}
+      categorySlug={category?.slug || ""}
+      projects={projects || []}
+      defaultProjectId={projectId}
+      recentListings={recentListings}
+      managerTelegramLink={manager?.telegram_link}
+    />
   );
 }

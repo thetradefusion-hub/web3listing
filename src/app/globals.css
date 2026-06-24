@@ -210,6 +210,32 @@
   font-size: 13px;
 }
 
+.portal-table-dense thead th {
+  padding: 6px 12px;
+  font-size: 10px;
+}
+
+.portal-table-dense tbody td {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.portal-table-laptop thead th {
+  padding: 4px 10px;
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+
+.portal-table-laptop tbody td {
+  padding: 3px 10px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.portal-table-laptop tbody tr:last-child td {
+  border-bottom: none;
+}
+
 /* Prevent invisible modal layers from blocking clicks */
 [data-slot="dialog-overlay"]:not([data-open]),
 [data-slot="sheet-overlay"]:not([data-open]) {

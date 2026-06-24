@@ -43,7 +43,8 @@ export default async function AdminServicesPage() {
                     <th className="px-5 py-3 font-medium">Service</th>
                     <th className="hidden px-3 py-3 font-medium md:table-cell">Category</th>
                     <th className="px-3 py-3 font-medium">Pricing</th>
-                    <th className="hidden px-3 py-3 font-medium lg:table-cell">Commission</th>
+                    <th className="hidden px-3 py-3 font-medium lg:table-cell">Badge</th>
+                    <th className="hidden px-3 py-3 font-medium xl:table-cell">Commission</th>
                     <th className="px-3 py-3 font-medium">Status</th>
                     <th className="px-5 py-3 text-right font-medium">Actions</th>
                   </tr>
@@ -65,7 +66,10 @@ export default async function AdminServicesPage() {
                         </td>
                         <td className="hidden px-3 py-3.5 text-slate-600 md:table-cell">{category?.name || "—"}</td>
                         <td className="px-3 py-3.5 font-medium text-slate-800">{price}</td>
-                        <td className="hidden px-3 py-3.5 text-slate-600 lg:table-cell">
+                        <td className="hidden px-3 py-3.5 text-slate-600 lg:table-cell capitalize">
+                          {service.badge || "—"}
+                        </td>
+                        <td className="hidden px-3 py-3.5 text-slate-600 xl:table-cell">
                           {service.commission_value}
                           {service.commission_type === "percentage" ? "%" : " fixed"}
                         </td>

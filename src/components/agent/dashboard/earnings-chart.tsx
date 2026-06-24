@@ -21,13 +21,17 @@ function smoothPath(points: { x: number; y: number }[]) {
 
 export function EarningsChart({
   data,
+  compact,
 }: {
   data: { label: string; amount: number }[];
+  compact?: boolean;
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const width = 400;
-  const height = 130;
-  const padding = { top: 12, right: 12, bottom: 24, left: 40 };
+  const height = compact ? 88 : 130;
+  const padding = compact
+    ? { top: 8, right: 8, bottom: 18, left: 32 }
+    : { top: 12, right: 12, bottom: 24, left: 40 };
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
 
@@ -43,7 +47,7 @@ export function EarningsChart({
 
   return (
     <div className="w-full overflow-hidden">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[130px] w-full" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox={`0 0 ${width} ${height}`} className={compact ? "h-[88px] w-full" : "h-[130px] w-full"} preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="earningsFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#635BFF" stopOpacity={0.2} />

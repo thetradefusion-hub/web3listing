@@ -18,7 +18,47 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { parseJsonArray } from "@/lib/service-catalog";
 import type { Service, ServiceCategory, PricingModel, CommissionType } from "@/types/database";
+
+function linesToArray(value: string) {
+  return value
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function linesToProcessSteps(value: string) {
+  return linesToArray(value).map((line) => {
+    const [title, ...rest] = line.split("|");
+    return { title: title.trim(), description: rest.join("|").trim() || undefined };
+  });
+}
+
+function linesToFaqs(value: string) {
+  return linesToArray(value)
+    .map((line) => {
+      const [question, ...rest] = line.split("|");
+      return { question: question.trim(), answer: rest.join("|").trim() };
+    })
+    .filter((f) => f.question && f.answer);
+}
+
+function arrayToLines(value: unknown) {
+  return parseJsonArray<string>(value).join("\n");
+}
+
+function processStepsToLines(value: unknown) {
+  return parseJsonArray<{ title: string; description?: string }>(value)
+    .map((s) => (s.description ? `${s.title} | ${s.description}` : s.title))
+    .join("\n");
+}
+
+function faqsToLines(value: unknown) {
+  return parseJsonArray<{ question: string; answer: string }>(value)
+    .map((f) => `${f.question} | ${f.answer}`)
+    .join("\n");
+}
 
 type ServiceFormDialogProps = {
   categories: ServiceCategory[];
@@ -45,6 +85,7 @@ function ServiceFormFields({
   );
   const [isActive, setIsActive] = useState(service?.is_active ?? true);
   const [requiresAck, setRequiresAck] = useState(service?.requires_third_party_ack ?? false);
+  const [badge, setBadge] = useState<"hot" | "popular" | "new" | "none">(service?.badge || "none");
 
   useEffect(() => {
     if (service) {
@@ -53,6 +94,7 @@ function ServiceFormFields({
       setCommissionType(service.commission_type);
       setIsActive(service.is_active);
       setRequiresAck(service.requires_third_party_ack);
+      setBadge(service.badge || "none");
     }
   }, [service]);
 
@@ -67,8 +109,24 @@ function ServiceFormFields({
         name: form.get("name") as string,
         slug: (form.get("slug") as string) || undefined,
         description: (form.get("description") as string) || null,
+        overview: (form.get("overview") as string) || null,
+        demo_link: (form.get("demo_link") as string) || null,
+        proof_of_work: (form.get("proof_of_work") as string) || null,
+        proof_of_work_url: (form.get("proof_of_work_url") as string) || null,
+        logo_url: (form.get("logo_url") as string) || null,
+        listing_type: (form.get("listing_type") as string) || null,
+        networks: (form.get("networks") as string) || null,
+        refund_policy: (form.get("refund_policy") as string) || null,
+        terms_conditions: (form.get("terms_conditions") as string) || null,
+        third_party_fee_note: (form.get("third_party_fee_note") as string) || null,
+        whats_included: linesToArray((form.get("whats_included") as string) || ""),
+        supported_platforms: linesToArray((form.get("supported_platforms") as string) || ""),
+        process_steps: linesToProcessSteps((form.get("process_steps") as string) || ""),
+        required_documents: linesToArray((form.get("required_documents") as string) || ""),
+        faqs: linesToFaqs((form.get("faqs") as string) || ""),
         pricing_model: pricingModel,
         price: pricingModel === "fixed" ? Number(form.get("price")) || null : null,
+        service_fee: Number(form.get("service_fee")) || null,
         commission_type: commissionType,
         commission_value: Number(form.get("commission_value")),
         estimated_tat: (form.get("estimated_tat") as string) || null,
@@ -76,6 +134,7 @@ function ServiceFormFields({
         sort_order: Number(form.get("sort_order")) || 0,
         is_active: isActive,
         requires_third_party_ack: requiresAck,
+        badge: badge === "none" ? null : badge,
       },
       service?.id
     );
@@ -126,13 +185,98 @@ function ServiceFormFields({
         </div>
 
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">Short Description (catalog card)</Label>
           <Textarea
             id="description"
             name="description"
-            rows={4}
+            rows={3}
             defaultValue={service?.description || ""}
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Display Badge</Label>
+          <Select value={badge} onValueChange={(v) => v && setBadge(v as typeof badge)}>
+            <SelectTrigger className="rounded-xl">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              <SelectItem value="hot">Hot</SelectItem>
+              <SelectItem value="popular">Popular</SelectItem>
+              <SelectItem value="new">New</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="logo_url">Logo URL</Label>
+          <Input id="logo_url" name="logo_url" defaultValue={service?.logo_url || ""} placeholder="https://..." />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="overview">Overview (detail page)</Label>
+          <Textarea id="overview" name="overview" rows={4} defaultValue={service?.overview || ""} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="whats_included">What&apos;s Included (one per line)</Label>
+          <Textarea id="whats_included" name="whats_included" rows={4} defaultValue={arrayToLines(service?.whats_included)} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="process_steps">Process Steps (title | description per line)</Label>
+          <Textarea id="process_steps" name="process_steps" rows={4} defaultValue={processStepsToLines(service?.process_steps)} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="supported_platforms">Supported Platforms (one per line)</Label>
+          <Textarea id="supported_platforms" name="supported_platforms" rows={3} defaultValue={arrayToLines(service?.supported_platforms)} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="demo_link">Demo Link</Label>
+          <Input id="demo_link" name="demo_link" defaultValue={service?.demo_link || ""} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="proof_of_work_url">Proof of Work URL</Label>
+          <Input id="proof_of_work_url" name="proof_of_work_url" defaultValue={service?.proof_of_work_url || ""} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="proof_of_work">Proof of Work Text</Label>
+          <Textarea id="proof_of_work" name="proof_of_work" rows={3} defaultValue={service?.proof_of_work || ""} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="listing_type">Listing Type</Label>
+          <Input id="listing_type" name="listing_type" defaultValue={service?.listing_type || ""} placeholder="e.g. CEX Listing" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="networks">Networks</Label>
+          <Input id="networks" name="networks" defaultValue={service?.networks || ""} placeholder="e.g. BSC, ETH" />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="required_documents">Requirements (one per line)</Label>
+          <Textarea id="required_documents" name="required_documents" rows={3} defaultValue={(service?.required_documents || []).join("\n")} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="faqs">FAQs (question | answer per line)</Label>
+          <Textarea id="faqs" name="faqs" rows={4} defaultValue={faqsToLines(service?.faqs)} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="terms_conditions">Terms & Conditions</Label>
+          <Textarea id="terms_conditions" name="terms_conditions" rows={3} defaultValue={service?.terms_conditions || ""} />
+        </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="refund_policy">Refund Policy</Label>
+          <Input id="refund_policy" name="refund_policy" defaultValue={service?.refund_policy || ""} />
         </div>
 
         <div className="space-y-2">
@@ -166,6 +310,18 @@ function ServiceFormFields({
             />
           </div>
         )}
+
+        <div className="space-y-2">
+          <Label htmlFor="service_fee">Platform Fee (USD)</Label>
+          <Input
+            id="service_fee"
+            name="service_fee"
+            type="number"
+            min="0"
+            step="0.01"
+            defaultValue={service?.service_fee ?? 0}
+          />
+        </div>
 
         <div className="space-y-2">
           <Label>Commission Type *</Label>
@@ -262,7 +418,7 @@ export function ServiceFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {open ? (
-        <DialogContent className="max-h-[min(92vh,880px)] w-full max-w-[calc(100%-1.5rem)] overflow-y-auto p-6 sm:max-w-2xl">
+        <DialogContent className="max-h-[min(92vh,900px)] w-full max-w-[calc(100%-1.5rem)] overflow-y-auto p-6 sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>{service ? "Edit Service" : "Add New Service"}</DialogTitle>
           </DialogHeader>

@@ -556,10 +556,31 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
   await requireAuth(["super_admin", "operations_manager", "service_team"]);
   const supabase = createAdminClient();
 
-  const { data: order } = await supabase.from("orders").update({
+  const { data: existing } = await supabase
+    .from("orders")
+    .select("started_at")
+    .eq("id", orderId)
+    .single();
+
+  const updates: Record<string, unknown> = {
     status,
     progress_notes: notes,
-  }).eq("id", orderId).select("*, profiles!orders_agent_id_fkey(email)").single();
+  };
+
+  if (status === "in_progress" && !existing?.started_at) {
+    updates.started_at = new Date().toISOString();
+  }
+  if (isCommissionEligibleStatus(status)) {
+    updates.completed_at = new Date().toISOString();
+    updates.delivery_date = new Date().toISOString().slice(0, 10);
+  }
+
+  const { data: order } = await supabase
+    .from("orders")
+    .update(updates)
+    .eq("id", orderId)
+    .select("*, profiles!orders_agent_id_fkey(email)")
+    .single();
 
   if (order?.profiles?.email) {
     const email = orderUpdateEmail(order.order_number, status.replace(/_/g, " "));
@@ -584,6 +605,116 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
   revalidatePath("/agent");
   revalidatePath("/agent/orders");
   revalidatePath(`/agent/orders/${orderId}`);
+  revalidatePath(`/agent/orders/${orderId}/delivery`);
+  revalidatePath("/agent/delivery");
+  return { success: true };
+}
+
+export async function saveOrderDelivery(data: {
+  order_id: string;
+  team_notes?: string;
+  completion_report_url?: string;
+  actual_tat?: string;
+  started_at?: string;
+  completed_at?: string;
+}) {
+  await requireAuth(["super_admin", "operations_manager", "service_team"]);
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      team_notes: data.team_notes?.trim() || null,
+      completion_report_url: data.completion_report_url?.trim() || null,
+      actual_tat: data.actual_tat?.trim() || null,
+      started_at: data.started_at || null,
+      completed_at: data.completed_at || null,
+      delivery_date: data.completed_at ? data.completed_at.slice(0, 10) : undefined,
+    })
+    .eq("id", data.order_id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/admin/orders/${data.order_id}`);
+  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
+  revalidatePath("/agent/delivery");
+  return { success: true };
+}
+
+export async function addOrderProof(data: {
+  order_id: string;
+  title: string;
+  proof_type?: "screenshot" | "document" | "link";
+  url: string;
+  thumbnail_url?: string;
+  sort_order?: number;
+}) {
+  await requireAuth(["super_admin", "operations_manager", "service_team"]);
+  const supabase = createAdminClient();
+
+  const { error } = await supabase.from("order_proofs").insert({
+    order_id: data.order_id,
+    title: data.title.trim(),
+    proof_type: data.proof_type || "link",
+    url: data.url.trim(),
+    thumbnail_url: data.thumbnail_url?.trim() || null,
+    sort_order: data.sort_order ?? 0,
+  });
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/admin/orders/${data.order_id}`);
+  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
+  return { success: true };
+}
+
+export async function deleteOrderProof(proofId: string, orderId: string) {
+  await requireAuth(["super_admin", "operations_manager", "service_team"]);
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("order_proofs").delete().eq("id", proofId);
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath(`/agent/orders/${orderId}/delivery`);
+  return { success: true };
+}
+
+export async function submitOrderReview(data: {
+  order_id: string;
+  rating: number;
+  review_text?: string;
+}) {
+  const profile = await requireAuth(["agent"]);
+  const supabase = createAdminClient();
+
+  if (data.rating < 1 || data.rating > 5) {
+    return { error: "Rating must be between 1 and 5" };
+  }
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, agent_id, status")
+    .eq("id", data.order_id)
+    .eq("agent_id", profile.id)
+    .single();
+
+  if (!order) return { error: "Order not found" };
+  if (!isCommissionEligibleStatus(order.status)) {
+    return { error: "Reviews are available after order completion" };
+  }
+
+  const { error } = await supabase.from("order_reviews").upsert(
+    {
+      order_id: data.order_id,
+      agent_id: profile.id,
+      rating: data.rating,
+      review_text: data.review_text?.trim() || null,
+    },
+    { onConflict: "order_id" }
+  );
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
   return { success: true };
 }
 
@@ -593,6 +724,9 @@ export async function uploadDeliverable(data: {
   description?: string;
   file_url?: string;
   external_link?: string;
+  file_size?: string;
+  file_type?: string;
+  sort_order?: number;
 }) {
   const admin = await requireAuth(["super_admin", "operations_manager", "service_team"]);
   const supabase = createAdminClient();
@@ -604,8 +738,23 @@ export async function uploadDeliverable(data: {
 
   if (error) return { error: error.message };
 
-  await supabase.from("orders").update({ status: "delivered" }).eq("id", data.order_id);
-  await creditAgentCommission(data.order_id);
+  const { data: order } = await supabase
+    .from("orders")
+    .select("status")
+    .eq("id", data.order_id)
+    .single();
+
+  if (order && !isCommissionEligibleStatus(order.status)) {
+    await supabase
+      .from("orders")
+      .update({
+        status: "delivered",
+        completed_at: new Date().toISOString(),
+        delivery_date: new Date().toISOString().slice(0, 10),
+      })
+      .eq("id", data.order_id);
+    await creditAgentCommission(data.order_id);
+  }
 
   revalidatePath("/admin");
   revalidatePath("/admin/orders");
@@ -613,6 +762,8 @@ export async function uploadDeliverable(data: {
   revalidatePath("/agent");
   revalidatePath("/agent/orders");
   revalidatePath(`/agent/orders/${data.order_id}`);
+  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
+  revalidatePath("/agent/delivery");
   revalidatePath("/agent/wallet");
   return { success: true };
 }
@@ -805,8 +956,13 @@ export async function upsertService(
     name: string;
     slug?: string;
     description?: string | null;
+    overview?: string | null;
+    demo_link?: string | null;
+    proof_of_work?: string | null;
+    proof_of_work_url?: string | null;
     pricing_model: "fixed" | "quote" | "enterprise";
     price?: number | null;
+    service_fee?: number | null;
     commission_type: "fixed" | "percentage";
     commission_value: number;
     estimated_tat?: string | null;
@@ -814,6 +970,18 @@ export async function upsertService(
     is_active?: boolean;
     sort_order?: number;
     requires_third_party_ack?: boolean;
+    badge?: "hot" | "popular" | "new" | null;
+    logo_url?: string | null;
+    whats_included?: string[] | null;
+    supported_platforms?: string[] | null;
+    process_steps?: { title: string; description?: string }[] | null;
+    listing_type?: string | null;
+    networks?: string | null;
+    refund_policy?: string | null;
+    required_documents?: string[] | null;
+    faqs?: { question: string; answer: string }[] | null;
+    terms_conditions?: string | null;
+    third_party_fee_note?: string | null;
   },
   id?: string
 ) {
@@ -832,8 +1000,13 @@ export async function upsertService(
     name: data.name.trim(),
     slug,
     description: data.description?.trim() || null,
+    overview: data.overview?.trim() || null,
+    demo_link: data.demo_link?.trim() || null,
+    proof_of_work: data.proof_of_work?.trim() || null,
+    proof_of_work_url: data.proof_of_work_url?.trim() || null,
     pricing_model: data.pricing_model,
     price: data.pricing_model === "fixed" ? data.price ?? null : null,
+    service_fee: data.service_fee ?? null,
     commission_type: data.commission_type,
     commission_value: data.commission_value,
     estimated_tat: data.estimated_tat?.trim() || null,
@@ -841,6 +1014,18 @@ export async function upsertService(
     is_active: data.is_active ?? true,
     sort_order: data.sort_order ?? 0,
     requires_third_party_ack: data.requires_third_party_ack ?? false,
+    badge: data.badge || null,
+    logo_url: data.logo_url?.trim() || null,
+    whats_included: data.whats_included ?? [],
+    supported_platforms: data.supported_platforms ?? [],
+    process_steps: data.process_steps ?? [],
+    listing_type: data.listing_type?.trim() || null,
+    networks: data.networks?.trim() || null,
+    refund_policy: data.refund_policy?.trim() || null,
+    required_documents: data.required_documents ?? null,
+    faqs: data.faqs ?? null,
+    terms_conditions: data.terms_conditions?.trim() || null,
+    third_party_fee_note: data.third_party_fee_note?.trim() || null,
   };
 
   const query = id

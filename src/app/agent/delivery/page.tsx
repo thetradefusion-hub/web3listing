@@ -64,8 +64,11 @@ export default async function DeliveryCenterPage() {
                   ) : (
                     <p className="text-sm text-slate-500">Deliverables pending</p>
                   )}
-                  <Link href={`/agent/orders/${order.id}`} className="mt-4 inline-block text-sm font-medium text-violet-600 hover:underline">
-                    View Order Details →
+                  <Link href={`/agent/orders/${order.id}/delivery`} className="mt-4 inline-block text-sm font-semibold text-[#059669] hover:underline">
+                    View Full Delivery →
+                  </Link>
+                  <Link href={`/agent/orders/${order.id}`} className="mt-2 block text-sm font-medium text-[#635BFF] hover:underline">
+                    Order Details
                   </Link>
                 </AgentPanelBody>
               </AgentPanel>
