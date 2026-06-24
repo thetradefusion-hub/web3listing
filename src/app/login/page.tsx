@@ -16,7 +16,7 @@ function LoginLoading() {
 
 export const metadata = {
   title: "Sign In",
-  description: "Sign in to the TokenWeb3Listing agent dashboard",
+  description: "Sign in to the TokenWeb3Listing partner dashboard",
 };
 
 export default function LoginPage() {

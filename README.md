@@ -1,6 +1,6 @@
 # TokenWeb3Listing.com
 
-B2B Agent & Reseller Portal for Web3 listing, marketing, and growth services.
+B2B Partner & Reseller Portal for Web3 listing, marketing, and growth services.
 
 ## Tech Stack
 
@@ -51,17 +51,17 @@ Open [http://localhost:3000](http://localhost:3000)
 |------|--------|
 | Super Admin | Full system access |
 | Operations Manager | Orders, delivery, quotations |
-| Agent / Reseller | KYC, projects, orders, wallet |
+| Partner / Reseller | KYC, projects, orders, wallet |
 | Service Team | Assigned orders, deliverables |
 
 ## Core Flow
 
-1. Admin creates agent account → credentials emailed
-2. Agent completes KYC → admin approves
-3. Agent creates project → selects service → order placed
-4. Admin generates quote (if needed) → agent pays → admin verifies
+1. Admin creates partner account → credentials emailed
+2. Partner completes KYC → admin approves
+3. Partner creates project → selects service → order placed
+4. Admin generates quote (if needed) → partner pays → admin verifies
 5. Order progresses → deliverables uploaded → commission credited
-6. Agent requests withdrawal → admin processes manually
+6. Partner requests withdrawal → admin processes manually
 
 ## Project Structure
 
@@ -69,7 +69,7 @@ Open [http://localhost:3000](http://localhost:3000)
 src/
 ├── app/
 │   ├── (public)/     # Marketing website
-│   ├── agent/        # Agent portal
+│   ├── partner/        # Partner portal
 │   ├── admin/        # Admin panel
 │   └── login/        # Authentication
 ├── components/

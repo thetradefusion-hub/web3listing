@@ -28,7 +28,7 @@ export const HERO_STATS = [
   { value: "96+", label: "Web3 Services" },
   { value: "20+", label: "Exchange Networks" },
   { value: "24–72h", label: "Avg. Turnaround" },
-  { value: "10–30%", label: "Agent Commission" },
+  { value: "10–30%", label: "Partner Commission" },
 ] as const;
 
 export const PLATFORM_STATS = [
@@ -36,7 +36,7 @@ export const PLATFORM_STATS = [
   { value: "20+", label: "exchange ecosystems" },
   { value: "13", label: "service categories" },
   { value: "24–72h", label: "average turnaround" },
-  { value: "10–30%", label: "agent commission" },
+  { value: "10–30%", label: "partner commission" },
   { value: "Global", label: "client coverage" },
 ] as const;
 
@@ -51,7 +51,7 @@ export const WHY_NEED_US = [
   },
   {
     title: "One dashboard for everything",
-    desc: "Listing, PR, market making, audits, wallets, community, and AI — managed from a single professional agent portal.",
+    desc: "Listing, PR, market making, audits, wallets, community, and AI — managed from a single professional partner portal.",
   },
   {
     title: "Higher approval readiness",
@@ -408,7 +408,7 @@ export const HOW_IT_WORKS = [
 export const PARTNER_BENEFITS = [
   "10%–30% Commission",
   "Real-Time Tracking",
-  "Agent Dashboard",
+  "Partner Dashboard",
   "Referral System",
   "Withdrawal Management",
   "Dedicated Support",

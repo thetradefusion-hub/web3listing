@@ -385,7 +385,7 @@ function ServiceFormFields({
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2 text-sm">
           <Checkbox checked={isActive} onCheckedChange={(v) => setIsActive(v === true)} />
-          Active (visible to agents)
+          Active (visible to partners)
         </label>
         <label className="flex items-center gap-2 text-sm">
           <Checkbox checked={requiresAck} onCheckedChange={(v) => setRequiresAck(v === true)} />

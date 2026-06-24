@@ -52,7 +52,7 @@ export default async function AdminPaymentsPage({
     <AdminPageShell>
       <AdminPageHeader
         title="Payment Verification"
-        description="Review agent payment proofs and confirm received funds"
+        description="Review partner payment proofs and confirm received funds"
       />
 
       <div className="flex flex-wrap gap-2">
@@ -73,7 +73,7 @@ export default async function AdminPaymentsPage({
         <div className="space-y-3">
           {payments.map((payment) => {
             const order = rel(payment.orders);
-            const agent = rel(order?.profiles);
+            const partner = rel(order?.profiles);
             return (
               <AdminPanel key={payment.id}>
                 <AdminPanelBody>
@@ -86,7 +86,7 @@ export default async function AdminPaymentsPage({
                         #{order?.order_number || "—"}
                       </Link>
                       <p className="mt-1 text-sm text-slate-500">
-                        {agent?.full_name || agent?.email || "—"} · {formatCurrency(payment.amount)}
+                        {partner?.full_name || partner?.email || "—"} · {formatCurrency(payment.amount)}
                       </p>
                       {payment.proof_url && (
                         <a
@@ -116,14 +116,14 @@ export default async function AdminPaymentsPage({
       ) : (
         <AdminEmptyState
           title="No payment records yet"
-          description="Payments appear here automatically when an agent places a fixed-price order or accepts a quotation."
+          description="Payments appear here automatically when an partner places a fixed-price order or accepts a quotation."
           action={
             <div className="max-w-lg space-y-2 text-left text-sm text-slate-500">
               <p className="font-medium text-slate-700">How payments show up:</p>
               <ol className="list-decimal space-y-1 pl-5">
-                <li>Agent places a fixed-price order → payment row created (pending)</li>
+                <li>Partner places a fixed-price order → payment row created (pending)</li>
                 <li>Or admin sends a quote → payment row created when quote is sent</li>
-                <li>Agent uploads payment proof → status becomes awaiting verification</li>
+                <li>Partner uploads payment proof → status becomes awaiting verification</li>
                 <li>Admin confirms here → status becomes confirmed</li>
               </ol>
               <Link href="/admin/orders" className="mt-3 inline-block text-sm font-medium text-violet-600 hover:underline">

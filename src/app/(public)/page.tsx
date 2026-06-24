@@ -129,7 +129,7 @@ export default async function HomePage() {
               <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-violet-500/20 blur-3xl" />
               <p className="lh-label text-violet-400">Partner program</p>
               <h3 className="mt-3 text-xl font-bold text-white sm:mt-4 sm:text-2xl">Become a partner & earn</h3>
-              <p className="mt-1.5 text-sm font-medium text-violet-300 sm:mt-2">Web3 Agent Program</p>
+              <p className="mt-1.5 text-sm font-medium text-violet-300 sm:mt-2">Web3 Partner Program</p>
               <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:mt-3">
                 Earn recurring commissions by referring projects to our marketplace.
               </p>
@@ -149,7 +149,7 @@ export default async function HomePage() {
                 asChild
               >
                 <Link href="/login">
-                  Become an agent <ArrowRight className="ml-2 h-4 w-4" />
+                  Become a partner <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>

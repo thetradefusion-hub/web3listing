@@ -56,7 +56,7 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
               </CardHeader>
               <CardContent>
                 <ol className="space-y-2 text-sm text-muted-foreground">
-                  <li>1. Agent selects service and submits requirements</li>
+                  <li>1. Partner selects service and submits requirements</li>
                   <li>2. Admin reviews and sources vendor pricing</li>
                   <li>3. Custom quote generated with margin</li>
                   <li>4. Client pays — work begins</li>
@@ -73,7 +73,7 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
                 <Link href="/login">{PRICING_CTA[model]}</Link>
               </Button>
               <p className="mt-3 text-center text-xs text-muted-foreground">
-                Agent login required to place orders
+                Partner login required to place orders
               </p>
             </ServicePricingCard>
           </CardContent>

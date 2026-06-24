@@ -63,7 +63,7 @@ export function PublicHeader() {
             className="rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-400 text-xs font-semibold text-slate-950 hover:from-cyan-400 sm:text-sm"
             asChild
           >
-            <Link href="/login">Agent Login</Link>
+            <Link href="/login">Partner Login</Link>
           </Button>
         </div>
       </div>
@@ -95,7 +95,7 @@ export function PublicHeader() {
                 </Button>
                 <Button className="w-full" asChild>
                   <Link href="/login" onClick={() => setOpen(false)}>
-                    Agent Login
+                    Partner Login
                   </Link>
                 </Button>
               </div>

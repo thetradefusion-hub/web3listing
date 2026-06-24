@@ -57,7 +57,7 @@ export default async function AdminWithdrawalsPage() {
           })}
         </div>
       ) : (
-        <AdminEmptyState title="No withdrawals yet" description="Agent withdrawal requests will appear here." />
+        <AdminEmptyState title="No withdrawals yet" description="Partner withdrawal requests will appear here." />
       )}
     </AdminPageShell>
   );

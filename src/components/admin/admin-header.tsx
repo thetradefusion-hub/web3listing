@@ -47,7 +47,7 @@ export function AdminHeader({ profile }: { profile: Profile }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <NotificationBell userId={profile.id} variant="agent" />
+          <NotificationBell userId={profile.id} variant="partner" />
 
           <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-2 py-1">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#635BFF] text-[10px] font-semibold text-white">

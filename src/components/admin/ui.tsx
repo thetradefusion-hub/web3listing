@@ -1,19 +1,19 @@
 export {
   rel,
-  AgentPageShell as AdminPageShell,
-  AgentPageHeader as AdminPageHeader,
-  AgentPrimaryButton as AdminPrimaryButton,
-  AgentSecondaryButton as AdminSecondaryButton,
-  AgentPanel as AdminPanel,
-  AgentPanelHeader as AdminPanelHeader,
-  AgentPanelBody as AdminPanelBody,
-  AgentEmptyState as AdminEmptyState,
-  AgentStatCard as AdminStatCard,
-  AgentBadge as AdminBadge,
-  AgentFilterPill as AdminFilterPill,
-  AgentListRow as AdminListRow,
+  PartnerPageShell as AdminPageShell,
+  PartnerPageHeader as AdminPageHeader,
+  PartnerPrimaryButton as AdminPrimaryButton,
+  PartnerSecondaryButton as AdminSecondaryButton,
+  PartnerPanel as AdminPanel,
+  PartnerPanelHeader as AdminPanelHeader,
+  PartnerPanelBody as AdminPanelBody,
+  PartnerEmptyState as AdminEmptyState,
+  PartnerStatCard as AdminStatCard,
+  PartnerBadge as AdminBadge,
+  PartnerFilterPill as AdminFilterPill,
+  PartnerListRow as AdminListRow,
   kycStatusVariant,
   projectStatusVariant,
-} from "@/components/agent/ui";
+} from "@/components/partner/ui";
 
-export { OrderStatusBadge } from "@/components/agent/dashboard/ui";
+export { OrderStatusBadge } from "@/components/partner/dashboard/ui";

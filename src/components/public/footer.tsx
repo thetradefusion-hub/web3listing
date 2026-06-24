@@ -8,7 +8,7 @@ const legalLinks = [
   { href: "/legal/refund", label: "Refund" },
   { href: "/legal/aml-kyc", label: "AML/KYC" },
   { href: "/legal/sla", label: "SLA" },
-  { href: "/legal/agent-policy", label: "Agent Policy" },
+  { href: "/legal/partner-policy", label: "Partner Policy" },
   { href: "/legal/disclaimer", label: "Disclaimer" },
 ];
 
@@ -34,7 +34,7 @@ export function PublicFooter() {
               <li><Link href="/about" className="transition hover:text-cyan-400">About Us</Link></li>
               <li><Link href="/blog" className="transition hover:text-cyan-400">Blog</Link></li>
               <li><Link href="/contact" className="transition hover:text-cyan-400">Contact</Link></li>
-              <li><Link href="/login" className="transition hover:text-cyan-400">Agent Login</Link></li>
+              <li><Link href="/login" className="transition hover:text-cyan-400">Partner Login</Link></li>
             </ul>
           </div>
           <div>

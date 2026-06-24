@@ -25,7 +25,7 @@ export default async function AdminOrdersPage() {
     <AdminPageShell>
       <AdminPageHeader
         title="Order Management"
-        description="Review, quote, and manage all agent orders"
+        description="Review, quote, and manage all partner orders"
       />
 
       {orders && orders.length > 0 ? (
@@ -38,7 +38,7 @@ export default async function AdminOrdersPage() {
                     <th>Order ID</th>
                     <th>Project</th>
                     <th>Service</th>
-                    <th className="hidden lg:table-cell">Agent</th>
+                    <th className="hidden lg:table-cell">Partner</th>
                     <th>Status</th>
                     <th className="text-right">Action</th>
                   </tr>
@@ -46,7 +46,7 @@ export default async function AdminOrdersPage() {
                 <tbody>
                   {orders.map((order) => {
                     const service = rel(order.services);
-                    const agent = rel(order.profiles);
+                    const partner = rel(order.profiles);
                     const project = rel(order.projects);
                     return (
                       <tr key={order.id}>
@@ -60,7 +60,7 @@ export default async function AdminOrdersPage() {
                           </div>
                         </td>
                         <td className="text-[#64748B]">{service?.name || "—"}</td>
-                        <td className="hidden text-[#64748B] lg:table-cell">{agent?.full_name || "—"}</td>
+                        <td className="hidden text-[#64748B] lg:table-cell">{partner?.full_name || "—"}</td>
                         <td>
                           <OrderStatusBadge status={order.status} />
                         </td>
@@ -79,7 +79,7 @@ export default async function AdminOrdersPage() {
               <>
                 {orders.map((order) => {
                   const service = rel(order.services);
-                  const agent = rel(order.profiles);
+                  const partner = rel(order.profiles);
                   const project = rel(order.projects);
                   return (
                     <MobileDataCard key={order.id} href={`/admin/orders/${order.id}`}>
@@ -92,7 +92,7 @@ export default async function AdminOrdersPage() {
                       </div>
                       <div className="mt-4 border-t border-[#F1F5F9] pt-4">
                         <MobileDataRow label="Service">{service?.name || "—"}</MobileDataRow>
-                        <MobileDataRow label="Agent">{agent?.full_name || "—"}</MobileDataRow>
+                        <MobileDataRow label="Partner">{partner?.full_name || "—"}</MobileDataRow>
                       </div>
                     </MobileDataCard>
                   );
@@ -102,7 +102,7 @@ export default async function AdminOrdersPage() {
           />
         </AdminPanel>
       ) : (
-        <AdminEmptyState title="No orders yet" description="Orders from agents will appear here." />
+        <AdminEmptyState title="No orders yet" description="Orders from partners will appear here." />
       )}
     </AdminPageShell>
   );

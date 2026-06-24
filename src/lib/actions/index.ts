@@ -55,7 +55,7 @@ export async function createAgentAccount(data: {
   const emailContent = credentialsEmail(data.email, password);
   await sendEmail({ to: data.email, ...emailContent });
 
-  revalidatePath("/admin/agents");
+  revalidatePath("/admin/partners");
   return { success: true, userId: authUser.user.id, password, email: data.email };
 }
 
@@ -65,7 +65,7 @@ export async function resetAgentPassword(userId: string) {
 
   const password = Math.random().toString(36).slice(-8) + "A1!";
   const { data: profile } = await admin.from("profiles").select("email").eq("id", userId).single();
-  if (!profile) return { error: "Agent not found" };
+  if (!profile) return { error: "Partner not found" };
 
   const { error } = await admin.auth.admin.updateUserById(userId, { password });
   if (error) return { error: error.message };
@@ -73,7 +73,7 @@ export async function resetAgentPassword(userId: string) {
   const emailContent = credentialsEmail(profile.email, password);
   await sendEmail({ to: profile.email, ...emailContent });
 
-  revalidatePath("/admin/agents");
+  revalidatePath("/admin/partners");
   return { success: true, password, email: profile.email };
 }
 
@@ -84,7 +84,7 @@ export async function approveAgentKyc(userId: string) {
   await admin.from("profiles").update({ kyc_status: "approved" }).eq("id", userId);
   await admin.from("kyc_submissions").update({ status: "approved", reviewed_at: new Date().toISOString() }).eq("user_id", userId);
 
-  revalidatePath("/admin/agents");
+  revalidatePath("/admin/partners");
   revalidatePath("/admin/kyc");
   return { success: true };
 }
@@ -103,7 +103,7 @@ export async function updateProfile(data: Record<string, string>) {
   }).eq("id", profile.id);
 
   if (error) return { error: error.message };
-  revalidatePath("/agent/profile");
+  revalidatePath("/partner/profile");
   return { success: true };
 }
 
@@ -129,7 +129,7 @@ export async function submitKyc(data: Record<string, string>) {
   }, { onConflict: "user_id" });
 
   if (error) return { error: error.message };
-  revalidatePath("/agent/kyc");
+  revalidatePath("/partner/kyc");
   return { success: true };
 }
 
@@ -253,11 +253,11 @@ async function creditAgentCommission(orderId: string) {
     title: "Commission Credited",
     message: `$${commission.toFixed(2)} added to your wallet for order ${order.order_number}.`,
     type: "commission",
-    link: "/agent/wallet",
+    link: "/partner/wallet",
   });
 
-  revalidatePath("/agent/wallet");
-  revalidatePath("/agent");
+  revalidatePath("/partner/wallet");
+  revalidatePath("/partner");
 }
 
 export async function createProject(data: Record<string, string>) {
@@ -281,7 +281,7 @@ export async function createProject(data: Record<string, string>) {
     );
   }
 
-  revalidatePath("/agent/projects");
+  revalidatePath("/partner/projects");
   revalidatePath("/admin/projects");
   return { success: true, project };
 }
@@ -301,7 +301,7 @@ export async function updateProject(id: string, data: Record<string, string>) {
     );
   }
 
-  revalidatePath("/agent/projects");
+  revalidatePath("/partner/projects");
   revalidatePath("/admin/projects");
   return { success: true };
 }
@@ -330,12 +330,12 @@ export async function reviewProject(projectId: string, status: "approved" | "rej
         ? `Your project "${project.project_name}" has been approved. You can now place orders for this project.`
         : `Your project "${project.project_name}" was rejected.${notes ? ` Reason: ${notes}` : ""}`,
     type: "project",
-    link: `/agent/projects/${projectId}`,
+    link: `/partner/projects/${projectId}`,
   });
 
   revalidatePath("/admin/projects");
   revalidatePath(`/admin/projects/${projectId}`);
-  revalidatePath("/agent/projects");
+  revalidatePath("/partner/projects");
   revalidatePath("/admin");
   return { success: true };
 }
@@ -398,10 +398,10 @@ export async function createOrder(data: {
     title: "Order Created",
     message: `Order ${order.order_number} has been created.`,
     type: "order",
-    link: `/agent/orders/${order.id}`,
+    link: `/partner/orders/${order.id}`,
   });
 
-  revalidatePath("/agent/orders");
+  revalidatePath("/partner/orders");
   return { success: true, order };
 }
 
@@ -445,10 +445,10 @@ export async function createQuotation(data: {
     payment_instructions: "Please send USDT (TRC20). Contact your account manager for payment details.",
   });
 
-  const { data: agent } = await supabase.from("profiles").select("email").eq("id", order.agent_id).single();
-  if (agent?.email) {
+  const { data: partner } = await supabase.from("profiles").select("email").eq("id", order.agent_id).single();
+  if (partner?.email) {
     const email = quoteReadyEmail(order.order_number, calc.client_price);
-    await sendEmail({ to: agent.email, ...email });
+    await sendEmail({ to: partner.email, ...email });
   }
 
   await supabase.from("notifications").insert({
@@ -456,7 +456,7 @@ export async function createQuotation(data: {
     title: "Quotation Ready",
     message: `Quotation of $${calc.client_price} ready for order ${order.order_number}`,
     type: "quote",
-    link: `/agent/orders/${data.order_id}`,
+    link: `/partner/orders/${data.order_id}`,
   });
 
   revalidatePath("/admin/orders");
@@ -473,7 +473,7 @@ export async function acceptQuotation(quotationId: string) {
   await supabase.from("quotations").update({ status: "accepted" }).eq("id", quotationId);
   await supabase.from("orders").update({ status: "waiting_payment" }).eq("id", quote.order_id);
 
-  revalidatePath("/agent/orders");
+  revalidatePath("/partner/orders");
   return { success: true };
 }
 
@@ -493,15 +493,15 @@ export async function uploadPaymentProof(paymentId: string, proofUrl: string) {
 
   await notifyAdmins(
     "Payment Proof Uploaded",
-    "An agent submitted payment proof for verification.",
+    "An partner submitted payment proof for verification.",
     `/admin/payments`
   );
 
   revalidatePath("/admin");
   revalidatePath("/admin/payments");
-  revalidatePath("/agent/orders");
+  revalidatePath("/partner/orders");
   if (payment.order_id) {
-    revalidatePath(`/agent/orders/${payment.order_id}`);
+    revalidatePath(`/partner/orders/${payment.order_id}`);
     revalidatePath(`/admin/orders/${payment.order_id}`);
   }
   return { success: true };
@@ -522,10 +522,10 @@ export async function verifyPayment(paymentId: string, confirmed: boolean) {
 
     const order = Array.isArray(payment.orders) ? payment.orders[0] : payment.orders;
     if (order) {
-      const { data: agent } = await supabase.from("profiles").select("email").eq("id", order.agent_id).single();
-      if (agent?.email) {
+      const { data: partner } = await supabase.from("profiles").select("email").eq("id", order.agent_id).single();
+      if (partner?.email) {
         const email = orderUpdateEmail(order.order_number, "Payment Confirmed");
-        await sendEmail({ to: agent.email, ...email });
+        await sendEmail({ to: partner.email, ...email });
       }
 
       await supabase.from("notifications").insert({
@@ -533,7 +533,7 @@ export async function verifyPayment(paymentId: string, confirmed: boolean) {
         title: "Payment Confirmed",
         message: `Payment for order ${order.order_number} has been confirmed.`,
         type: "payment",
-        link: `/agent/orders/${payment.order_id}`,
+        link: `/partner/orders/${payment.order_id}`,
       });
     }
   }
@@ -544,10 +544,10 @@ export async function verifyPayment(paymentId: string, confirmed: boolean) {
   if (payment?.order_id) {
     revalidatePath(`/admin/orders/${payment.order_id}`);
   }
-  revalidatePath("/agent");
-  revalidatePath("/agent/orders");
+  revalidatePath("/partner");
+  revalidatePath("/partner/orders");
   if (payment?.order_id) {
-    revalidatePath(`/agent/orders/${payment.order_id}`);
+    revalidatePath(`/partner/orders/${payment.order_id}`);
   }
   return { success: true };
 }
@@ -592,7 +592,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
     title: "Order Updated",
     message: `Order ${order.order_number} is now ${status.replace(/_/g, " ")}`,
     type: "order",
-    link: `/agent/orders/${orderId}`,
+    link: `/partner/orders/${orderId}`,
   });
 
   if (isCommissionEligibleStatus(status)) {
@@ -602,11 +602,11 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
   revalidatePath("/admin");
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${orderId}`);
-  revalidatePath("/agent");
-  revalidatePath("/agent/orders");
-  revalidatePath(`/agent/orders/${orderId}`);
-  revalidatePath(`/agent/orders/${orderId}/delivery`);
-  revalidatePath("/agent/delivery");
+  revalidatePath("/partner");
+  revalidatePath("/partner/orders");
+  revalidatePath(`/partner/orders/${orderId}`);
+  revalidatePath(`/partner/orders/${orderId}/delivery`);
+  revalidatePath("/partner/delivery");
   return { success: true };
 }
 
@@ -636,8 +636,8 @@ export async function saveOrderDelivery(data: {
   if (error) return { error: error.message };
 
   revalidatePath(`/admin/orders/${data.order_id}`);
-  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
-  revalidatePath("/agent/delivery");
+  revalidatePath(`/partner/orders/${data.order_id}/delivery`);
+  revalidatePath("/partner/delivery");
   return { success: true };
 }
 
@@ -664,7 +664,7 @@ export async function addOrderProof(data: {
   if (error) return { error: error.message };
 
   revalidatePath(`/admin/orders/${data.order_id}`);
-  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
+  revalidatePath(`/partner/orders/${data.order_id}/delivery`);
   return { success: true };
 }
 
@@ -674,7 +674,7 @@ export async function deleteOrderProof(proofId: string, orderId: string) {
   const { error } = await supabase.from("order_proofs").delete().eq("id", proofId);
   if (error) return { error: error.message };
   revalidatePath(`/admin/orders/${orderId}`);
-  revalidatePath(`/agent/orders/${orderId}/delivery`);
+  revalidatePath(`/partner/orders/${orderId}/delivery`);
   return { success: true };
 }
 
@@ -714,7 +714,7 @@ export async function submitOrderReview(data: {
 
   if (error) return { error: error.message };
 
-  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
+  revalidatePath(`/partner/orders/${data.order_id}/delivery`);
   return { success: true };
 }
 
@@ -759,12 +759,12 @@ export async function uploadDeliverable(data: {
   revalidatePath("/admin");
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${data.order_id}`);
-  revalidatePath("/agent");
-  revalidatePath("/agent/orders");
-  revalidatePath(`/agent/orders/${data.order_id}`);
-  revalidatePath(`/agent/orders/${data.order_id}/delivery`);
-  revalidatePath("/agent/delivery");
-  revalidatePath("/agent/wallet");
+  revalidatePath("/partner");
+  revalidatePath("/partner/orders");
+  revalidatePath(`/partner/orders/${data.order_id}`);
+  revalidatePath(`/partner/orders/${data.order_id}/delivery`);
+  revalidatePath("/partner/delivery");
+  revalidatePath("/partner/wallet");
   return { success: true };
 }
 
@@ -827,8 +827,8 @@ export async function requestWithdrawal(data: {
     "/admin/withdrawals"
   );
 
-  revalidatePath("/agent/wallet");
-  revalidatePath("/agent");
+  revalidatePath("/partner/wallet");
+  revalidatePath("/partner");
   revalidatePath("/admin/withdrawals");
   return { success: true };
 }
@@ -872,10 +872,10 @@ export async function processWithdrawal(
     }).eq("user_id", withdrawal.user_id);
   }
 
-  const { data: agent } = await supabase.from("profiles").select("email").eq("id", withdrawal.user_id).single();
-  if (agent?.email) {
+  const { data: partner } = await supabase.from("profiles").select("email").eq("id", withdrawal.user_id).single();
+  if (partner?.email) {
     const email = withdrawalStatusEmail(withdrawal.amount, status);
-    await sendEmail({ to: agent.email, ...email });
+    await sendEmail({ to: partner.email, ...email });
   }
 
   revalidatePath("/admin/withdrawals");
@@ -899,7 +899,7 @@ export async function createTicket(subject: string, message: string) {
     message,
   });
 
-  revalidatePath("/agent/support");
+  revalidatePath("/partner/support");
   return { success: true, ticket };
 }
 
@@ -917,7 +917,7 @@ export async function replyTicket(ticketId: string, message: string) {
     await supabase.from("tickets").update({ status: "in_progress" }).eq("id", ticketId);
   }
 
-  revalidatePath("/agent/support");
+  revalidatePath("/partner/support");
   revalidatePath("/admin/tickets");
   return { success: true };
 }
@@ -1037,7 +1037,7 @@ export async function upsertService(
 
   revalidatePath("/admin/services");
   revalidatePath("/services");
-  revalidatePath("/agent/services");
+  revalidatePath("/partner/services");
   return { success: true };
 }
 
@@ -1048,7 +1048,7 @@ export async function toggleServiceActive(id: string, isActive: boolean) {
   if (error) return { error: error.message };
   revalidatePath("/admin/services");
   revalidatePath("/services");
-  revalidatePath("/agent/services");
+  revalidatePath("/partner/services");
   return { success: true };
 }
 

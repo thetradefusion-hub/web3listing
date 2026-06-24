@@ -155,10 +155,10 @@ export function DeliveryManager({
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>Notes from Our Team (visible to agent)</Label>
+          <Label>Notes from Our Team (visible to partner)</Label>
           <Textarea
             rows={4}
-            placeholder="Personalized completion message for the agent..."
+            placeholder="Personalized completion message for the partner..."
             value={teamNotes}
             onChange={(e) => setTeamNotes(e.target.value)}
             className="rounded-xl"

@@ -149,7 +149,7 @@ export function ProjectReviewer({ projectId }: { projectId: string }) {
             id="reject-notes"
             value={rejectNotes}
             onChange={(e) => setRejectNotes(e.target.value)}
-            placeholder="Explain what the agent should fix..."
+            placeholder="Explain what the partner should fix..."
             rows={2}
             className="rounded-xl bg-white"
           />

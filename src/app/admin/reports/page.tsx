@@ -14,7 +14,7 @@ import {
 export default async function AdminReportsPage() {
   const supabase = await createClient();
 
-  const [{ data: payments }, { data: orders }, { data: agents }, { data: commissions }] = await Promise.all([
+  const [{ data: payments }, { data: orders }, { data: partners }, { data: commissions }] = await Promise.all([
     supabase.from("payments").select("amount, status, created_at").eq("status", "confirmed"),
     supabase.from("orders").select("status, service_id, services(name)"),
     supabase.from("profiles").select("id, full_name").eq("role", "agent"),
@@ -39,13 +39,13 @@ export default async function AdminReportsPage() {
     <AdminPageShell>
       <AdminPageHeader
         title="Reports & Analytics"
-        description="Revenue, agent performance, and service statistics"
+        description="Revenue, partner performance, and service statistics"
       />
 
       <div className="grid gap-4 md:grid-cols-3">
         <AdminStatCard title="Total Revenue" value={formatCurrency(totalRevenue)} subtitle="Confirmed payments" icon={DollarSign} color="teal" />
-        <AdminStatCard title="Commissions Paid" value={formatCurrency(totalCommissions)} subtitle="Agent earnings" icon={TrendingUp} color="purple" />
-        <AdminStatCard title="Active Agents" value={agents?.length || 0} subtitle="Registered" icon={Users} color="blue" />
+        <AdminStatCard title="Commissions Paid" value={formatCurrency(totalCommissions)} subtitle="Partner earnings" icon={TrendingUp} color="purple" />
+        <AdminStatCard title="Active Partners" value={partners?.length || 0} subtitle="Registered" icon={Users} color="blue" />
       </div>
 
       <AdminPanel>

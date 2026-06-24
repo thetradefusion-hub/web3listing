@@ -26,7 +26,7 @@ export default async function AdminTicketsPage() {
     <AdminPageShell>
       <AdminPageHeader
         title="Support Tickets"
-        description="Manage agent support requests"
+        description="Manage partner support requests"
       />
 
       {tickets && tickets.length > 0 ? (
@@ -51,7 +51,7 @@ export default async function AdminTicketsPage() {
           })}
         </div>
       ) : (
-        <AdminEmptyState title="No tickets" description="Support tickets from agents will appear here." />
+        <AdminEmptyState title="No tickets" description="Support tickets from partners will appear here." />
       )}
     </AdminPageShell>
   );

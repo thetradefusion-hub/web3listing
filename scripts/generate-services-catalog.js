@@ -300,7 +300,7 @@ for (const g of catalog) {
     const slug = slugify(name);
     const t = resolvePricing(slug, name);
     const desc = esc(
-      `${name} for Web3 projects. Partner-fulfilled service with ${t.tat} delivery. Transparent pricing model and agent commission.`
+      `${name} for Web3 projects. Partner-fulfilled service with ${t.tat} delivery. Transparent pricing model and partner commission.`
     );
     const price = t.price === null ? "NULL" : t.price;
     const fee = t.fee === null ? "NULL" : t.fee;

@@ -25,7 +25,7 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
 
   if (!project) notFound();
 
-  const agent = rel(project.profiles);
+  const partner = rel(project.profiles);
 
   const detailFields: [string, string | null | undefined][] = [
     ["Token Name", project.token_name],
@@ -48,19 +48,19 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
     <AdminPageShell className="mx-auto max-w-4xl">
       <AdminPageHeader
         title={project.project_name}
-        description={`Submitted by ${agent?.full_name || agent?.email || "Unknown agent"}`}
+        description={`Submitted by ${partner?.full_name || partner?.email || "Unknown partner"}`}
         badge={<AdminBadge variant={projectStatusVariant(project.status)}>{project.status}</AdminBadge>}
       />
 
       <div className="space-y-4">
         <AdminPanel>
-          <AdminPanelHeader title="Agent Details" />
+          <AdminPanelHeader title="Partner Details" />
           <AdminPanelBody className="grid gap-3 md:grid-cols-2">
             {[
-              ["Name", agent?.full_name],
-              ["Email", agent?.email],
-              ["Company", agent?.company_name],
-              ["Telegram", agent?.telegram_username],
+              ["Name", partner?.full_name],
+              ["Email", partner?.email],
+              ["Company", partner?.company_name],
+              ["Telegram", partner?.telegram_username],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{label}</p>
@@ -105,7 +105,7 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
 
         {project.status === "submitted" && (
           <AdminPanel>
-            <AdminPanelHeader title="Review Actions" description="Approve to let the agent place orders for this project" />
+            <AdminPanelHeader title="Review Actions" description="Approve to let the partner place orders for this project" />
             <AdminPanelBody>
               <ProjectReviewer projectId={project.id} />
             </AdminPanelBody>

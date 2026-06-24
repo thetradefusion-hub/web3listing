@@ -23,7 +23,7 @@ export default async function AdminKycPage() {
     <AdminPageShell>
       <AdminPageHeader
         title="KYC Review"
-        description="Review and approve agent identity submissions"
+        description="Review and approve partner identity submissions"
       />
 
       {submissions && submissions.length > 0 ? (
@@ -33,7 +33,7 @@ export default async function AdminKycPage() {
             return (
               <AdminPanel key={kyc.id}>
                 <AdminPanelHeader
-                  title={profile?.full_name || profile?.email || "Unknown Agent"}
+                  title={profile?.full_name || profile?.email || "Unknown Partner"}
                   action={<AdminBadge variant={kycStatusVariant(kyc.status)}>{kyc.status}</AdminBadge>}
                 />
                 <AdminPanelBody className="space-y-4">
@@ -74,7 +74,7 @@ export default async function AdminKycPage() {
           })}
         </div>
       ) : (
-        <AdminEmptyState title="No KYC submissions" description="Agent KYC requests will appear here." />
+        <AdminEmptyState title="No KYC submissions" description="Partner KYC requests will appear here." />
       )}
     </AdminPageShell>
   );

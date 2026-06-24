@@ -38,7 +38,7 @@ export default async function AdminDashboard() {
   prevStart.setDate(prevStart.getDate() - 30);
 
   const [
-    { count: agentCount },
+    { count: partnerCount },
     { count: orderCount },
     { count: activeProjects },
     { count: pendingKyc },
@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
     { data: pendingQuotes },
     { data: recentPayments },
     { data: recentOrdersForActivity },
-    { data: agentsWithCreated },
+    { data: partnersWithCreated },
     { data: allOrdersWithDates },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "agent"),
@@ -107,8 +107,8 @@ export default async function AdminDashboard() {
   const ordersCurrent = sumInRange(allOrdersWithDates || [], periodStart, now);
   const ordersPrev = sumInRange(allOrdersWithDates || [], prevStart, periodStart);
 
-  const agentsCurrent = sumInRange(agentsWithCreated || [], periodStart, now);
-  const agentsPrev = sumInRange(agentsWithCreated || [], prevStart, periodStart);
+  const partnersCurrent = sumInRange(partnersWithCreated || [], periodStart, now);
+  const partnersPrev = sumInRange(partnersWithCreated || [], prevStart, periodStart);
 
   const revenueSeries = buildRevenueSeries(payments || [], 14);
   const activities = buildRecentActivities({
@@ -128,8 +128,8 @@ export default async function AdminDashboard() {
         revenueTrend: calcTrend(revenueCurrent, revenuePrev),
         totalOrders: orderCount || 0,
         ordersTrend: calcTrend(ordersCurrent, ordersPrev),
-        totalAgents: agentCount || 0,
-        agentsTrend: calcTrend(agentsCurrent, agentsPrev),
+        totalPartners: partnerCount || 0,
+        partnersTrend: calcTrend(partnersCurrent, partnersPrev),
         activeProjects: activeProjects || 0,
         projectsTrend: undefined,
         totalCommission,
@@ -146,7 +146,7 @@ export default async function AdminDashboard() {
         },
         openTickets: openTickets?.length || 0,
         pendingKyc: pendingKyc || 0,
-        totalAgents: agentCount || 0,
+        totalPartners: partnerCount || 0,
         pendingQuotes: {
           count: pendingQuotes?.length || 0,
           value: quoteValue,

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/constants";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const legal = ["terms", "privacy", "refund", "aml-kyc", "sla", "agent-policy", "disclaimer"];
+  const legal = ["terms", "privacy", "refund", "aml-kyc", "sla", "partner-policy", "disclaimer"];
   const staticPages = ["", "/services", "/about", "/contact", "/blog", "/login"];
 
   return [

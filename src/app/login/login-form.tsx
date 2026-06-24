@@ -30,7 +30,7 @@ export default function LoginForm() {
       return;
     }
 
-    const redirect = searchParams.get("redirect") || "/agent";
+    const redirect = searchParams.get("redirect") || "/partner";
     router.push(redirect);
     router.refresh();
   }

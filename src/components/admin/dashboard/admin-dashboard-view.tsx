@@ -62,8 +62,8 @@ export function AdminDashboardView({
     revenueTrend?: string;
     totalOrders: number;
     ordersTrend?: string;
-    totalAgents: number;
-    agentsTrend?: string;
+    totalPartners: number;
+    partnersTrend?: string;
     activeProjects: number;
     projectsTrend?: string;
     totalCommission: number;
@@ -83,7 +83,7 @@ export function AdminDashboardView({
     pendingWithdrawals: { count: number; amount: number };
     openTickets: number;
     pendingKyc: number;
-    totalAgents: number;
+    totalPartners: number;
     pendingQuotes: { count: number; value: number };
   };
 }) {
@@ -121,11 +121,11 @@ export function AdminDashboardView({
           trend={stats.ordersTrend}
         />
         <AdminDashboardStatCard
-          title="Total Agents"
-          value={stats.totalAgents}
+          title="Total Partners"
+          value={stats.totalPartners}
           icon={Users}
           color="orange"
-          trend={stats.agentsTrend}
+          trend={stats.partnersTrend}
         />
         <AdminDashboardStatCard
           title="Active Projects"
@@ -334,7 +334,7 @@ export function AdminDashboardView({
         <ActionCard
           title="KYC Verification"
           metric={String(actions.pendingKyc)}
-          subtext={`of ${actions.totalAgents} agents`}
+          subtext={`of ${actions.totalPartners} partners`}
           href="/admin/kyc"
           cta="Verify Now"
           tone="border-[#FECACA] bg-[#FEF2F2]/50"

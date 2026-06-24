@@ -28,7 +28,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   if (!order) notFound();
 
   const service = rel(order.services);
-  const agent = rel(order.profiles);
+  const partner = rel(order.profiles);
 
   const [{ data: payment }, { data: quotation }, { data: deliverables }, { data: proofs }] = await Promise.all([
     supabase.from("payments").select("*").eq("order_id", id).order("created_at", { ascending: false }).limit(1).single(),
@@ -41,7 +41,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
     <AdminPageShell className="mx-auto max-w-5xl">
       <AdminPageHeader
         title={`#${order.order_number}`}
-        description={`${service?.name || "Service"} · Agent: ${agent?.full_name || "—"}`}
+        description={`${service?.name || "Service"} · Partner: ${partner?.full_name || "—"}`}
         badge={<OrderStatusBadge status={order.status} />}
       />
 
@@ -63,7 +63,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
       {service?.pricing_model !== "fixed" && !quotation && (
         <AdminPanel>
-          <AdminPanelHeader title="Quotation Builder" description="Generate and send quote to agent" />
+          <AdminPanelHeader title="Quotation Builder" description="Generate and send quote to partner" />
           <AdminPanelBody>
             <QuotationBuilder
               orderId={id}
@@ -109,7 +109,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       )}
 
       <AdminPanel>
-        <AdminPanelHeader title="Delivery Management" description="Proofs, files, team notes, and completion details for the agent delivery page" />
+        <AdminPanelHeader title="Delivery Management" description="Proofs, files, team notes, and completion details for the partner delivery page" />
         <AdminPanelBody>
           <DeliveryManager order={order} proofs={proofs || []} deliverables={deliverables || []} />
         </AdminPanelBody>

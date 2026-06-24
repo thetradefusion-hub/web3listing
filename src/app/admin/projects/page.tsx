@@ -47,7 +47,7 @@ export default async function AdminProjectsPage({
     <AdminPageShell>
       <AdminPageHeader
         title="Project Review"
-        description="Review agent-submitted token projects before they can place orders"
+        description="Review partner-submitted token projects before they can place orders"
       />
 
       <div className="flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ export default async function AdminProjectsPage({
                     <th>Project</th>
                     <th className="hidden md:table-cell">Token</th>
                     <th className="hidden lg:table-cell">Network</th>
-                    <th className="hidden lg:table-cell">Agent</th>
+                    <th className="hidden lg:table-cell">Partner</th>
                     <th>Status</th>
                     <th className="hidden sm:table-cell">Submitted</th>
                     <th className="text-right">Action</th>
@@ -80,7 +80,7 @@ export default async function AdminProjectsPage({
                 </thead>
                 <tbody>
                   {projects.map((project) => {
-                    const agent = rel(project.profiles);
+                    const partner = rel(project.profiles);
                     return (
                       <tr key={project.id}>
                         <td className="font-medium text-[#0F172A]">{project.project_name}</td>
@@ -89,7 +89,7 @@ export default async function AdminProjectsPage({
                         </td>
                         <td className="hidden text-[#64748B] lg:table-cell">{project.blockchain_network}</td>
                         <td className="hidden text-[#64748B] lg:table-cell">
-                          {agent?.full_name || agent?.email || "—"}
+                          {partner?.full_name || partner?.email || "—"}
                         </td>
                         <td>
                           <AdminBadge variant={projectStatusVariant(project.status)}>{project.status}</AdminBadge>
@@ -114,7 +114,7 @@ export default async function AdminProjectsPage({
             mobile={
               <>
                 {projects.map((project) => {
-                  const agent = rel(project.profiles);
+                  const partner = rel(project.profiles);
                   return (
                     <MobileDataCard key={project.id} href={`/admin/projects/${project.id}`}>
                       <div className="flex items-start justify-between gap-3">
@@ -127,7 +127,7 @@ export default async function AdminProjectsPage({
                         <AdminBadge variant={projectStatusVariant(project.status)}>{project.status}</AdminBadge>
                       </div>
                       <div className="mt-4 border-t border-[#F1F5F9] pt-4">
-                        <MobileDataRow label="Agent">{agent?.full_name || agent?.email || "—"}</MobileDataRow>
+                        <MobileDataRow label="Partner">{partner?.full_name || partner?.email || "—"}</MobileDataRow>
                         <MobileDataRow label="Submitted">
                           {new Date(project.created_at).toLocaleDateString()}
                         </MobileDataRow>
@@ -145,7 +145,7 @@ export default async function AdminProjectsPage({
           description={
             statusFilter === "submitted"
               ? "No projects are waiting for review right now."
-              : "Agent project submissions will appear here."
+              : "Partner project submissions will appear here."
           }
         />
       )}

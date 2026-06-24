@@ -12,7 +12,7 @@ export function NotificationBell({
   variant = "default",
 }: {
   userId: string;
-  variant?: "default" | "agent";
+  variant?: "default" | "partner";
 }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -30,7 +30,7 @@ export function NotificationBell({
   }, [userId]);
 
   const unreadCount = notifications.length;
-  const isAgent = variant === "agent";
+  const isPartner = variant === "partner";
 
   return (
     <div className="relative">
@@ -40,7 +40,7 @@ export function NotificationBell({
         size="icon"
         onClick={() => setOpen((v) => !v)}
         className={
-          isAgent
+          isPartner
             ? "relative h-9 w-9 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50"
             : "relative"
         }
@@ -49,7 +49,7 @@ export function NotificationBell({
         {unreadCount > 0 && (
           <span
             className={
-              isAgent
+              isPartner
                 ? "absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
                 : "absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-500 text-[10px] font-bold text-black"
             }

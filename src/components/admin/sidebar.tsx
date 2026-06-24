@@ -34,7 +34,7 @@ const navSections: { label: string; items: NavItem[] }[] = [
   {
     label: "People & Orders",
     items: [
-      { href: "/admin/agents", label: "Agents", icon: Users },
+      { href: "/admin/partners", label: "Partners", icon: Users },
       { href: "/admin/kyc", label: "KYC Review", icon: UserCheck },
       { href: "/admin/projects", label: "Projects", icon: FolderKanban },
       { href: "/admin/orders", label: "Orders", icon: Package },

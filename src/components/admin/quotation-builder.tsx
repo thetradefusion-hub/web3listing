@@ -50,7 +50,7 @@ export function QuotationBuilder({
       </div>
       <div className="grid gap-2 rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-sm">
         <div className="flex justify-between"><span className="text-slate-500">Client Price</span><span className="font-semibold text-slate-900">${calc.client_price.toFixed(2)}</span></div>
-        <div className="flex justify-between"><span className="text-slate-500">Agent Commission</span><span className="font-semibold text-emerald-600">${calc.commission_amount.toFixed(2)}</span></div>
+        <div className="flex justify-between"><span className="text-slate-500">Partner Commission</span><span className="font-semibold text-emerald-600">${calc.commission_amount.toFixed(2)}</span></div>
         <div className="flex justify-between"><span className="text-slate-500">Company Profit</span><span className="font-semibold text-violet-600">${calc.company_profit.toFixed(2)}</span></div>
       </div>
       <Button

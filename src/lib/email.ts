@@ -29,9 +29,9 @@ export async function sendEmail({
 
 export function credentialsEmail(email: string, password: string) {
   return {
-    subject: "Your TokenWeb3Listing Agent Account",
+    subject: "Your TokenWeb3Listing Partner Account",
     html: `
-      <h2>Welcome to TokenWeb3Listing Agent Portal</h2>
+      <h2>Welcome to TokenWeb3Listing Partner Portal</h2>
       <p>Your account has been created. Use these credentials to login:</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Password:</strong> ${password}</p>
@@ -48,7 +48,7 @@ export function kycStatusEmail(status: string, notes?: string) {
       <h2>KYC Status Update</h2>
       <p>Your KYC verification has been <strong>${status}</strong>.</p>
       ${notes ? `<p>Notes: ${notes}</p>` : ""}
-      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/agent/kyc">View KYC Status</a></p>
+      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/partner/kyc">View KYC Status</a></p>
     `,
   };
 }
@@ -59,7 +59,7 @@ export function orderUpdateEmail(orderNumber: string, status: string) {
     html: `
       <h2>Order Update</h2>
       <p>Order <strong>${orderNumber}</strong> status changed to <strong>${status}</strong>.</p>
-      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/agent/orders">View Orders</a></p>
+      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/partner/orders">View Orders</a></p>
     `,
   };
 }
@@ -70,7 +70,7 @@ export function quoteReadyEmail(orderNumber: string, amount: number) {
     html: `
       <h2>Quotation Ready</h2>
       <p>A quotation of <strong>$${amount}</strong> is ready for order <strong>${orderNumber}</strong>.</p>
-      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/agent/orders">Review & Pay</a></p>
+      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/partner/orders">Review & Pay</a></p>
     `,
   };
 }
@@ -81,7 +81,7 @@ export function withdrawalStatusEmail(amount: number, status: string) {
     html: `
       <h2>Withdrawal Update</h2>
       <p>Your withdrawal request of <strong>$${amount}</strong> has been <strong>${status}</strong>.</p>
-      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/agent/wallet">View Wallet</a></p>
+      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/partner/wallet">View Wallet</a></p>
     `,
   };
 }
