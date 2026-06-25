@@ -32,13 +32,13 @@ function AdminPortalInner({
   children: ReactNode;
 }) {
   return (
-    <div className="admin-portal relative flex h-screen overflow-hidden font-sans text-[#0F172A]">
+    <div className="admin-portal relative flex h-screen overflow-hidden font-sans text-foreground">
       <AdminSidebar className="hidden h-screen shrink-0 md:flex" />
       <AdminMobileDrawer />
       <MobileNavRouteCloser />
       <div className="portal-main relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <AdminHeader profile={profile} />
-        <main className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-5 lg:px-6 lg:py-5">
+        <main className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-3.5 md:px-4 md:py-4">
           {children}
         </main>
       </div>

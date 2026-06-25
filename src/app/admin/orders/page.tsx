@@ -18,7 +18,7 @@ export default async function AdminOrdersPage() {
   const supabase = await createClient();
   const { data: orders } = await supabase
     .from("orders")
-    .select("*, services(name, estimated_tat), profiles!orders_agent_id_fkey(full_name), projects(project_name, token_symbol)")
+    .select("*, services(name, estimated_tat), profiles!orders_agent_id_fkey(full_name, role), projects(project_name, token_symbol)")
     .order("created_at", { ascending: false });
 
   return (
@@ -39,6 +39,7 @@ export default async function AdminOrdersPage() {
                     <th>Project</th>
                     <th>Service</th>
                     <th className="hidden lg:table-cell">Partner</th>
+                    <th className="hidden xl:table-cell">Owner type</th>
                     <th>Status</th>
                     <th className="text-right">Action</th>
                   </tr>
@@ -61,6 +62,17 @@ export default async function AdminOrdersPage() {
                         </td>
                         <td className="text-[#64748B]">{service?.name || "—"}</td>
                         <td className="hidden text-[#64748B] lg:table-cell">{partner?.full_name || "—"}</td>
+                        <td className="hidden xl:table-cell">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                              partner?.role === "user"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-indigo-100 text-indigo-700"
+                            }`}
+                          >
+                            {partner?.role === "user" ? "User" : "Partner"}
+                          </span>
+                        </td>
                         <td>
                           <OrderStatusBadge status={order.status} />
                         </td>

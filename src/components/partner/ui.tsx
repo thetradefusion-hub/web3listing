@@ -2,6 +2,11 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  badgeVariantStyles,
+  iconTintStyles,
+  type AccentColor,
+} from "@/lib/theme-tokens";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -15,17 +20,20 @@ export function PartnerPageShell({
   className,
   narrow,
   compact,
+  fullWidth,
 }: {
   children: ReactNode;
   className?: string;
   narrow?: boolean;
   compact?: boolean;
+  fullWidth?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[1400px]",
-        compact ? "space-y-4" : "space-y-6",
+        "flex w-full flex-col",
+        !fullWidth && !narrow && "max-w-[1400px]",
+        compact ? "gap-3" : "gap-5",
         narrow && "max-w-3xl",
         className
       )}
@@ -50,13 +58,13 @@ export function PartnerPageHeader({
     <div className="flex flex-wrap items-start justify-between gap-6">
       <div>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-[32px] font-bold leading-tight tracking-tight text-[#0F172A]">
+          <h1 className="text-[32px] font-bold leading-tight tracking-tight text-foreground">
             {title}
           </h1>
           {badge}
         </div>
         {description && (
-          <p className="mt-2 text-sm leading-relaxed text-[#64748B]">{description}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -80,7 +88,7 @@ export function PartnerPrimaryButton({
   disabled?: boolean;
 }) {
   const classes = cn(
-    "inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#635BFF] px-5 text-sm font-medium text-white shadow-sm transition hover:brightness-105 disabled:opacity-50",
+    "inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition hover:brightness-105 disabled:opacity-50",
     className
   );
 
@@ -112,7 +120,7 @@ export function PartnerSecondaryButton({
     <Link
       href={href}
       className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-5 text-sm font-medium text-[#0F172A] transition hover:bg-[#F1F5F9]",
+        "inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-muted px-5 text-sm font-medium text-foreground transition hover:bg-accent",
         className
       )}
     >
@@ -157,14 +165,14 @@ export function PartnerPanelHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 border-b border-[#F1F5F9] px-5 py-4 sm:flex-row sm:items-start sm:justify-between",
+        "flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-start sm:justify-between",
         className
       )}
     >
       <div className="min-w-0">
-        <h2 className="text-lg font-semibold text-[#0F172A]">{title}</h2>
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
         {description && (
-          <p className="mt-1 text-sm text-[#64748B]">{description}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -194,9 +202,9 @@ export function PartnerEmptyState({
   return (
     <PartnerPanel>
       <div className="flex flex-col items-center justify-center px-8 py-16 text-center">
-        <p className="text-base font-medium text-[#0F172A]">{title}</p>
+        <p className="text-base font-medium text-foreground">{title}</p>
         {description && (
-          <p className="mt-2 max-w-sm text-sm text-[#64748B]">{description}</p>
+          <p className="mt-2 max-w-sm text-sm text-muted-foreground">{description}</p>
         )}
         {action && <div className="mt-6">{action}</div>}
       </div>
@@ -204,14 +212,7 @@ export function PartnerEmptyState({
   );
 }
 
-const statIconStyles = {
-  blue: "bg-[#EEF2FF] text-[#635BFF]",
-  green: "bg-[#ECFDF5] text-[#10B981]",
-  orange: "bg-[#FFFBEB] text-[#F59E0B]",
-  purple: "bg-[#F5F3FF] text-[#8B5CF6]",
-  teal: "bg-[#F0FDFA] text-[#14B8A6]",
-  pink: "bg-[#FDF2F8] text-[#EC4899]",
-} as const;
+const statIconStyles = iconTintStyles;
 
 export function PartnerStatCard({
   title,
@@ -225,23 +226,23 @@ export function PartnerStatCard({
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
-  color?: keyof typeof statIconStyles;
+  color?: AccentColor | "teal" | "pink";
   trend?: string;
 }) {
   return (
-    <Card className="premium-card premium-card-interactive gap-0 border-[#E2E8F0] py-0 shadow-none ring-0">
+    <Card className="premium-card premium-card-interactive gap-0 border-border py-0 shadow-none ring-0">
       <CardContent className="p-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-medium text-[#64748B]">{title}</p>
-            <p className="mt-3 text-[36px] font-bold leading-none tracking-tight text-[#0F172A]">
+            <p className="text-[13px] font-medium text-muted-foreground">{title}</p>
+            <p className="mt-3 text-[36px] font-bold leading-none tracking-tight text-foreground">
               {value}
             </p>
             {subtitle && (
-              <p className="mt-2 text-xs font-medium text-[#94A3B8]">{subtitle}</p>
+              <p className="mt-2 text-xs font-medium text-muted-foreground">{subtitle}</p>
             )}
             {trend && (
-              <p className="mt-3 inline-flex rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-xs font-medium text-[#10B981]">
+              <p className="mt-3 inline-flex rounded-full bg-chart-2/10 px-2.5 py-0.5 text-xs font-medium text-chart-2">
                 {trend}
               </p>
             )}
@@ -249,7 +250,7 @@ export function PartnerStatCard({
           <div
             className={cn(
               "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl",
-              statIconStyles[color]
+              statIconStyles[color as keyof typeof statIconStyles] ?? statIconStyles.blue
             )}
           >
             <Icon className="h-5 w-5" strokeWidth={2} />
@@ -265,23 +266,14 @@ export function PartnerBadge({
   variant = "default",
 }: {
   children: ReactNode;
-  variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
+  variant?: keyof typeof badgeVariantStyles;
 }) {
-  const styles = {
-    default: "border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]",
-    success: "border-[#A7F3D0] bg-[#ECFDF5] text-[#059669]",
-    warning: "border-[#FDE68A] bg-[#FFFBEB] text-[#D97706]",
-    danger: "border-[#FECACA] bg-[#FEF2F2] text-[#DC2626]",
-    info: "border-[#C7D2FE] bg-[#EEF2FF] text-[#635BFF]",
-    muted: "border-[#E2E8F0] bg-[#F8FAFC] text-[#94A3B8]",
-  };
-
   return (
     <Badge
       variant="outline"
       className={cn(
         "h-6 rounded-md px-2.5 text-xs font-medium capitalize",
-        styles[variant]
+        badgeVariantStyles[variant]
       )}
     >
       {children}
@@ -317,8 +309,8 @@ export function PartnerFilterPill({
       className={cn(
         "inline-flex h-9 items-center rounded-full border px-4 text-sm font-medium transition",
         active
-          ? "border-[rgba(99,91,255,0.2)] bg-[rgba(99,91,255,0.1)] text-[#635BFF]"
-          : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:text-[#0F172A]"
+          ? "border-primary/30 bg-primary/10 text-primary"
+          : "border-border bg-card text-muted-foreground hover:border-border hover:text-foreground"
       )}
     >
       {children}
@@ -334,7 +326,7 @@ export function PartnerListRow({
   children: ReactNode;
 }) {
   const className =
-    "flex items-center justify-between gap-4 rounded-2xl border border-[#F1F5F9] bg-white px-5 py-4 transition hover:border-[#E2E8F0] hover:bg-[#F8FAFC]";
+    "flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-5 py-4 transition hover:border-border hover:bg-muted/50";
 
   if (href) {
     return (

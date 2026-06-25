@@ -34,7 +34,7 @@ export default async function AdminProjectsPage({
 
   let query = supabase
     .from("projects")
-    .select("*, profiles!projects_agent_id_fkey(full_name, email, company_name)")
+    .select("*, profiles!projects_agent_id_fkey(full_name, email, company_name, role)")
     .order("created_at", { ascending: false });
 
   if (statusFilter) {
@@ -89,7 +89,18 @@ export default async function AdminProjectsPage({
                         </td>
                         <td className="hidden text-[#64748B] lg:table-cell">{project.blockchain_network}</td>
                         <td className="hidden text-[#64748B] lg:table-cell">
-                          {partner?.full_name || partner?.email || "—"}
+                          <div className="flex flex-col gap-1">
+                            <span>{partner?.full_name || partner?.email || "—"}</span>
+                            <span
+                              className={`inline-flex w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                partner?.role === "user"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-indigo-100 text-indigo-700"
+                              }`}
+                            >
+                              {partner?.role === "user" ? "User" : "Partner"}
+                            </span>
+                          </div>
                         </td>
                         <td>
                           <AdminBadge variant={projectStatusVariant(project.status)}>{project.status}</AdminBadge>
@@ -127,7 +138,10 @@ export default async function AdminProjectsPage({
                         <AdminBadge variant={projectStatusVariant(project.status)}>{project.status}</AdminBadge>
                       </div>
                       <div className="mt-4 border-t border-[#F1F5F9] pt-4">
-                        <MobileDataRow label="Partner">{partner?.full_name || partner?.email || "—"}</MobileDataRow>
+                        <MobileDataRow label="Owner">
+                          {partner?.full_name || partner?.email || "—"} ·{" "}
+                          {partner?.role === "user" ? "User" : "Partner"}
+                        </MobileDataRow>
                         <MobileDataRow label="Submitted">
                           {new Date(project.created_at).toLocaleDateString()}
                         </MobileDataRow>

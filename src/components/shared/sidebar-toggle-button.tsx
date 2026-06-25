@@ -15,7 +15,7 @@ export function SidebarToggleButton({ className }: { className?: string }) {
       size="icon"
       onClick={toggleCollapsed}
       className={cn(
-        "hidden h-10 w-10 shrink-0 rounded-xl border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] md:inline-flex",
+        "hidden h-9 w-9 shrink-0 rounded-xl border border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground md:inline-flex",
         className
       )}
       aria-label="Toggle sidebar"

@@ -3,28 +3,44 @@ import {
   ArrowLeft,
   BarChart3,
   Check,
-  ChevronRight,
   Circle,
   ExternalLink,
+  Layers,
+  Map,
+  MessageCircle,
+  Send,
   Shield,
+  Sparkles,
   TrendingUp,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { ProjectForm } from "@/components/partner/project-form";
 import { CopyTextButton } from "@/components/partner/projects/copy-text-button";
 import { ProjectRecommendationsGrid } from "@/components/partner/projects/project-recommendations-grid";
+import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
 import { PartnerBadge, projectStatusVariant } from "@/components/partner/ui";
 import {
   WHY_RECOMMENDATIONS,
   buildRoadmap,
   computeGrowthPhases,
 } from "@/lib/project-recommendations";
-import { getServiceCardMeta } from "@/lib/service-catalog";
+import { getServiceAccent, getServiceCardMeta, getServiceLogoColor } from "@/lib/service-catalog";
 import type { Order, Project, Service } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 const WHY_ICONS = [TrendingUp, Shield, Users, BarChart3];
+
+function statusLabel(status: Project["status"]) {
+  const labels: Record<Project["status"], string> = {
+    draft: "Draft",
+    submitted: "In Review",
+    approved: "Approved",
+    rejected: "Rejected",
+  };
+  return labels[status] || status;
+}
 
 function GrowthRing({ score }: { score: number }) {
   const radius = 36;
@@ -32,15 +48,15 @@ function GrowthRing({ score }: { score: number }) {
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="relative flex h-24 w-24 shrink-0 items-center justify-center sm:h-28 sm:w-28">
+    <div className="relative flex size-28 shrink-0 items-center justify-center">
       <svg className="-rotate-90" width="112" height="112" viewBox="0 0 112 112" aria-hidden>
-        <circle cx="56" cy="56" r={radius} fill="none" stroke="#E2E8F0" strokeWidth="8" />
+        <circle cx="56" cy="56" r={radius} fill="none" stroke="var(--border)" strokeWidth="8" />
         <circle
           cx="56"
           cy="56"
           r={radius}
           fill="none"
-          stroke="#635BFF"
+          stroke="var(--primary)"
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -48,9 +64,18 @@ function GrowthRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute text-center">
-        <p className="text-xl font-bold text-[#0F172A] sm:text-2xl">{score}%</p>
-        <p className="text-[10px] font-medium text-[#94A3B8]">Overall Score</p>
+        <p className="text-2xl font-bold tabular-nums text-foreground">{score}%</p>
+        <p className="text-[10px] font-medium text-muted-foreground">Growth Score</p>
       </div>
+    </div>
+  );
+}
+
+function MetaTile({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="min-w-0 rounded-xl border border-border bg-muted/30 px-3.5 py-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <div className="mt-1 text-sm font-semibold text-foreground">{children}</div>
     </div>
   );
 }
@@ -60,6 +85,7 @@ export function ProjectDetailView({
   orders,
   services,
   managerTelegramLink,
+  basePath = "/partner",
 }: {
   project: Project;
   orders: (Order & {
@@ -69,24 +95,32 @@ export function ProjectDetailView({
     service_categories?: { slug: string; name: string } | { slug: string; name: string }[] | null;
   })[];
   managerTelegramLink?: string | null;
+  basePath?: string;
 }) {
   if (project.status === "draft") {
     return (
-      <div className="mx-auto max-w-3xl space-y-5">
+      <div className="mx-auto w-full max-w-3xl space-y-4">
+        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Link href={`${basePath}/projects`} className="transition hover:text-primary">
+            My Projects
+          </Link>
+          <span aria-hidden>›</span>
+          <span className="font-medium text-foreground">Edit Project</span>
+        </nav>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg" asChild>
-            <Link href="/partner/projects">
-              <ArrowLeft className="h-4 w-4" />
+          <Button variant="outline" size="icon" className="size-9 rounded-xl" asChild>
+            <Link href={`${basePath}/projects`}>
+              <ArrowLeft className="size-4" />
             </Link>
           </Button>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Edit Project</h1>
-            <p className="text-sm text-[#64748B]">Complete your project before ordering services</p>
+            <h1 className="text-xl font-bold text-foreground">Complete your project</h1>
+            <p className="text-sm text-muted-foreground">Fill in details before ordering services</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-6">
-          <ProjectForm project={project} />
-        </div>
+        <DashboardPanel title="Project details" icon={Layers} iconColor="blue">
+          <ProjectForm project={project} basePath={basePath} />
+        </DashboardPanel>
       </div>
     );
   }
@@ -94,236 +128,231 @@ export function ProjectDetailView({
   const { phases, score } = computeGrowthPhases(project, orders);
   const orderedServiceIds = new Set(orders.map((o) => o.service_id));
   const roadmap = buildRoadmap(services, orderedServiceIds);
+  const accent = getServiceAccent(project.project_name);
+  const logoColor = getServiceLogoColor(project.project_name);
+  const initials = (project.token_symbol || project.project_name).slice(0, 2).toUpperCase();
 
   const description =
     project.team_info ||
     `${project.token_name} on ${project.blockchain_network}. Build visibility, trust, and growth with curated Web3 listing services.`;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-5">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-lg" asChild>
-            <Link href="/partner/projects" aria-label="Back to projects">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold text-[#0F172A] sm:text-2xl">Recommended Next Steps</h1>
-            <nav className="mt-1 flex flex-wrap items-center gap-1 text-xs text-[#94A3B8] sm:text-sm">
-              <Link href="/partner" className="hover:text-[#635BFF]">Dashboard</Link>
-              <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-              <Link href="/partner/projects" className="hover:text-[#635BFF]">My Projects</Link>
-              <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate text-[#64748B]">{project.project_name}</span>
-            </nav>
-          </div>
-        </div>
+    <div className="flex w-full flex-col gap-4 sm:gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <nav className="flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <Link href={basePath} className="transition hover:text-primary">
+            Dashboard
+          </Link>
+          <span aria-hidden>›</span>
+          <Link href={`${basePath}/projects`} className="transition hover:text-primary">
+            My Projects
+          </Link>
+          <span aria-hidden>›</span>
+          <span className="truncate font-medium text-foreground">{project.project_name}</span>
+        </nav>
+        <Button variant="outline" size="sm" className="h-9 rounded-xl font-semibold" asChild>
+          <Link href="/partner/projects">
+            <ArrowLeft data-icon="inline-start" />
+            Back
+          </Link>
+        </Button>
       </div>
 
       {/* Project hero */}
-      <section className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-          <div className="flex min-w-0 gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-sm font-bold text-white shadow-md sm:h-16 sm:w-16">
-              {project.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={project.logo_url} alt="" className="h-full w-full object-cover" />
-              ) : (
-                project.token_symbol?.slice(0, 2).toUpperCase() || "TK"
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-bold text-[#0F172A] sm:text-xl">
-                  {project.project_name}{" "}
-                  <span className="font-semibold text-[#64748B]">({project.token_symbol})</span>
-                </h2>
-                <PartnerBadge variant={projectStatusVariant(project.status)}>{project.status}</PartnerBadge>
+      <Card size="sm" className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 py-0">
+        <div className={cn("absolute inset-y-0 left-0 w-1 bg-gradient-to-b", accent)} aria-hidden />
+        <CardContent className="p-4 pl-5 sm:p-5 sm:pl-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex min-w-0 gap-4">
+              <div
+                className={cn(
+                  "flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl shadow-md ring-2 ring-border/50 sm:size-16",
+                  logoColor
+                )}
+              >
+                {project.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={project.logo_url} alt="" className="size-full object-cover" />
+                ) : (
+                  <span className="text-sm font-bold">{initials}</span>
+                )}
               </div>
-              <p className="mt-1 text-sm text-[#64748B]">{project.blockchain_network}</p>
-              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#64748B] sm:line-clamp-3">
-                {description}
-              </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg font-bold text-foreground sm:text-xl">
+                    {project.project_name}{" "}
+                    <span className="font-semibold text-muted-foreground">({project.token_symbol})</span>
+                  </h1>
+                  <PartnerBadge variant={projectStatusVariant(project.status)}>
+                    {statusLabel(project.status)}
+                  </PartnerBadge>
+                </div>
+                <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Layers className="size-3.5 shrink-0" />
+                  {project.blockchain_network}
+                </p>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">
+                  {description}
+                </p>
+              </div>
             </div>
+            <Button className="h-9 shrink-0 rounded-xl font-semibold" asChild>
+              <Link href={`${basePath}/services?project=${project.id}`}>
+                <ExternalLink data-icon="inline-start" />
+                Browse Services
+              </Link>
+            </Button>
           </div>
 
-          <Button variant="outline" className="h-9 shrink-0 rounded-lg text-xs sm:text-sm" asChild>
-            <Link href={`/partner/services?project=${project.id}`}>
-              <ExternalLink className="mr-2 h-3.5 w-3.5" />
-              Browse All Services
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-5 grid gap-3 border-t border-[#F1F5F9] pt-5 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["Token Symbol", project.token_symbol],
-            ["Token Name", project.token_name],
-            ["Network", project.blockchain_network],
-            [
-              "Contract",
-              project.contract_address ? (
+          <div className="mt-5 grid gap-3 border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-4">
+            <MetaTile label="Token Symbol">{project.token_symbol}</MetaTile>
+            <MetaTile label="Token Name">{project.token_name}</MetaTile>
+            <MetaTile label="Network">{project.blockchain_network}</MetaTile>
+            <MetaTile label="Contract">
+              {project.contract_address ? (
                 <span className="flex min-w-0 items-center gap-1">
-                  <span className="truncate font-mono text-xs sm:text-sm">
+                  <span className="truncate font-mono text-xs">
                     {project.contract_address.slice(0, 10)}...{project.contract_address.slice(-6)}
                   </span>
                   <CopyTextButton text={project.contract_address} />
                 </span>
               ) : (
                 "—"
-              ),
-            ],
-          ].map(([label, value]) => (
-            <div key={String(label)} className="min-w-0 rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] px-3.5 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#94A3B8]">{label}</p>
-              <div className="mt-1 text-sm font-semibold text-[#0F172A]">{value}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+              )}
+            </MetaTile>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Growth overview */}
-      <section className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold text-[#0F172A]">Project Growth Overview</h2>
-            <p className="mt-1 text-sm text-[#64748B]">
-              Track your project journey from setup to growth and scaling.
-            </p>
-
-            <div className="mt-5 overflow-x-auto pb-1">
-              <div className="flex min-w-[640px] items-start justify-between gap-1 lg:min-w-0">
-                {phases.map((phase, index) => (
-                  <div key={phase.id} className="flex flex-1 flex-col items-center text-center">
-                    <div className="flex w-full items-center">
-                      {index > 0 && (
-                        <div
-                          className={cn(
-                            "h-0.5 flex-1",
-                            phase.status !== "pending" ? "bg-[#10B981]" : "bg-[#E2E8F0]"
-                          )}
-                        />
-                      )}
-                      <span
+      <DashboardPanel
+        title="Project Growth Overview"
+        description="Track your journey from setup to scaling"
+        icon={TrendingUp}
+        iconColor="green"
+      >
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0 flex-1 overflow-x-auto pb-1">
+            <div className="flex min-w-[640px] items-start justify-between gap-1 lg:min-w-0">
+              {phases.map((phase, index) => (
+                <div key={phase.id} className="flex flex-1 flex-col items-center text-center">
+                  <div className="flex w-full items-center">
+                    {index > 0 && (
+                      <div
                         className={cn(
-                          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2",
-                          phase.status === "completed"
-                            ? "border-[#10B981] bg-[#ECFDF5] text-[#059669]"
-                            : phase.status === "in_progress"
-                              ? "border-[#635BFF] bg-[#EEF2FF] text-[#635BFF]"
-                              : "border-[#E2E8F0] bg-white text-[#CBD5E1]"
+                          "h-0.5 flex-1",
+                          phase.status !== "pending" ? "bg-chart-2" : "bg-border"
                         )}
-                      >
-                        {phase.status === "completed" ? (
-                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                        ) : phase.status === "in_progress" ? (
-                          <Circle className="h-2 w-2 fill-current" />
-                        ) : null}
-                      </span>
-                      {index < phases.length - 1 && (
-                        <div
-                          className={cn(
-                            "h-0.5 flex-1",
-                            phases[index + 1]?.status !== "pending" ? "bg-[#10B981]" : "bg-[#E2E8F0]"
-                          )}
-                        />
-                      )}
-                    </div>
-                    <p
+                      />
+                    )}
+                    <span
                       className={cn(
-                        "mt-2 text-[10px] font-semibold leading-tight sm:text-[11px]",
-                        phase.status === "pending" ? "text-[#94A3B8]" : "text-[#0F172A]"
-                      )}
-                    >
-                      {phase.label}
-                    </p>
-                    <p
-                      className={cn(
-                        "mt-0.5 text-[9px] font-medium capitalize",
+                        "flex size-7 shrink-0 items-center justify-center rounded-full border-2",
                         phase.status === "completed"
-                          ? "text-[#059669]"
+                          ? "border-chart-2 bg-chart-2/10 text-chart-2"
                           : phase.status === "in_progress"
-                            ? "text-[#635BFF]"
-                            : "text-[#CBD5E1]"
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-muted/40 text-muted-foreground"
                       )}
                     >
-                      {phase.status === "completed"
-                        ? "Completed"
-                        : phase.status === "in_progress"
-                          ? "In Progress"
-                          : "Pending"}
-                    </p>
+                      {phase.status === "completed" ? (
+                        <Check className="size-3.5" strokeWidth={2.5} />
+                      ) : phase.status === "in_progress" ? (
+                        <Circle className="size-2 fill-current" />
+                      ) : null}
+                    </span>
+                    {index < phases.length - 1 && (
+                      <div
+                        className={cn(
+                          "h-0.5 flex-1",
+                          phases[index + 1]?.status !== "pending" ? "bg-chart-2" : "bg-border"
+                        )}
+                      />
+                    )}
                   </div>
-                ))}
-              </div>
+                  <p
+                    className={cn(
+                      "mt-2 text-[10px] font-semibold leading-tight sm:text-[11px]",
+                      phase.status === "pending" ? "text-muted-foreground" : "text-foreground"
+                    )}
+                  >
+                    {phase.label}
+                  </p>
+                  <p
+                    className={cn(
+                      "mt-0.5 text-[9px] font-medium capitalize",
+                      phase.status === "completed"
+                        ? "text-chart-2"
+                        : phase.status === "in_progress"
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                    )}
+                  >
+                    {phase.status === "completed"
+                      ? "Done"
+                      : phase.status === "in_progress"
+                        ? "Active"
+                        : "Pending"}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-
           <GrowthRing score={score} />
         </div>
-      </section>
+      </DashboardPanel>
 
-      {/* Recommendations grid */}
-      <ProjectRecommendationsGrid projectId={project.id} services={services} />
+      <ProjectRecommendationsGrid projectId={project.id} services={services} basePath={basePath} />
 
-      {/* Bottom: why + roadmap */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5">
-          <h2 className="text-base font-bold text-[#0F172A]">Why These Recommendations?</h2>
-          <div className="mt-4 space-y-3">
+        <DashboardPanel title="Why These Recommendations?" icon={Sparkles} iconColor="blue">
+          <div className="space-y-3">
             {WHY_RECOMMENDATIONS.map((item, i) => {
               const Icon = WHY_ICONS[i % WHY_ICONS.length];
               return (
-                <div key={item.title} className="flex gap-3">
-                  <span
-                    className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                      item.tone
-                    )}
-                  >
-                    <Icon className="h-4 w-4" strokeWidth={2} />
+                <div
+                  key={item.title}
+                  className="flex gap-3 rounded-xl border border-border bg-muted/20 p-3"
+                >
+                  <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg ring-1", item.tone)}>
+                    <Icon className="size-4" strokeWidth={2} />
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-[#0F172A]">{item.title}</p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-[#64748B]">{item.description}</p>
+                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{item.description}</p>
                   </div>
                 </div>
               );
             })}
           </div>
-        </section>
+        </DashboardPanel>
 
-        <section className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5">
-          <h2 className="text-base font-bold text-[#0F172A]">Your Personalized Roadmap</h2>
-          <div className="mt-4 space-y-3">
+        <DashboardPanel title="Your Personalized Roadmap" icon={Map} iconColor="purple">
+          <div className="space-y-2.5">
             {roadmap.length > 0 ? (
               roadmap.map((item) => {
                 const meta = getServiceCardMeta(item.service);
                 return (
                   <div
                     key={item.service.id}
-                    className="flex items-start justify-between gap-3 rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] px-3.5 py-3"
+                    className="flex items-start justify-between gap-3 rounded-xl border border-border bg-muted/20 px-3.5 py-3"
                   >
                     <div className="flex min-w-0 gap-3">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-xs font-bold text-[#635BFF]">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                         {item.step}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#0F172A]">
-                          {item.step}. {item.service.name}
-                        </p>
-                        <p className="text-[11px] font-medium text-[#059669]">{item.boost}</p>
+                        <p className="truncate text-sm font-semibold text-foreground">{item.service.name}</p>
+                        <p className="text-[11px] font-medium text-chart-2">{item.boost}</p>
                       </div>
                     </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      <span className="rounded-md border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[10px] font-semibold text-[#C2410C]">
+                    <div className="flex shrink-0 flex-col items-end gap-1.5">
+                      <span className="rounded-md border border-chart-3/30 bg-chart-3/10 px-2 py-0.5 text-[10px] font-semibold text-chart-3">
                         Pending
                       </span>
                       <Link
-                        href={`/partner/services/${item.service.slug}?project=${project.id}`}
-                        className="text-[11px] font-semibold text-[#635BFF] hover:underline"
+                        href={`${basePath}/services/${item.service.slug}?project=${project.id}`}
+                        className="text-[11px] font-semibold text-primary hover:underline"
                       >
                         {meta.ctaLabel}
                       </Link>
@@ -332,32 +361,41 @@ export function ProjectDetailView({
                 );
               })
             ) : (
-              <p className="text-sm text-[#94A3B8]">You have explored all recommended services for now.</p>
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                You have explored all recommended services for now.
+              </p>
             )}
           </div>
-        </section>
+        </DashboardPanel>
       </div>
 
-      {/* Consultation banner */}
-      <section className="rounded-2xl border border-[#BFDBFE] bg-gradient-to-r from-[#EFF6FF] to-[#EEF2FF] p-4 sm:flex sm:items-center sm:justify-between sm:p-5">
-        <div>
-          <p className="font-bold text-[#1E40AF]">Need help choosing the right services?</p>
-          <p className="mt-1 text-sm text-[#3B82F6]">
-            Book a free consultation with your dedicated account manager.
-          </p>
-        </div>
-        {managerTelegramLink ? (
-          <Button className="mt-3 w-full rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] sm:mt-0 sm:w-auto" asChild>
-            <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
-              Book Free Consultation
-            </a>
-          </Button>
-        ) : (
-          <Button className="mt-3 w-full rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] sm:mt-0 sm:w-auto" asChild>
-            <Link href="/partner/support">Book Free Consultation</Link>
-          </Button>
-        )}
-      </section>
+      <Card size="sm" className="overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 via-card to-chart-4/5">
+        <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex items-start gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <MessageCircle className="size-5" />
+            </span>
+            <div>
+              <p className="font-semibold text-foreground">Need help choosing services?</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                Book a free consultation with your dedicated account manager.
+              </p>
+            </div>
+          </div>
+          {managerTelegramLink ? (
+            <Button className="h-10 shrink-0 rounded-xl font-semibold" asChild>
+              <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
+                <Send data-icon="inline-start" />
+                Book Consultation
+              </a>
+            </Button>
+          ) : (
+            <Button className="h-10 shrink-0 rounded-xl font-semibold" asChild>
+              <Link href={`${basePath}/support`}>Contact Support</Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

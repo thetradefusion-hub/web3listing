@@ -48,7 +48,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     })) || [];
 
   return (
-    <PartnerPageShell>
+    <PartnerPageShell compact fullWidth className="gap-4 sm:gap-5">
       <ProjectDetailView
         project={project}
         orders={ordersWithServices}

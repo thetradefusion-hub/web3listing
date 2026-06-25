@@ -2,7 +2,8 @@ export type UserRole =
   | "super_admin"
   | "operations_manager"
   | "agent"
-  | "service_team";
+  | "service_team"
+  | "user";
 
 export type KycStatus = "pending" | "approved" | "rejected";
 
@@ -136,6 +137,7 @@ export interface Service {
   faqs: { question: string; answer: string }[] | null;
   terms_conditions: string | null;
   requires_third_party_ack: boolean;
+  requires_kyc?: boolean;
   is_active: boolean;
   sort_order: number;
   badge: "hot" | "popular" | "new" | null;

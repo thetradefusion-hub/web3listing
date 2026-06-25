@@ -41,7 +41,7 @@ export function NotificationBell({
         onClick={() => setOpen((v) => !v)}
         className={
           isPartner
-            ? "relative h-9 w-9 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50"
+            ? "relative size-9 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground"
             : "relative"
         }
       >
@@ -50,7 +50,7 @@ export function NotificationBell({
           <span
             className={
               isPartner
-                ? "absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
+                ? "absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground"
                 : "absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-500 text-[10px] font-bold text-black"
             }
           >
@@ -59,7 +59,7 @@ export function NotificationBell({
         )}
       </Button>
       {open && notifications.length > 0 && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-border bg-card p-2 shadow-lg">
           {notifications.map((n) => (
             <button
               key={n.id}
@@ -68,10 +68,10 @@ export function NotificationBell({
                 await markNotificationRead(n.id);
                 setNotifications((prev) => prev.filter((item) => item.id !== n.id));
               }}
-              className="w-full rounded-md p-2 text-left text-sm hover:bg-slate-50"
+              className="w-full rounded-lg p-2.5 text-left text-sm transition-colors hover:bg-muted/50"
             >
-              <p className="font-medium text-slate-900">{n.title}</p>
-              <p className="text-xs text-slate-500">{n.message}</p>
+              <p className="font-medium text-foreground">{n.title}</p>
+              <p className="text-xs text-muted-foreground">{n.message}</p>
             </button>
           ))}
         </div>

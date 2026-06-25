@@ -16,10 +16,12 @@ export function OrderForm({
   service,
   projects,
   defaultProjectId,
+  basePath = "/partner",
 }: {
   service: Service;
   projects: Project[];
   defaultProjectId?: string;
+  basePath?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -62,15 +64,15 @@ export function OrderForm({
           ? "Quote request submitted for admin review"
           : "Consultation request submitted"
     );
-    router.push(`/partner/orders/${result.order?.id}`);
+    router.push(`${basePath}/orders/${result.order?.id}`);
   }
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Select Project *</Label>
+        <Label className="text-xs font-semibold text-muted-foreground">Select Project *</Label>
         <Select value={projectId} onValueChange={(v) => setProjectId(v || "")}>
-          <SelectTrigger className="rounded-xl">
+          <SelectTrigger className="h-10 w-full rounded-xl">
             <SelectValue placeholder="Choose a project" />
           </SelectTrigger>
           <SelectContent>
@@ -116,21 +118,21 @@ export function OrderForm({
       )}
 
       {service.requires_third_party_ack && (
-        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3">
+        <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3">
           <Checkbox
             id="ack"
             checked={thirdPartyAck}
             onCheckedChange={(v) => setThirdPartyAck(!!v)}
             className="mt-0.5"
           />
-          <label htmlFor="ack" className="text-sm leading-relaxed text-red-900">
+          <label htmlFor="ack" className="text-sm leading-relaxed text-muted-foreground">
             I understand approval depends on third-party review and is not guaranteed.
           </label>
         </div>
       )}
 
       <Button
-        className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md hover:opacity-90"
+        className="h-10 w-full rounded-xl font-semibold"
         onClick={handleOrder}
         disabled={loading || (service.requires_third_party_ack && !thirdPartyAck)}
       >

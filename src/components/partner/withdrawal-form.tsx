@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle, Banknote, Wallet } from "lucide-react";
 import { requestWithdrawal } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { formatCurrency } from "@/lib/commission";
 import { MIN_WITHDRAWAL } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function WithdrawalForm({ availableBalance }: { availableBalance: number }) {
   const router = useRouter();
@@ -54,15 +63,29 @@ export function WithdrawalForm({ availableBalance }: { availableBalance: number 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <p className="text-sm text-slate-500">
-        Available: ${balance.toFixed(2)} · Minimum: ${MIN_WITHDRAWAL}
-      </p>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-muted/30 p-3.5">
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Available
+          </span>
+          <span className="text-lg font-bold tabular-nums text-foreground">{formatCurrency(balance)}</span>
+        </div>
+        <div className="flex flex-col gap-1 border-l border-border pl-3">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Minimum
+          </span>
+          <span className="text-lg font-bold tabular-nums text-foreground">{formatCurrency(MIN_WITHDRAWAL)}</span>
+        </div>
+      </div>
+
       {!canWithdraw && (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          You need at least ${MIN_WITHDRAWAL} available balance to request a withdrawal.
-        </p>
+        <div className="flex items-start gap-2.5 rounded-xl border border-chart-3/30 bg-chart-3/10 px-3.5 py-3 text-sm text-foreground">
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-chart-3" />
+          <p>You need at least {formatCurrency(MIN_WITHDRAWAL)} available balance to request a withdrawal.</p>
+        </div>
       )}
+
       <div className="space-y-2">
         <Label htmlFor="amount">Amount (USD)</Label>
         <Input
@@ -74,12 +97,18 @@ export function WithdrawalForm({ availableBalance }: { availableBalance: number 
           step="0.01"
           required
           disabled={!canWithdraw}
+          placeholder={`Min ${MIN_WITHDRAWAL}`}
+          className="h-10 rounded-xl bg-background"
         />
       </div>
+
       <div className="space-y-2">
         <Label>Payment Method</Label>
         <Select value={method} onValueChange={(v) => v && setMethod(v as typeof method)}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-10 rounded-xl bg-background">
+            <Banknote className="size-4 shrink-0 text-muted-foreground" />
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="usdt">USDT</SelectItem>
             <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
@@ -87,22 +116,39 @@ export function WithdrawalForm({ availableBalance }: { availableBalance: number 
           </SelectContent>
         </Select>
       </div>
+
       {method !== "bank_transfer" ? (
         <div className="space-y-2">
           <Label htmlFor="wallet_address">Wallet Address</Label>
-          <Input id="wallet_address" name="wallet_address" required />
+          <Input
+            id="wallet_address"
+            name="wallet_address"
+            required
+            disabled={!canWithdraw}
+            placeholder="Enter wallet address"
+            className="h-10 rounded-xl bg-background font-mono text-sm"
+          />
         </div>
       ) : (
         <div className="space-y-2">
           <Label htmlFor="bank_info">Bank Information</Label>
-          <Input id="bank_info" name="bank_info" required />
+          <Input
+            id="bank_info"
+            name="bank_info"
+            required
+            disabled={!canWithdraw}
+            placeholder="Account name, number, bank details"
+            className="h-10 rounded-xl bg-background"
+          />
         </div>
       )}
+
       <Button
         type="submit"
         disabled={loading || !canWithdraw}
-        className="rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg hover:opacity-90"
+        className={cn("h-10 w-full rounded-xl font-semibold")}
       >
+        <Wallet data-icon="inline-start" />
         {loading ? "Submitting..." : "Request Withdrawal"}
       </Button>
     </form>

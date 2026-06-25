@@ -26,7 +26,7 @@ export function MobileDataCard({
   href?: string;
 }) {
   const className =
-    "block rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:border-[#CBD5E1] hover:shadow-md";
+    "block rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:border-border hover:bg-muted/40 hover:shadow-md";
 
   if (href) {
     return (
@@ -48,8 +48,8 @@ export function MobileDataRow({
 }) {
   return (
     <div className="flex items-start justify-between gap-3 py-2 text-sm">
-      <span className="shrink-0 text-xs font-medium text-[#94A3B8]">{label}</span>
-      <span className="min-w-0 text-right text-[#0F172A]">{children}</span>
+      <span className="shrink-0 text-xs font-medium text-muted-foreground">{label}</span>
+      <span className="min-w-0 text-right text-foreground">{children}</span>
     </div>
   );
 }

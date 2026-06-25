@@ -5,14 +5,54 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, credentialsEmail, kycStatusEmail, orderUpdateEmail, quoteReadyEmail, withdrawalStatusEmail } from "@/lib/email";
 import { calculateQuotation, calculateOrderCommission, isCommissionEligibleStatus } from "@/lib/commission";
-import { MIN_WITHDRAWAL } from "@/lib/constants";
+import { MIN_WITHDRAWAL, OWNER_ROLES } from "@/lib/constants";
 import { requireAuth, isAdminRole } from "@/lib/auth";
-import type { OrderStatus, PaymentMethod, WithdrawalStatus } from "@/types/database";
+import { getPortalForRole, PORTALS } from "@/lib/portal-config";
+import type { OrderStatus, PaymentMethod, Profile, WithdrawalStatus } from "@/types/database";
+
+function ownerBasePath(role: Profile["role"]) {
+  const portal = getPortalForRole(role);
+  return portal ? PORTALS[portal].basePath : "/partner";
+}
+
+function ownerOrderPath(role: Profile["role"], orderId: string) {
+  return `${ownerBasePath(role)}/orders/${orderId}`;
+}
 
 export async function signIn(email: string, password: string) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function signUp(data: {
+  email: string;
+  password: string;
+  full_name: string;
+  company_name?: string;
+  country: string;
+}) {
+  const supabase = await createClient();
+  const { data: authData, error } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+    options: {
+      data: {
+        role: "user",
+        full_name: data.full_name,
+        company_name: data.company_name || null,
+        country: data.country,
+      },
+    },
+  });
+
+  if (error) return { error: error.message };
+
+  if (authData.user && !authData.session) {
+    return { success: true, needsEmailConfirmation: true };
+  }
+
   return { success: true };
 }
 
@@ -38,7 +78,7 @@ export async function createAgentAccount(data: {
     email: data.email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: data.full_name },
+    user_metadata: { full_name: data.full_name, role: "agent" },
   });
 
   if (error) return { error: error.message };
@@ -104,6 +144,7 @@ export async function updateProfile(data: Record<string, string>) {
 
   if (error) return { error: error.message };
   revalidatePath("/partner/profile");
+  revalidatePath("/user/profile");
   return { success: true };
 }
 
@@ -130,6 +171,7 @@ export async function submitKyc(data: Record<string, string>) {
 
   if (error) return { error: error.message };
   revalidatePath("/partner/kyc");
+  revalidatePath("/user/kyc");
   return { success: true };
 }
 
@@ -189,6 +231,14 @@ async function creditAgentCommission(orderId: string) {
     .single();
 
   if (!order || !isCommissionEligibleStatus(order.status)) return;
+
+  const { data: owner } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", order.agent_id)
+    .single();
+
+  if (owner?.role === "user") return;
 
   const service = Array.isArray(order.services) ? order.services[0] : order.services;
   if (!service) return;
@@ -261,10 +311,15 @@ async function creditAgentCommission(orderId: string) {
 }
 
 export async function createProject(data: Record<string, string>) {
-  const profile = await requireAuth(["agent"]);
+  const profile = await requireAuth(OWNER_ROLES);
   const supabase = await createClient();
+  const base = ownerBasePath(profile.role);
 
-  const status = data.status || "draft";
+  let status = data.status || "draft";
+  if (profile.role === "user" && status === "submitted") {
+    status = "approved";
+  }
+
   const { data: project, error } = await supabase.from("projects").insert({
     agent_id: profile.id,
     ...data,
@@ -281,7 +336,7 @@ export async function createProject(data: Record<string, string>) {
     );
   }
 
-  revalidatePath("/partner/projects");
+  revalidatePath(`${base}/projects`);
   revalidatePath("/admin/projects");
   return { success: true, project };
 }
@@ -289,6 +344,13 @@ export async function createProject(data: Record<string, string>) {
 export async function updateProject(id: string, data: Record<string, string>) {
   const profile = await requireAuth();
   const supabase = await createClient();
+  const base = ownerBasePath(profile.role);
+
+  let status = data.status;
+  if (profile.role === "user" && status === "submitted") {
+    status = "approved";
+    data.status = "approved";
+  }
 
   const { error } = await supabase.from("projects").update(data).eq("id", id).eq("agent_id", profile.id);
   if (error) return { error: error.message };
@@ -301,7 +363,7 @@ export async function updateProject(id: string, data: Record<string, string>) {
     );
   }
 
-  revalidatePath("/partner/projects");
+  revalidatePath(`${base}/projects`);
   revalidatePath("/admin/projects");
   return { success: true };
 }
@@ -312,7 +374,7 @@ export async function reviewProject(projectId: string, status: "approved" | "rej
 
   const { data: project } = await admin
     .from("projects")
-    .select("agent_id, project_name, status")
+    .select("agent_id, project_name, status, profiles!projects_agent_id_fkey(role)")
     .eq("id", projectId)
     .single();
 
@@ -322,6 +384,9 @@ export async function reviewProject(projectId: string, status: "approved" | "rej
   const { error } = await admin.from("projects").update({ status }).eq("id", projectId);
   if (error) return { error: error.message };
 
+  const ownerProfile = Array.isArray(project.profiles) ? project.profiles[0] : project.profiles;
+  const ownerRole = ownerProfile?.role || "agent";
+
   await admin.from("notifications").insert({
     user_id: project.agent_id,
     title: status === "approved" ? "Project Approved" : "Project Rejected",
@@ -330,12 +395,13 @@ export async function reviewProject(projectId: string, status: "approved" | "rej
         ? `Your project "${project.project_name}" has been approved. You can now place orders for this project.`
         : `Your project "${project.project_name}" was rejected.${notes ? ` Reason: ${notes}` : ""}`,
     type: "project",
-    link: `/partner/projects/${projectId}`,
+    link: `${ownerBasePath(ownerRole)}/projects/${projectId}`,
   });
 
   revalidatePath("/admin/projects");
   revalidatePath(`/admin/projects/${projectId}`);
   revalidatePath("/partner/projects");
+  revalidatePath("/user/projects");
   revalidatePath("/admin");
   return { success: true };
 }
@@ -346,8 +412,8 @@ export async function createOrder(data: {
   requirements?: string;
   third_party_ack?: boolean;
 }) {
-  const profile = await requireAuth(["agent"]);
-  if (profile.kyc_status !== "approved") {
+  const profile = await requireAuth(OWNER_ROLES);
+  if (profile.role === "agent" && profile.kyc_status !== "approved") {
     return { error: "KYC approval required before placing orders" };
   }
 
@@ -398,10 +464,10 @@ export async function createOrder(data: {
     title: "Order Created",
     message: `Order ${order.order_number} has been created.`,
     type: "order",
-    link: `/partner/orders/${order.id}`,
+    link: ownerOrderPath(profile.role, order.id),
   });
 
-  revalidatePath("/partner/orders");
+  revalidatePath(`${ownerBasePath(profile.role)}/orders`);
   return { success: true, order };
 }
 
@@ -445,7 +511,7 @@ export async function createQuotation(data: {
     payment_instructions: "Please send USDT (TRC20). Contact your account manager for payment details.",
   });
 
-  const { data: partner } = await supabase.from("profiles").select("email").eq("id", order.agent_id).single();
+  const { data: partner } = await supabase.from("profiles").select("email, role").eq("id", order.agent_id).single();
   if (partner?.email) {
     const email = quoteReadyEmail(order.order_number, calc.client_price);
     await sendEmail({ to: partner.email, ...email });
@@ -456,7 +522,7 @@ export async function createQuotation(data: {
     title: "Quotation Ready",
     message: `Quotation of $${calc.client_price} ready for order ${order.order_number}`,
     type: "quote",
-    link: `/partner/orders/${data.order_id}`,
+    link: ownerOrderPath(partner?.role || "agent", data.order_id),
   });
 
   revalidatePath("/admin/orders");
@@ -464,8 +530,9 @@ export async function createQuotation(data: {
 }
 
 export async function acceptQuotation(quotationId: string) {
-  const profile = await requireAuth(["agent"]);
+  const profile = await requireAuth(OWNER_ROLES);
   const supabase = await createClient();
+  const base = ownerBasePath(profile.role);
 
   const { data: quote } = await supabase.from("quotations").select("*, orders(*)").eq("id", quotationId).single();
   if (!quote || quote.orders.agent_id !== profile.id) return { error: "Not found" };
@@ -473,13 +540,14 @@ export async function acceptQuotation(quotationId: string) {
   await supabase.from("quotations").update({ status: "accepted" }).eq("id", quotationId);
   await supabase.from("orders").update({ status: "waiting_payment" }).eq("id", quote.order_id);
 
-  revalidatePath("/partner/orders");
+  revalidatePath(`${base}/orders`);
   return { success: true };
 }
 
 export async function uploadPaymentProof(paymentId: string, proofUrl: string) {
   const profile = await requireAuth();
   const supabase = await createClient();
+  const base = ownerBasePath(profile.role);
 
   const { data: payment } = await supabase.from("payments").select("*, orders(*)").eq("id", paymentId).single();
   if (!payment) return { error: "Payment not found" };
@@ -499,9 +567,9 @@ export async function uploadPaymentProof(paymentId: string, proofUrl: string) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/payments");
-  revalidatePath("/partner/orders");
+  revalidatePath(`${base}/orders`);
   if (payment.order_id) {
-    revalidatePath(`/partner/orders/${payment.order_id}`);
+    revalidatePath(`${base}/orders/${payment.order_id}`);
     revalidatePath(`/admin/orders/${payment.order_id}`);
   }
   return { success: true };
@@ -522,7 +590,7 @@ export async function verifyPayment(paymentId: string, confirmed: boolean) {
 
     const order = Array.isArray(payment.orders) ? payment.orders[0] : payment.orders;
     if (order) {
-      const { data: partner } = await supabase.from("profiles").select("email").eq("id", order.agent_id).single();
+      const { data: partner } = await supabase.from("profiles").select("email, role").eq("id", order.agent_id).single();
       if (partner?.email) {
         const email = orderUpdateEmail(order.order_number, "Payment Confirmed");
         await sendEmail({ to: partner.email, ...email });
@@ -533,7 +601,7 @@ export async function verifyPayment(paymentId: string, confirmed: boolean) {
         title: "Payment Confirmed",
         message: `Payment for order ${order.order_number} has been confirmed.`,
         type: "payment",
-        link: `/partner/orders/${payment.order_id}`,
+        link: ownerOrderPath(partner?.role || "agent", payment.order_id),
       });
     }
   }
@@ -545,9 +613,12 @@ export async function verifyPayment(paymentId: string, confirmed: boolean) {
     revalidatePath(`/admin/orders/${payment.order_id}`);
   }
   revalidatePath("/partner");
+  revalidatePath("/user");
   revalidatePath("/partner/orders");
+  revalidatePath("/user/orders");
   if (payment?.order_id) {
     revalidatePath(`/partner/orders/${payment.order_id}`);
+    revalidatePath(`/user/orders/${payment.order_id}`);
   }
   return { success: true };
 }
@@ -579,12 +650,15 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
     .from("orders")
     .update(updates)
     .eq("id", orderId)
-    .select("*, profiles!orders_agent_id_fkey(email)")
+    .select("*, profiles!orders_agent_id_fkey(email, role)")
     .single();
+
+  const ownerProfile = Array.isArray(order?.profiles) ? order.profiles[0] : order?.profiles;
+  const ownerRole = ownerProfile?.role || "agent";
 
   if (order?.profiles?.email) {
     const email = orderUpdateEmail(order.order_number, status.replace(/_/g, " "));
-    await sendEmail({ to: order.profiles.email, ...email });
+    await sendEmail({ to: ownerProfile?.email || order.profiles.email, ...email });
   }
 
   await supabase.from("notifications").insert({
@@ -592,7 +666,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
     title: "Order Updated",
     message: `Order ${order.order_number} is now ${status.replace(/_/g, " ")}`,
     type: "order",
-    link: `/partner/orders/${orderId}`,
+    link: ownerOrderPath(ownerRole, orderId),
   });
 
   if (isCommissionEligibleStatus(status)) {
@@ -603,9 +677,13 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/partner");
+  revalidatePath("/user");
   revalidatePath("/partner/orders");
+  revalidatePath("/user/orders");
   revalidatePath(`/partner/orders/${orderId}`);
+  revalidatePath(`/user/orders/${orderId}`);
   revalidatePath(`/partner/orders/${orderId}/delivery`);
+  revalidatePath(`/user/orders/${orderId}/delivery`);
   revalidatePath("/partner/delivery");
   return { success: true };
 }
@@ -683,8 +761,9 @@ export async function submitOrderReview(data: {
   rating: number;
   review_text?: string;
 }) {
-  const profile = await requireAuth(["agent"]);
+  const profile = await requireAuth(OWNER_ROLES);
   const supabase = createAdminClient();
+  const base = ownerBasePath(profile.role);
 
   if (data.rating < 1 || data.rating > 5) {
     return { error: "Rating must be between 1 and 5" };
@@ -714,7 +793,7 @@ export async function submitOrderReview(data: {
 
   if (error) return { error: error.message };
 
-  revalidatePath(`/partner/orders/${data.order_id}/delivery`);
+  revalidatePath(`${base}/orders/${data.order_id}/delivery`);
   return { success: true };
 }
 

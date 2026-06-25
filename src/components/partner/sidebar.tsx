@@ -10,18 +10,23 @@ import {
   Headphones,
   ShieldCheck,
   UserCog,
+  Plus,
 } from "lucide-react";
 import { signOut } from "@/lib/actions";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
+import { PartnerBadge, kycStatusVariant } from "@/components/partner/ui";
 import {
   PortalSidebarBrand,
   PortalSidebarFooter,
   PortalSidebarLogout,
   PortalSidebarNav,
   PortalSidebarNavItem,
+  PortalSidebarQuickAction,
   PortalSidebarSection,
   PortalSidebarShell,
+  PortalSidebarUserCard,
 } from "@/components/shared/portal-sidebar-ui";
+import type { Profile } from "@/types/database";
 
 const navSections: { label: string; items: NavItem[] }[] = [
   {
@@ -32,20 +37,20 @@ const navSections: { label: string; items: NavItem[] }[] = [
     label: "Workspace",
     items: [
       { href: "/partner/projects", label: "My Projects", icon: FolderKanban },
-      { href: "/partner/services", label: "Service Marketplace", icon: Store },
+      { href: "/partner/services", label: "Marketplace", icon: Store },
       { href: "/partner/orders", label: "My Orders", icon: Package },
     ],
   },
   {
     label: "Earnings",
-    items: [{ href: "/partner/wallet", label: "Wallet & Withdrawals", icon: Wallet }],
+    items: [{ href: "/partner/wallet", label: "Wallet", icon: Wallet }],
   },
   {
     label: "Account",
     items: [
-      { href: "/partner/kyc", label: "KYC Verification", icon: ShieldCheck },
-      { href: "/partner/profile", label: "Profile Settings", icon: UserCog },
-      { href: "/partner/support", label: "Support & Contact", icon: Headphones },
+      { href: "/partner/kyc", label: "KYC", icon: ShieldCheck },
+      { href: "/partner/profile", label: "Profile", icon: UserCog },
+      { href: "/partner/support", label: "Support", icon: Headphones },
     ],
   },
 ];
@@ -62,10 +67,18 @@ type NavItem = {
   exact?: boolean;
 };
 
+function kycLabel(status: Profile["kyc_status"]) {
+  if (status === "approved") return "Verified";
+  if (status === "rejected") return "Rejected";
+  return "Pending";
+}
+
 export function PartnerSidebar({
+  profile,
   className,
   onNavigate,
 }: {
+  profile?: Profile;
   className?: string;
   onNavigate?: () => void;
 }) {
@@ -73,14 +86,32 @@ export function PartnerSidebar({
   const { collapsed: shellCollapsed } = usePortalShell();
   const collapsed = onNavigate ? false : shellCollapsed;
 
+  const displayName = profile?.company_name || profile?.full_name || profile?.email || "Partner";
+  const initials = (profile?.full_name || profile?.email || "P")
+    .split(/[\s@]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("");
+
   async function handleLogout() {
     await signOut();
     window.location.href = "/login";
   }
 
   return (
-    <PortalSidebarShell className={className} collapsed={collapsed} collapsible={!onNavigate}>
-      <PortalSidebarBrand href="/partner" badge="Partner Portal" collapsed={collapsed} />
+    <PortalSidebarShell
+      className={className}
+      collapsed={collapsed}
+      collapsible={!onNavigate}
+      variant="partner"
+    >
+      <PortalSidebarBrand
+        href="/partner"
+        badge="Partner Portal"
+        collapsed={collapsed}
+        variant="partner"
+      />
 
       <PortalSidebarNav collapsed={collapsed}>
         {navSections.map((section) => (
@@ -101,6 +132,28 @@ export function PartnerSidebar({
       </PortalSidebarNav>
 
       <PortalSidebarFooter collapsed={collapsed}>
+        {profile ? (
+          <PortalSidebarUserCard
+            name={displayName}
+            subtitle={profile.email}
+            initials={initials}
+            collapsed={collapsed}
+            badge={
+              <PartnerBadge variant={kycStatusVariant(profile.kyc_status)}>
+                {kycLabel(profile.kyc_status)}
+              </PartnerBadge>
+            }
+          />
+        ) : null}
+
+        <PortalSidebarQuickAction
+          href="/partner/projects/new"
+          label="New Project"
+          icon={Plus}
+          onClick={onNavigate}
+          collapsed={collapsed}
+        />
+
         <PortalSidebarLogout onLogout={handleLogout} collapsed={collapsed} />
       </PortalSidebarFooter>
     </PortalSidebarShell>

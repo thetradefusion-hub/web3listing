@@ -20,22 +20,22 @@ export const WHY_RECOMMENDATIONS = [
   {
     title: "Increase Visibility",
     description: "Get listed on trackers, explorers, and exchanges to reach more investors.",
-    tone: "bg-[#EEF2FF] text-[#6366F1]",
+    tone: "bg-primary/10 text-primary ring-primary/20",
   },
   {
     title: "Build Trust",
     description: "Security audits and verified profiles improve investor confidence.",
-    tone: "bg-[#ECFDF5] text-[#059669]",
+    tone: "bg-chart-2/10 text-chart-2 ring-chart-2/20",
   },
   {
     title: "Accelerate Growth",
     description: "Marketing and community services drive organic adoption faster.",
-    tone: "bg-[#FFF7ED] text-[#EA580C]",
+    tone: "bg-chart-3/10 text-chart-3 ring-chart-3/20",
   },
   {
     title: "Expert Guidance",
     description: "Our team recommends services based on your project stage and goals.",
-    tone: "bg-[#F5F3FF] text-[#7C3AED]",
+    tone: "bg-chart-4/10 text-chart-4 ring-chart-4/20",
   },
 ];
 
@@ -137,11 +137,13 @@ export function computeGrowthPhases(
 }
 
 export function getServiceImpactBadge(service: Service, categorySlug?: string) {
-  if (service.badge === "hot") return { label: "High Impact", tone: "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]" };
-  if (service.badge === "popular") return { label: "Recommended", tone: "bg-[#EEF2FF] text-[#6366F1] border-[#C7D2FE]" };
+  if (service.badge === "hot")
+    return { label: "High Impact", tone: "border-chart-2/30 bg-chart-2/10 text-chart-2" };
+  if (service.badge === "popular")
+    return { label: "Recommended", tone: "border-primary/30 bg-primary/10 text-primary" };
   if (service.badge === "new" || categorySlug === "trending-services")
-    return { label: "Trending", tone: "bg-[#FFF7ED] text-[#EA580C] border-[#FED7AA]" };
-  return { label: "Recommended", tone: "bg-[#EEF2FF] text-[#6366F1] border-[#C7D2FE]" };
+    return { label: "Trending", tone: "border-chart-3/30 bg-chart-3/10 text-chart-3" };
+  return { label: "Recommended", tone: "border-primary/30 bg-primary/10 text-primary" };
 }
 
 export function getServiceBenefits(service: Service) {

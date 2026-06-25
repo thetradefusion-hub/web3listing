@@ -1,23 +1,64 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Banknote,
-  Clock3,
-  Filter,
-  FolderOpen,
-  Headphones,
-  Search,
-  Send,
-  SlidersHorizontal,
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Banknote, Clock3, RotateCcw, Send, SlidersHorizontal } from "lucide-react";
+import { catalogToolbarRowClass } from "@/components/partner/services/service-catalog-toolbar";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { CATEGORY_ICONS } from "@/lib/service-catalog";
 import type { ServiceCategory } from "@/types/database";
+import { cn } from "@/lib/utils";
+import { usePortalBasePath } from "@/components/shared/portal-view-context";
+
+function FilterSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      <p className="text-[11px] font-semibold tracking-wide text-muted-foreground">{title}</p>
+      {children}
+    </div>
+  );
+}
+
+function FilterToolbarLabel({
+  activeCount,
+  clearHref,
+}: {
+  activeCount: number;
+  clearHref: string;
+}) {
+  return (
+    <div className={cn(catalogToolbarRowClass, "justify-between gap-2 px-3.5")}>
+      <div className="flex min-w-0 items-center gap-2">
+        <SlidersHorizontal className="size-4 shrink-0 text-primary" strokeWidth={2} />
+        <span className="truncate text-sm font-medium text-foreground">Filter Services</span>
+      </div>
+      {activeCount > 0 ? (
+        <Link href={clearHref} className="shrink-0 text-[11px] font-medium text-primary hover:underline">
+          Clear All
+        </Link>
+      ) : null}
+    </div>
+  );
+}
 
 export function ServiceCatalogFilters({
   categories,
@@ -27,6 +68,8 @@ export function ServiceCatalogFilters({
   managerTelegramLink,
   onApplied,
   hideHelpCard,
+  hideSearch,
+  sidebarLayout,
   className,
 }: {
   categories: ServiceCategory[];
@@ -36,10 +79,14 @@ export function ServiceCatalogFilters({
   managerTelegramLink?: string | null;
   onApplied?: () => void;
   hideHelpCard?: boolean;
+  hideSearch?: boolean;
+  /** Desktop sidebar: toolbar row matches search h-11, body below */
+  sidebarLayout?: boolean;
   className?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const basePath = usePortalBasePath();
 
   const current = {
     q: searchParams.get("q") || "",
@@ -52,6 +99,25 @@ export function ServiceCatalogFilters({
     page: searchParams.get("page") || "1",
   };
 
+  const [tat, setTat] = useState(current.tat || "__any__");
+  const [payment, setPayment] = useState(current.payment || "__any__");
+
+  useEffect(() => {
+    setTat(current.tat || "__any__");
+    setPayment(current.payment || "__any__");
+  }, [current.tat, current.payment]);
+
+  const activeCount = useMemo(() => {
+    let n = 0;
+    if (current.category) n++;
+    if (current.minPrice) n++;
+    if (current.maxPrice) n++;
+    if (current.tat) n++;
+    if (current.payment) n++;
+    if (!hideSearch && current.q) n++;
+    return n;
+  }, [current, hideSearch]);
+
   function buildUrl(updates: Record<string, string>) {
     const params = new URLSearchParams();
     const merged = { ...current, ...updates };
@@ -60,175 +126,243 @@ export function ServiceCatalogFilters({
     });
     if (merged.page && merged.page !== "1") params.set("page", merged.page);
     const qs = params.toString();
-    return `/partner/services${qs ? `?${qs}` : ""}`;
+    return `${basePath}/services${qs ? `?${qs}` : ""}`;
   }
 
   function applyFilters(form: FormData) {
     const updates = {
       q: (form.get("q") as string) || "",
-      category: (form.get("category") as string) || "",
+      category: current.category,
       minPrice: (form.get("minPrice") as string) || "",
       maxPrice: (form.get("maxPrice") as string) || "",
-      tat: (form.get("tat") as string) || "",
-      payment: (form.get("payment") as string) || "",
+      tat: tat === "__any__" ? "" : tat,
+      payment: payment === "__any__" ? "" : payment,
       page: "1",
     };
     router.push(buildUrl(updates));
     onApplied?.();
   }
 
+  function selectCategory(slug: string) {
+    const next = current.category === slug ? "" : slug;
+    router.push(buildUrl({ category: next, page: "1" }));
+  }
+
+  const clearHref = `${basePath}/services${current.project ? `?project=${current.project}` : ""}`;
+
+  const filterBody = (
+    <>
+      {!hideSearch && (
+        <Input
+          name="q"
+          defaultValue={current.q}
+          placeholder="Search in filters..."
+          className="h-9 rounded-xl bg-muted/40 text-sm"
+        />
+      )}
+
+      <FilterSection title="Category">
+        <ScrollArea className="h-[160px] rounded-xl border border-border bg-muted/20 pr-2">
+          <div className="flex flex-col gap-1 p-1.5">
+            {categories.map((cat) => {
+              const Icon = CATEGORY_ICONS[cat.slug];
+              const active = current.category === cat.slug;
+              const count = categoryCounts[cat.id] || 0;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => selectCategory(cat.slug)}
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-all",
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                      : "text-foreground hover:bg-card hover:shadow-sm"
+                  )}
+                >
+                  {Icon && (
+                    <Icon
+                      className={cn("size-3.5 shrink-0", active ? "text-primary-foreground" : "text-muted-foreground")}
+                      strokeWidth={2}
+                    />
+                  )}
+                  <span className="min-w-0 flex-1 truncate text-xs font-medium">{cat.name}</span>
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
+                      active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </FilterSection>
+
+      <Separator />
+
+      <FilterSection title="Price range">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="filter-min-price" className="text-[10px] font-medium text-muted-foreground">
+              Min
+            </Label>
+            <Input
+              id="filter-min-price"
+              name="minPrice"
+              type="number"
+              min="0"
+              defaultValue={current.minPrice}
+              placeholder="0"
+              className="h-9 rounded-xl bg-muted/40 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="filter-max-price" className="text-[10px] font-medium text-muted-foreground">
+              Max
+            </Label>
+            <Input
+              id="filter-max-price"
+              name="maxPrice"
+              type="number"
+              min="0"
+              defaultValue={current.maxPrice}
+              placeholder="999"
+              className="h-9 rounded-xl bg-muted/40 text-sm"
+            />
+          </div>
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Turnaround">
+        <Select value={tat} onValueChange={(v) => setTat(v ?? "__any__")}>
+          <SelectTrigger className="h-9 w-full rounded-xl bg-muted/40">
+            <Clock3 className="size-3.5 shrink-0 text-muted-foreground" />
+            <SelectValue placeholder="Any TAT" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__any__">Any TAT</SelectItem>
+            {tatOptions.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FilterSection>
+
+      <FilterSection title="Payment">
+        <Select value={payment} onValueChange={(v) => setPayment(v ?? "__any__")}>
+          <SelectTrigger className="h-9 w-full rounded-xl bg-muted/40">
+            <Banknote className="size-3.5 shrink-0 text-muted-foreground" />
+            <SelectValue placeholder="Any terms" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__any__">Any terms</SelectItem>
+            {paymentOptions.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FilterSection>
+    </>
+  );
+
+  const helpCard = !hideHelpCard ? (
+    <Card className="gap-0 overflow-hidden rounded-xl border-primary/20 bg-gradient-to-br from-primary/5 via-card to-chart-4/5 py-0 shadow-sm ring-0">
+      <CardContent className="flex flex-col gap-2.5 p-3.5">
+        <p className="text-xs font-semibold text-foreground">Need help choosing?</p>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          Your account manager can recommend the best services for your project stage.
+        </p>
+        {managerTelegramLink ? (
+          <Button size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>
+            <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
+              <Send data-icon="inline-start" />
+              Message on Telegram
+            </a>
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>
+            <Link href={`${basePath}/support`}>Contact Support</Link>
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  ) : null;
+
   return (
-    <aside className={className}>
+    <aside className={cn("flex flex-col gap-2", className)}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           applyFilters(new FormData(e.currentTarget));
         }}
-        className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5"
+        className="flex flex-col gap-2"
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF2FF]">
-              <SlidersHorizontal className="h-3.5 w-3.5 text-[#635BFF]" strokeWidth={2} />
-            </span>
-            Filter Services
-          </h3>
-          <Link
-            href={`/partner/services${current.project ? `?project=${current.project}` : ""}`}
-            className="text-xs font-medium text-[#635BFF] hover:underline"
-          >
-            Clear All
-          </Link>
-        </div>
-
-        <input type="hidden" name="category" value={current.category} />
-
-        <div className="relative mb-4 hidden lg:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94A3B8]" strokeWidth={2} />
-          <Input
-            name="q"
-            defaultValue={current.q}
-            placeholder="Search services..."
-            className="h-10 rounded-xl border-[#E2E8F0] pl-9"
-          />
-        </div>
-
-        <div className="mb-4 max-h-[200px] space-y-1 overflow-y-auto pr-1 lg:max-h-[240px]">
-          <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8]">
-            <FolderOpen className="h-3.5 w-3.5" strokeWidth={2} />
-            Category
-          </p>
-          {categories.map((cat) => {
-            const Icon = CATEGORY_ICONS[cat.slug];
-            return (
-              <label
-                key={cat.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1.5 transition hover:bg-[#F8FAFC]"
+        {sidebarLayout ? (
+          <>
+            <FilterToolbarLabel activeCount={activeCount} clearHref={clearHref} />
+            <Card className="gap-0 overflow-hidden rounded-xl border py-0 shadow-sm ring-0">
+              <CardContent className="flex flex-col gap-4 p-4">{filterBody}</CardContent>
+              <CardFooter className="flex flex-col gap-2 border-t bg-muted/20 p-4">
+                <Button type="submit" className="h-10 w-full rounded-xl font-semibold">
+                  Apply Filters
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-8 w-full rounded-lg text-xs font-medium text-muted-foreground hover:text-primary"
+                  asChild
+                >
+                  <Link href={clearHref}>
+                    <RotateCcw data-icon="inline-start" />
+                    Clear all
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </>
+        ) : (
+          <Card className="gap-0 overflow-hidden rounded-xl border py-0 shadow-sm ring-0">
+            <CardHeader className="flex h-11 shrink-0 flex-row items-center justify-between gap-2 border-b px-4 py-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <SlidersHorizontal className="size-4 shrink-0 text-primary" strokeWidth={2} />
+                <CardTitle className="text-sm font-semibold text-foreground">Filter Services</CardTitle>
+              </div>
+              {activeCount > 0 ? (
+                <Link href={clearHref} className="shrink-0 text-[11px] font-medium text-primary hover:underline">
+                  Clear All
+                </Link>
+              ) : null}
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 p-4">{filterBody}</CardContent>
+            <CardFooter className="flex flex-col gap-2 border-t bg-muted/20 p-4">
+              <Button type="submit" className="h-10 w-full rounded-xl font-semibold">
+                Apply Filters
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-8 w-full rounded-lg text-xs font-medium text-muted-foreground hover:text-primary"
+                asChild
               >
-                <Checkbox
-                  checked={current.category === cat.slug}
-                  onCheckedChange={(checked) => {
-                    router.push(buildUrl({ category: checked ? cat.slug : "", page: "1" }));
-                  }}
-                />
-                {Icon && (
-                  <Icon className="h-3.5 w-3.5 shrink-0 text-[#94A3B8]" strokeWidth={2} />
-                )}
-                <span className="flex-1 truncate text-sm text-[#475569]">{cat.name}</span>
-                <span className="rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-semibold text-[#64748B]">
-                  {categoryCounts[cat.id] || 0}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-
-        <div className="mb-4 grid grid-cols-2 gap-2">
-          <div className="space-y-1.5">
-            <Label className="flex items-center gap-1 text-xs text-[#64748B]">
-              <Filter className="h-3 w-3" strokeWidth={2} />
-              Min Price
-            </Label>
-            <Input name="minPrice" type="number" min="0" defaultValue={current.minPrice} placeholder="$0" className="h-9 rounded-lg" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="flex items-center gap-1 text-xs text-[#64748B]">
-              <Filter className="h-3 w-3" strokeWidth={2} />
-              Max Price
-            </Label>
-            <Input name="maxPrice" type="number" min="0" defaultValue={current.maxPrice} placeholder="$999" className="h-9 rounded-lg" />
-          </div>
-        </div>
-
-        <div className="mb-4 space-y-1.5">
-          <Label className="flex items-center gap-1 text-xs text-[#64748B]">
-            <Clock3 className="h-3 w-3" strokeWidth={2} />
-            TAT
-          </Label>
-          <select
-            name="tat"
-            defaultValue={current.tat}
-            className="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm text-[#0F172A]"
-          >
-            <option value="">Select TAT</option>
-            {tatOptions.map((tat) => (
-              <option key={tat} value={tat}>{tat}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4 space-y-1.5">
-          <Label className="flex items-center gap-1 text-xs text-[#64748B]">
-            <Banknote className="h-3 w-3" strokeWidth={2} />
-            Payment Terms
-          </Label>
-          <select
-            name="payment"
-            defaultValue={current.payment}
-            className="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm text-[#0F172A]"
-          >
-            <option value="">Select Payment Terms</option>
-            {paymentOptions.map((term) => (
-              <option key={term} value={term}>{term}</option>
-            ))}
-          </select>
-        </div>
-
-        <Button type="submit" className="h-10 w-full rounded-xl bg-gradient-to-r from-[#635BFF] to-[#7C6FFF] font-semibold shadow-sm hover:from-[#5248E6]">
-          Apply Filters
-        </Button>
+                <Link href={clearHref}>
+                  <RotateCcw data-icon="inline-start" />
+                  Clear all
+                </Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </form>
 
-      {!hideHelpCard && (
-        <div className="mt-4 rounded-2xl border border-[#E0E7FF] bg-gradient-to-br from-[#FAFBFF] to-[#EEF2FF]/50 p-4">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
-              <Headphones className="h-4 w-4 text-[#635BFF]" strokeWidth={2} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#0F172A]">Need Help Choosing?</p>
-              <p className="mt-1 text-xs leading-relaxed text-[#64748B]">
-                Contact your dedicated manager for personalized recommendations.
-              </p>
-            </div>
-          </div>
-          {managerTelegramLink ? (
-            <a
-              href={managerTelegramLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#C7D2FE] bg-white text-sm font-medium text-[#635BFF] transition hover:bg-[#EEF2FF]"
-            >
-              <Send className="h-4 w-4" strokeWidth={2} />
-              Message on Telegram
-            </a>
-          ) : (
-            <Button variant="outline" className="mt-3 h-10 w-full rounded-xl" asChild>
-              <Link href="/partner/support">Contact Support</Link>
-            </Button>
-          )}
-        </div>
-      )}
+      {helpCard}
     </aside>
   );
 }

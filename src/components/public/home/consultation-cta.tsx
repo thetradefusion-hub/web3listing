@@ -19,19 +19,21 @@ export function ConsultationCta({
   secondaryHref = "/services",
 }: ConsultationCtaProps) {
   return (
-    <section className="py-10 sm:py-14 lg:py-16">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 via-[#0c1222] to-violet-600/10 px-5 py-8 text-center sm:rounded-2xl sm:px-10 sm:py-12">
-          <div className="pointer-events-none absolute inset-0 landing-grid opacity-30" />
-          <div className="relative">
-            <h2 className="text-xl font-bold text-white sm:text-2xl lg:text-3xl">{title}</h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
+    <section className="landing-section-tight">
+      <div className="landing-container">
+        <div className="relative overflow-hidden rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 via-card to-violet-500/10 px-4 py-8 text-center sm:rounded-2xl sm:px-10 sm:py-14">
+          <div className="pointer-events-none absolute inset-0 landing-grid opacity-20" />
+          <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-cyan-500/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 -left-16 size-48 rounded-full bg-violet-500/15 blur-3xl" />
+          <div className="relative min-w-0">
+            <h2 className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">{title}</h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               {subtitle}
             </p>
-            <div className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:mt-7 sm:max-w-none sm:flex-row sm:justify-center">
+            <div className="mx-auto mt-6 flex w-full max-w-md flex-col gap-2.5 sm:mt-7 sm:max-w-none sm:flex-row sm:justify-center sm:gap-3">
               <Button
                 size="lg"
-                className="h-11 w-full rounded-xl bg-cyan-500 text-sm font-semibold text-slate-950 hover:bg-cyan-400 sm:h-12 sm:w-auto sm:rounded-full sm:px-8"
+                className="h-11 w-full rounded-xl bg-cyan-500 text-sm font-semibold text-slate-950 shadow-[0_8px_24px_rgba(34,211,238,0.3)] hover:bg-cyan-400 sm:h-12 sm:w-auto sm:rounded-full sm:px-8"
                 asChild
               >
                 <Link href={primaryHref}>{primaryLabel}</Link>
@@ -39,7 +41,7 @@ export function ConsultationCta({
               <Button
                 size="lg"
                 variant="outline"
-                className="h-11 w-full rounded-xl border-white/15 bg-white/5 text-sm font-semibold hover:bg-white/10 sm:h-12 sm:w-auto sm:rounded-full sm:px-8"
+                className="h-11 w-full rounded-xl sm:h-12 sm:w-auto sm:rounded-full sm:px-8"
                 asChild
               >
                 <Link href={secondaryHref}>{secondaryLabel}</Link>

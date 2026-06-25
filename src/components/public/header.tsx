@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { TELEGRAM_SUPPORT } from "@/lib/constants";
 
 const navLinks = [
@@ -19,20 +20,24 @@ export function PublicHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#080d18]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16">
-        <div className="flex min-w-0 items-center gap-2">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="landing-container flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2 md:flex-none">
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="text-slate-300 hover:text-white md:hidden"
+            className="size-9 shrink-0 text-muted-foreground hover:text-foreground md:hidden"
             onClick={() => setOpen(true)}
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <BrandLogo href="/" size="md" className="sm:text-2xl" />
+          <BrandLogo
+            href="/"
+            size="md"
+            className="min-w-0 truncate text-base sm:text-xl md:text-2xl"
+          />
         </div>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -40,37 +45,39 @@ export function PublicHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-lg px-3.5 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-white"
+              className="rounded-lg px-3.5 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="hidden text-slate-400 hover:text-white sm:inline-flex"
-            asChild
-          >
+        <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2">
+          <ThemeToggle className="hidden size-9 text-muted-foreground hover:text-foreground sm:inline-flex" />
+          <Button variant="ghost" size="sm" className="hidden text-muted-foreground hover:text-foreground lg:inline-flex" asChild>
             <a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">
               Telegram
             </a>
           </Button>
+          <Button variant="ghost" size="sm" className="hidden text-muted-foreground hover:text-foreground md:inline-flex" asChild>
+            <Link href="/login">Log in</Link>
+          </Button>
           <Button
             size="sm"
-            className="rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-400 text-xs font-semibold text-slate-950 hover:from-cyan-400 sm:text-sm"
+            className="h-9 rounded-lg bg-cyan-500 px-3 text-xs font-semibold text-slate-950 shadow-sm hover:bg-cyan-400 sm:h-9 sm:px-4 sm:text-sm"
             asChild
           >
-            <Link href="/login">Partner Login</Link>
+            <Link href="/signup">
+              <span className="sm:hidden">Start</span>
+              <span className="hidden sm:inline">Get started</span>
+            </Link>
           </Button>
         </div>
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
         {open ? (
-          <SheetContent side="left" className="w-[min(100vw,300px)] p-0">
+          <SheetContent side="left" className="w-[min(100vw,300px)] border-border bg-background p-0">
             <div className="flex h-full flex-col p-5">
               <Link href="/" onClick={() => setOpen(false)}>
                 <BrandLogo size="lg" />
@@ -87,15 +94,24 @@ export function PublicHeader() {
                   </Link>
                 ))}
               </nav>
-              <div className="space-y-2 border-t pt-4">
+              <div className="space-y-2 border-t border-border pt-4">
+                <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-sm text-muted-foreground">Theme</span>
+                  <ThemeToggle className="text-muted-foreground hover:text-foreground" />
+                </div>
                 <Button variant="outline" className="w-full" asChild>
                   <a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">
                     Telegram Support
                   </a>
                 </Button>
-                <Button className="w-full" asChild>
+                <Button variant="outline" className="w-full" asChild>
                   <Link href="/login" onClick={() => setOpen(false)}>
-                    Partner Login
+                    Log in
+                  </Link>
+                </Button>
+                <Button className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400" asChild>
+                  <Link href="/signup" onClick={() => setOpen(false)}>
+                    Get started
                   </Link>
                 </Button>
               </div>

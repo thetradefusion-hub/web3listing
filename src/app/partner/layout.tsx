@@ -6,7 +6,10 @@ import { PartnerPortalShell } from "@/components/partner/portal-shell";
 export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
   const profile = await getCurrentUser();
   if (!profile) redirect("/login");
-  if (profile.role !== "agent") redirect("/admin");
+  if (profile.role !== "agent") {
+    if (profile.role === "user") redirect("/user");
+    redirect("/admin");
+  }
 
   const supabase = await createClient();
   const { data: manager } = profile.account_manager_id

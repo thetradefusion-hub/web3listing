@@ -1,8 +1,9 @@
 "use client";
 
+import { Cell, Label, Pie, PieChart } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
+import { chartCssVars, chartTextClasses } from "@/lib/theme-tokens";
 import { cn } from "@/lib/utils";
-
-const COLORS = ["#10B981", "#F59E0B", "#EF4444", "#94A3B8"];
 
 export function ProjectStatusChart({
   data,
@@ -13,67 +14,79 @@ export function ProjectStatusChart({
   total: number;
   compact?: boolean;
 }) {
-  const size = compact ? 96 : 150;
-  const cx = size / 2;
-  const cy = size / 2;
-  const outerR = compact ? 42 : 65;
-  const innerR = compact ? 30 : 45;
-  const gap = 0.04;
-
-  let angle = -Math.PI / 2;
-  const sum = data.reduce((s, d) => s + d.value, 0) || 1;
-
-  const arcs = data.map((item, i) => {
-    const slice = (item.value / sum) * (Math.PI * 2 - gap * data.length);
-    const start = angle + gap / 2;
-    const end = start + slice;
-    angle = end + gap / 2;
-
-    const x1o = cx + outerR * Math.cos(start);
-    const y1o = cy + outerR * Math.sin(start);
-    const x2o = cx + outerR * Math.cos(end);
-    const y2o = cy + outerR * Math.sin(end);
-    const x1i = cx + innerR * Math.cos(end);
-    const y1i = cy + innerR * Math.sin(end);
-    const x2i = cx + innerR * Math.cos(start);
-    const y2i = cy + innerR * Math.sin(start);
-    const large = slice > Math.PI ? 1 : 0;
-
-    const d = [
-      `M ${x1o} ${y1o}`,
-      `A ${outerR} ${outerR} 0 ${large} 1 ${x2o} ${y2o}`,
-      `L ${x1i} ${y1i}`,
-      `A ${innerR} ${innerR} 0 ${large} 0 ${x2i} ${y2i}`,
-      "Z",
-    ].join(" ");
-
-    return { d, color: COLORS[i % COLORS.length], item };
-  });
+  const chartConfig = data.reduce<ChartConfig>((acc, item, index) => {
+    acc[item.name] = {
+      label: item.name,
+      color: chartCssVars[index % chartCssVars.length],
+    };
+    return acc;
+  }, {});
 
   return (
-    <div className={cn("flex items-center", compact ? "gap-3" : "flex-col gap-4 sm:flex-row")}>
-      <div className="relative shrink-0" style={{ width: size, height: size }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          {arcs.map((arc, i) => (
-            <path key={i} d={arc.d} fill={arc.color} opacity={0.9} />
-          ))}
-        </svg>
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <p className={cn("font-bold leading-none text-[#0F172A]", compact ? "text-lg" : "text-[28px]")}>{total}</p>
-          <p className={cn("font-medium text-[#94A3B8]", compact ? "mt-0.5 text-[9px]" : "mt-1 text-xs")}>Projects</p>
-        </div>
-      </div>
-      <div className={cn("flex-1", compact ? "space-y-1" : "space-y-2")}>
-        {data.map((item, i) => (
-          <div key={item.name} className="flex items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-1.5">
+    <div className={cn("flex w-full min-h-[168px] flex-col items-center justify-center gap-5 sm:flex-row sm:items-center")}>
+      <ChartContainer
+        config={chartConfig}
+        className={cn("aspect-square w-full max-w-[132px] shrink-0", compact ? "h-[128px]" : "h-[148px]")}
+        initialDimension={{ width: 128, height: compact ? 128 : 148 }}
+      >
+        <PieChart>
+          <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            innerRadius={compact ? 38 : 44}
+            outerRadius={compact ? 56 : 64}
+            strokeWidth={2}
+            stroke="var(--card)"
+            paddingAngle={data.length > 1 ? 3 : 0}
+          >
+            {data.map((entry, index) => (
+              <Cell key={entry.name} fill={chartCssVars[index % chartCssVars.length]} />
+            ))}
+            <Label
+              content={({ viewBox }) => {
+                if (!viewBox || !("cx" in viewBox) || !("cy" in viewBox)) return null;
+                return (
+                  <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                    <tspan x={viewBox.cx} y={(viewBox.cy || 0) - 6} className="fill-foreground text-2xl font-bold">
+                      {total}
+                    </tspan>
+                    <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 14} className="fill-muted-foreground text-[10px] font-medium">
+                      Total
+                    </tspan>
+                  </text>
+                );
+              }}
+            />
+          </Pie>
+        </PieChart>
+      </ChartContainer>
+
+      <div className="flex w-full min-w-0 flex-1 flex-col gap-2">
+        {data.map((item, index) => (
+          <div
+            key={item.name}
+            className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-muted/20 px-3 py-2"
+          >
+            <div className="flex min-w-0 items-center gap-2.5">
               <span
-                className="h-1.5 w-1.5 shrink-0 rounded-full"
-                style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                className="size-2.5 shrink-0 rounded-full ring-2 ring-card"
+                style={{ backgroundColor: chartCssVars[index % chartCssVars.length] }}
               />
-              <span className={cn("truncate text-[#64748B]", compact ? "text-[10px]" : "text-sm")}>{item.name}</span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
+                <p className="text-[11px] text-muted-foreground">{item.value} project{item.value === 1 ? "" : "s"}</p>
+              </div>
             </div>
-            <span className={cn("shrink-0 font-semibold text-[#0F172A]", compact ? "text-[10px]" : "text-sm")}>{item.percent}%</span>
+            <span
+              className={cn(
+                "shrink-0 rounded-md px-2 py-0.5 text-xs font-bold tabular-nums",
+                chartTextClasses[index % chartTextClasses.length]
+              )}
+            >
+              {item.percent}%
+            </span>
           </div>
         ))}
       </div>

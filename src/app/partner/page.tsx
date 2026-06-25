@@ -11,15 +11,16 @@ import { getCurrentUser } from "@/lib/auth";
 import { formatCurrency } from "@/lib/commission";
 import { PartnerDashboardView } from "@/components/partner/dashboard/partner-dashboard-view";
 import { rel } from "@/components/partner/ui";
+import type { QuickActionColor } from "@/lib/theme-tokens";
 import { format, subMonths, startOfMonth, endOfMonth, eachWeekOfInterval, endOfWeek } from "date-fns";
 
-const quickActions = [
-  { label: "Create New Project", href: "/partner/projects/new", icon: Plus, color: "bg-[#EEF2FF] text-[#635BFF]" },
-  { label: "View All Services", href: "/partner/services", icon: Store, color: "bg-[#ECFDF5] text-[#10B981]" },
-  { label: "My Orders", href: "/partner/orders", icon: Package, color: "bg-[#FFFBEB] text-[#F59E0B]" },
-  { label: "Wallet & Earnings", href: "/partner/wallet", icon: Wallet, color: "bg-[#F0FDFA] text-[#14B8A6]" },
-  { label: "Withdrawal", href: "/partner/wallet", icon: Banknote, color: "bg-[#F5F3FF] text-[#8B5CF6]" },
-  { label: "Support Ticket", href: "/partner/support", icon: Headphones, color: "bg-[#FDF2F8] text-[#EC4899]" },
+const quickActions: { label: string; href: string; icon: typeof Plus; color: QuickActionColor }[] = [
+  { label: "New Project", href: "/partner/projects/new", icon: Plus, color: "blue" },
+  { label: "Services", href: "/partner/services", icon: Store, color: "green" },
+  { label: "Orders", href: "/partner/orders", icon: Package, color: "orange" },
+  { label: "Wallet", href: "/partner/wallet", icon: Wallet, color: "teal" },
+  { label: "Withdraw", href: "/partner/wallet", icon: Banknote, color: "purple" },
+  { label: "Support", href: "/partner/support", icon: Headphones, color: "pink" },
 ];
 
 const projectStatusLabels: Record<string, string> = {
@@ -29,10 +30,6 @@ const projectStatusLabels: Record<string, string> = {
   rejected: "Rejected",
   draft: "Draft",
 };
-
-function padCount(n: number) {
-  return n < 10 ? `0${n}` : String(n);
-}
 
 export default async function PartnerDashboard() {
   const profile = await getCurrentUser();
@@ -159,10 +156,10 @@ export default async function PartnerDashboard() {
     .slice(0, 5);
 
   const activeOrderPct =
-    orderCount && activeOrders ? `${Math.round(((activeOrders || 0) / orderCount) * 100)}% of total` : undefined;
+    orderCount && activeOrders ? `${Math.round(((activeOrders || 0) / orderCount) * 100)}%` : undefined;
   const completionRate =
     orderCount && completedOrders
-      ? `${Math.round(((completedOrders || 0) / orderCount) * 100)}% completion`
+      ? `${Math.round(((completedOrders || 0) / orderCount) * 100)}%`
       : undefined;
   const pendingBalance = wallet?.pending_balance || 0;
 
@@ -172,7 +169,7 @@ export default async function PartnerDashboard() {
       stats={{
         projectCount: projectCount || 0,
         orderCount: orderCount || 0,
-        activeOrders: padCount(activeOrders || 0),
+        activeOrders: activeOrders || 0,
         completedOrders: completedOrders || 0,
         lifetimeEarnings: wallet?.lifetime_earnings || 0,
         availableBalance: wallet?.available_balance || 0,
@@ -188,7 +185,6 @@ export default async function PartnerDashboard() {
       topServices={topServices}
       monthEarnings={formatCurrency(monthEarnings)}
       earningsGrowth={earningsGrowth}
-      monthLabel={format(now, "MMMM yyyy")}
       earningsChartData={earningsChartData}
       quickActions={quickActions}
       manager={manager}

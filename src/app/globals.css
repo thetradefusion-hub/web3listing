@@ -118,7 +118,9 @@
 }
 
 .agent-portal,
-.admin-portal {
+.admin-portal,
+.partner-portal,
+.user-portal {
   --background: #f8fafc;
   --foreground: #0f172a;
   --card: #ffffff;
@@ -137,7 +139,42 @@
   --border: #e2e8f0;
   --input: #e2e8f0;
   --ring: #635bff;
+  --chart-1: #635bff;
+  --chart-2: #10b981;
+  --chart-3: #f59e0b;
+  --chart-4: #8b5cf6;
+  --chart-5: #ec4899;
   color-scheme: light;
+}
+
+.dark .agent-portal,
+.dark .admin-portal,
+.dark .partner-portal,
+.dark .user-portal {
+  --background: #0f1117;
+  --foreground: #f1f5f9;
+  --card: #161b26;
+  --card-foreground: #f1f5f9;
+  --popover: #161b26;
+  --popover-foreground: #f1f5f9;
+  --primary: #7c75ff;
+  --primary-foreground: #ffffff;
+  --secondary: #1e2433;
+  --secondary-foreground: #f1f5f9;
+  --muted: #1e2433;
+  --muted-foreground: #94a3b8;
+  --accent: #1e2433;
+  --accent-foreground: #f1f5f9;
+  --destructive: #f87171;
+  --border: #2a3142;
+  --input: #2a3142;
+  --ring: #7c75ff;
+  --chart-1: #7c75ff;
+  --chart-2: #34d399;
+  --chart-3: #fbbf24;
+  --chart-4: #a78bfa;
+  --chart-5: #f472b6;
+  color-scheme: dark;
 }
 
 .portal-sidebar {
@@ -145,21 +182,30 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
+.partner-sidebar {
+  --sidebar-glow: color-mix(in oklch, var(--primary) 18%, transparent);
+}
+
 .portal-main {
-  background-color: #f8fafc;
+  background-color: var(--background);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 91, 255, 0.06), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 91, 255, 0.04), transparent);
+    radial-gradient(ellipse 120% 80% at 50% -30%, color-mix(in oklch, var(--primary) 5%, transparent), transparent);
 }
 
 .premium-card {
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
+  border: 1px solid var(--border);
+  background: var(--card);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.05),
     0 12px 40px rgba(15, 23, 42, 0.06);
   transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.dark .premium-card {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .premium-card-interactive:hover {
@@ -169,11 +215,17 @@
     0 16px 48px rgba(15, 23, 42, 0.08);
 }
 
+.dark .premium-card-interactive:hover {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.25),
+    0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
 .portal-table thead {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: #f8fafc;
+  background: var(--muted);
 }
 
 .portal-table thead th {
@@ -182,15 +234,15 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #94a3b8;
-  border-bottom: 1px solid #e2e8f0;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
 }
 
 .portal-table tbody td {
   padding: 16px 24px;
   font-size: 14px;
-  color: #0f172a;
-  border-bottom: 1px solid #f1f5f9;
+  color: var(--foreground);
+  border-bottom: 1px solid var(--border);
 }
 
 .portal-table tbody tr {
@@ -198,7 +250,7 @@
 }
 
 .portal-table tbody tr:hover {
-  background-color: #f8fafc;
+  background-color: var(--muted);
 }
 
 .portal-table-compact thead th {
@@ -252,11 +304,55 @@ div[data-base-ui-inert][role="presentation"][inert] {
 }
 
 .landing-grid {
-  background-color: #080d18;
+  background-color: var(--background);
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px);
   background-size: 48px 48px;
+}
+
+.dark .landing-grid {
+  background-color: var(--background);
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px);
+}
+
+.lh-accent {
+  color: oklch(0.52 0.14 195);
+}
+
+.dark .lh-accent {
+  color: oklch(0.78 0.15 195);
+}
+
+.landing-section-alt {
+  border-block-color: var(--border);
+  background: color-mix(in oklch, var(--muted) 55%, transparent);
+}
+
+.landing-surface-deep {
+  background: color-mix(in oklch, var(--muted) 70%, var(--background));
+}
+
+.landing-card {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.dark .landing-card {
+  background: color-mix(in oklch, var(--card) 75%, transparent);
+}
+
+.client-dashboard-canvas {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -30%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 55%),
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px);
+  background-size: auto, 40px 40px, 40px 40px;
 }
 
 .login-glow {
@@ -292,16 +388,24 @@ div[data-base-ui-inert][role="presentation"][inert] {
 /* Listing.help-inspired landing utilities */
 .lh-display {
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   text-transform: uppercase;
-  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-size: clamp(1.5rem, 4.5vw, 3rem);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 640px) {
+  .lh-display {
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
 }
 
 .lh-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -313,10 +417,18 @@ div[data-base-ui-inert][role="presentation"][inert] {
 }
 
 .hero-title {
-  font-size: clamp(2rem, 6.5vw, 3.75rem);
+  font-size: clamp(1.75rem, 5.2vw, 3.75rem);
   font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 640px) {
+  .hero-title {
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+  }
 }
 
 .lh-stat-value {
@@ -336,6 +448,87 @@ div[data-base-ui-inert][role="presentation"][inert] {
   }
   100% {
     transform: translateX(-50%);
+  }
+}
+
+.landing-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+@media (min-width: 640px) {
+  .landing-container {
+    padding-inline: max(1.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-container {
+    padding-inline: max(2rem, env(safe-area-inset-left, 0px));
+    padding-right: max(2rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+.landing-section {
+  padding-block: 2.75rem;
+}
+
+@media (min-width: 640px) {
+  .landing-section {
+    padding-block: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-section {
+    padding-block: 6rem;
+  }
+}
+
+.landing-section-tight {
+  padding-block: 2rem;
+}
+
+@media (min-width: 640px) {
+  .landing-section-tight {
+    padding-block: 3.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-section-tight {
+    padding-block: 4rem;
+  }
+}
+
+.hero-preview-float {
+  animation: none;
+}
+
+@media (min-width: 1024px) {
+  .hero-preview-float {
+    animation: hero-preview-float 6s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-preview-float,
+  .lh-marquee {
+    animation: none;
+  }
+}
+
+@keyframes hero-preview-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 

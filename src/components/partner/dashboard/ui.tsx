@@ -2,152 +2,38 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowDownRight, ArrowUpRight, Package, TrendingUp } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { ArrowDownRight, ArrowUpRight, Package } from "lucide-react";
 
-const iconStyles = {
-  blue: { icon: "bg-[#EEF2FF] text-[#635BFF]", accent: "bg-[#635BFF]" },
-  green: { icon: "bg-[#ECFDF5] text-[#10B981]", accent: "bg-[#10B981]" },
-  orange: { icon: "bg-[#FFFBEB] text-[#F59E0B]", accent: "bg-[#F59E0B]" },
-  purple: { icon: "bg-[#F5F3FF] text-[#8B5CF6]", accent: "bg-[#8B5CF6]" },
-  teal: { icon: "bg-[#F0FDFA] text-[#14B8A6]", accent: "bg-[#14B8A6]" },
-  pink: { icon: "bg-[#FDF2F8] text-[#EC4899]", accent: "bg-[#EC4899]" },
-} as const;
+const statusConfig: Record<string, { dot: string; label: string; variant?: "secondary" | "outline" | "destructive" }> = {
+  in_progress: { dot: "bg-primary", label: "Active", variant: "secondary" },
+  payment_confirmed: { dot: "bg-[color:var(--chart-2)]", label: "Paid", variant: "secondary" },
+  under_review: { dot: "bg-[color:var(--chart-3)]", label: "Review", variant: "outline" },
+  completed: { dot: "bg-[color:var(--chart-2)]", label: "Done", variant: "secondary" },
+  delivered: { dot: "bg-[color:var(--chart-2)]", label: "Delivered", variant: "secondary" },
+  closed: { dot: "bg-muted-foreground", label: "Closed", variant: "outline" },
+  submitted: { dot: "bg-[color:var(--chart-3)]", label: "Submitted", variant: "outline" },
+  waiting_payment: { dot: "bg-[color:var(--chart-3)]", label: "Pending", variant: "outline" },
+  third_party_review: { dot: "bg-primary", label: "Review", variant: "secondary" },
+};
 
-export function DashboardStatCard({
-  title,
-  value,
-  subtitle,
-  icon: Icon,
-  color,
-  trend,
-  trendDirection = "up",
-  largeValue,
-}: {
-  title: string;
-  value: string | number;
-  subtitle: string;
-  icon: LucideIcon;
-  color: keyof typeof iconStyles;
-  trend?: string;
-  trendDirection?: "up" | "down" | "neutral";
-  largeValue?: boolean;
-}) {
-  const styles = iconStyles[color];
-  const TrendIcon =
-    trendDirection === "down" ? ArrowDownRight : trendDirection === "up" ? ArrowUpRight : TrendingUp;
+export function OrderStatusBadge({ status, compact }: { status: string; compact?: boolean; mini?: boolean }) {
+  const item = statusConfig[status] || statusConfig.submitted;
 
   return (
-    <Card className="premium-card premium-card-interactive group relative gap-0 overflow-hidden border-[#E2E8F0] py-0 shadow-none ring-0">
-      <div className={cn("absolute inset-x-0 top-0 h-0.5 opacity-80", styles.accent)} />
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-[#64748B]">{title}</p>
-            <p
-              className={cn(
-                "mt-1 font-bold leading-none tracking-tight text-[#0F172A] tabular-nums",
-                largeValue ? "text-xl xl:text-2xl" : "text-2xl xl:text-[28px]"
-              )}
-            >
-              {value}
-            </p>
-            <p className="mt-1 text-[11px] font-medium text-[#94A3B8]">{subtitle}</p>
-            {trend && (
-              <div
-                className={cn(
-                  "mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium",
-                  trendDirection === "down"
-                    ? "bg-[#FEF2F2] text-[#DC2626]"
-                    : trendDirection === "neutral"
-                      ? "bg-[#F8FAFC] text-[#64748B]"
-                      : "bg-[#ECFDF5] text-[#059669]"
-                )}
-              >
-                <TrendIcon className="h-2.5 w-2.5" />
-                {trend}
-              </div>
-            )}
-          </div>
-          <div
-            className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105",
-              styles.icon
-            )}
-          >
-            <Icon className="h-4 w-4" strokeWidth={2} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-export function OrderStatusBadge({ status, compact, mini }: { status: string; compact?: boolean; mini?: boolean }) {
-  const config: Record<string, { className: string; label: string }> = {
-    in_progress: {
-      className: "border-[#C7D2FE] bg-[#EEF2FF] text-[#635BFF]",
-      label: "In Progress",
-    },
-    payment_confirmed: {
-      className: "border-[#A7F3D0] bg-[#ECFDF5] text-[#10B981]",
-      label: "Payment Confirmed",
-    },
-    under_review: {
-      className: "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]",
-      label: "Under Review",
-    },
-    completed: {
-      className: "border-[#A7F3D0] bg-[#ECFDF5] text-[#10B981]",
-      label: "Completed",
-    },
-    delivered: {
-      className: "border-[#A7F3D0] bg-[#ECFDF5] text-[#10B981]",
-      label: "Delivered",
-    },
-    closed: {
-      className: "border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]",
-      label: "Closed",
-    },
-    submitted: {
-      className: "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]",
-      label: "Submitted",
-    },
-    waiting_payment: {
-      className: "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]",
-      label: "Waiting Payment",
-    },
-    third_party_review: {
-      className: "border-[#C7D2FE] bg-[#EEF2FF] text-[#635BFF]",
-      label: "Third Party Review",
-    },
-  };
-
-  const item = config[status] || config.submitted;
-
-  return (
-    <Badge
-      variant="outline"
-      className={cn(
-        "rounded-md font-medium",
-        mini
-          ? "h-4 px-1 text-[9px] leading-none"
-          : compact
-            ? "h-5 px-1.5 text-[10px]"
-            : "h-6 px-2.5 text-xs",
-        item.className
-      )}
-    >
+    <Badge variant={item.variant ?? "outline"} className={cn("gap-1.5 font-medium", compact ? "h-6" : "h-7")}>
+      <span className={cn("size-1.5 rounded-full", item.dot)} />
       {item.label}
     </Badge>
   );
 }
 
+import { chartBgClasses, chartTextClasses } from "@/lib/theme-tokens";
+
 export function TopServicesList({
   services,
-  compact,
-  premium,
 }: {
   services: { name: string; count: number }[];
   compact?: boolean;
@@ -156,38 +42,41 @@ export function TopServicesList({
   const maxCount = services[0]?.count || 1;
 
   return (
-    <div className={compact ? "space-y-2" : "space-y-3"}>
-      {services.map((svc, i) => (
-        <div key={svc.name} className="group">
-          <div className={cn("flex items-center", compact ? "gap-2" : "gap-2.5")}>
-            <span
-              className={cn(
-                "flex shrink-0 items-center justify-center font-bold",
-                premium
-                  ? "h-5 w-5 rounded-md bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] text-[9px] text-[#635BFF] ring-1 ring-[#C7D2FE]/50"
-                  : "rounded-md bg-[#F8FAFC] text-[#64748B] ring-1 ring-[#F1F5F9]",
-                !premium && (compact ? "h-5 w-5 text-[9px] rounded" : "h-7 w-7 text-[11px] rounded-lg")
-              )}
-            >
-              {i + 1}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className={cn("truncate font-medium text-[#0F172A]", compact ? "text-[11px]" : "text-sm")}>{svc.name}</p>
+    <div className="flex min-h-[168px] flex-col justify-center gap-3.5">
+      {services.map((svc, i) => {
+        const pct = Math.round((svc.count / maxCount) * 100);
+        return (
+          <div key={svc.name} className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-primary-foreground shadow-sm",
+                  chartBgClasses[i % chartBgClasses.length]
+                )}
+              >
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground" title={svc.name}>
+                  {svc.name}
+                </p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className={cn("text-sm font-bold tabular-nums", chartTextClasses[i % chartTextClasses.length])}>
+                  {svc.count}
+                </p>
+                <p className="text-[10px] text-muted-foreground">orders</p>
+              </div>
             </div>
-            <span className={cn("shrink-0 font-semibold tabular-nums text-[#635BFF]", compact ? "text-[11px]" : "text-sm")}>
-              {svc.count}
-            </span>
-          </div>
-          {(premium || !compact) && (
-            <div className={cn("overflow-hidden rounded-full bg-[#F1F5F9]", premium ? "ml-7 mt-1 h-0.5" : "ml-9 h-1")}>
+            <div className="ml-10 h-1.5 overflow-hidden rounded-full bg-muted/80">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#635BFF] to-[#8B5CF6] transition-all duration-500"
-                style={{ width: `${Math.max(8, (svc.count / maxCount) * 100)}%` }}
+                className={cn("h-full rounded-full transition-all", chartBgClasses[i % chartBgClasses.length])}
+                style={{ width: `${pct}%` }}
               />
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -195,89 +84,78 @@ export function TopServicesList({
 export function DashboardEmptyOrders({ compact }: { compact?: boolean }) {
   if (compact) {
     return (
-      <div className="flex flex-col items-center justify-center px-2 py-5 text-center">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] ring-1 ring-[#C7D2FE]/50">
-          <Package className="h-4 w-4 text-[#635BFF]" />
-        </div>
-        <p className="mt-2 text-xs font-semibold text-[#0F172A]">No orders yet</p>
-        <p className="mt-1 text-[10px] text-[#64748B]">Create a project to get started</p>
-        <Link
-          href="/partner/projects/new"
-          className="mt-2.5 inline-flex h-7 items-center rounded-lg bg-[#635BFF] px-3 text-[10px] font-semibold text-white hover:brightness-105"
-        >
-          Create Project
-        </Link>
-      </div>
+      <Empty className="border-0 bg-transparent py-8">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Package />
+          </EmptyMedia>
+          <EmptyTitle>No orders</EmptyTitle>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button asChild size="sm">
+            <Link href="/partner/projects/new">New Project</Link>
+          </Button>
+        </EmptyContent>
+      </Empty>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF]">
-        <Package className="h-5 w-5 text-[#635BFF]" />
-      </div>
-      <p className="mt-4 text-base font-semibold text-[#0F172A]">No orders yet</p>
-      <p className="mt-1.5 max-w-sm text-sm text-[#64748B]">
-        Create a project and browse services to place your first order and start earning commissions.
-      </p>
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
-        <Link
-          href="/partner/projects/new"
-          className="inline-flex h-9 items-center rounded-xl bg-[#635BFF] px-4 text-sm font-medium text-white transition hover:brightness-105"
-        >
-          Create Project
-        </Link>
-        <Link
-          href="/partner/services"
-          className="inline-flex h-9 items-center rounded-xl border border-[#E2E8F0] bg-white px-4 text-sm font-medium text-[#0F172A] transition hover:bg-[#F8FAFC]"
-        >
-          View Services
-        </Link>
-      </div>
-    </div>
+    <Empty className="border-dashed py-10">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Package />
+        </EmptyMedia>
+        <EmptyTitle>No orders yet</EmptyTitle>
+        <EmptyDescription>
+          Create a project and browse services to place your first order and start earning commissions.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent className="flex-row flex-wrap justify-center gap-2">
+        <Button asChild>
+          <Link href="/partner/projects/new">Create Project</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/partner/services">View Services</Link>
+        </Button>
+      </EmptyContent>
+    </Empty>
   );
 }
 
 export function EarningsOverviewCard({
   monthEarnings,
   earningsGrowth,
-  monthLabel,
   chart,
-  compact,
 }: {
   monthEarnings: string;
   earningsGrowth: string;
-  monthLabel: string;
   chart: ReactNode;
-  compact?: boolean;
 }) {
   const isPositive = Number(earningsGrowth) >= 0;
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-start justify-between gap-2">
+    <div className="flex min-h-[168px] flex-col justify-center gap-4">
+      <div className="flex items-end justify-between gap-3 rounded-xl border border-border/60 bg-muted/20 px-3.5 py-3">
         <div>
-          <p className={cn("font-medium uppercase tracking-wider text-[#94A3B8]", compact ? "text-[9px]" : "text-[11px]")}>
-            Earnings
-          </p>
-          <p className={cn("font-bold leading-none tracking-tight text-[#0F172A] tabular-nums", compact ? "mt-0.5 text-lg" : "mt-1 text-[24px]")}>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">This month</p>
+          <p className="mt-0.5 text-2xl font-bold tracking-tight tabular-nums text-foreground sm:text-[1.75rem]">
             {monthEarnings}
           </p>
-          <p className={cn("font-medium text-[#94A3B8]", compact ? "text-[10px]" : "mt-0.5 text-xs")}>{monthLabel}</p>
         </div>
-        <span
+        <Badge
+          variant="secondary"
           className={cn(
-            "inline-flex shrink-0 items-center gap-0.5 rounded-full font-medium",
-            compact ? "h-5 px-1.5 text-[9px]" : "h-6 px-2 text-[10px]",
-            isPositive ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#FEF2F2] text-[#DC2626]"
+            "h-7 gap-1 rounded-lg px-2.5 text-xs font-semibold tabular-nums",
+            isPositive ? "bg-chart-2/10 text-chart-2" : "bg-destructive/10 text-destructive"
           )}
         >
-          {isPositive ? <ArrowUpRight className="h-2.5 w-2.5" /> : <ArrowDownRight className="h-2.5 w-2.5" />}
+          {isPositive ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}
           {isPositive ? "+" : ""}
           {earningsGrowth}%
-        </span>
+        </Badge>
       </div>
-      <div className={compact ? "mt-1" : "mt-2"}>{chart}</div>
+      <div className="min-h-0 flex-1">{chart}</div>
     </div>
   );
 }

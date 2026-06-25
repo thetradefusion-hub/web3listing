@@ -12,7 +12,7 @@ import { BLOCKCHAIN_NETWORKS } from "@/lib/constants";
 import { toast } from "sonner";
 import type { Project } from "@/types/database";
 
-export function ProjectForm({ project }: { project?: Project }) {
+export function ProjectForm({ project, basePath = "/partner" }: { project?: Project; basePath?: string }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export function ProjectForm({ project }: { project?: Project }) {
       return;
     }
     toast.success(status === "draft" ? "Draft saved" : "Project submitted");
-    router.push("/partner/projects");
+    router.push(`${basePath}/projects`);
     router.refresh();
   }
 

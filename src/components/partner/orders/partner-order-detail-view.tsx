@@ -42,6 +42,8 @@ export function PartnerOrderDetailView({
   quotation,
   deliverables,
   history,
+  basePath = "/partner",
+  showCommission = true,
 }: {
   order: Order;
   service: Service | null;
@@ -50,6 +52,8 @@ export function PartnerOrderDetailView({
   quotation: Quotation | null;
   deliverables: Deliverable[];
   history: OrderStatusHistory[];
+  basePath?: string;
+  showCommission?: boolean;
 }) {
   const showDelivery = isCommissionEligibleStatus(order.status);
   const commission = service
@@ -65,7 +69,7 @@ export function PartnerOrderDetailView({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-lg" asChild>
-            <Link href="/partner/orders" aria-label="Back to orders">
+            <Link href={`${basePath}/orders`} aria-label="Back to orders">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -80,7 +84,7 @@ export function PartnerOrderDetailView({
               {service?.name || "Service"} · {project?.project_name || "Project"}
             </p>
             <nav className="mt-2 flex items-center gap-1 text-xs text-[#94A3B8]">
-              <Link href="/partner/orders" className="hover:text-[#635BFF]">My Orders</Link>
+              <Link href={`${basePath}/orders`} className="hover:text-[#635BFF]">My Orders</Link>
               <ChevronRight className="h-3 w-3" />
               <span>#{order.order_number}</span>
             </nav>
@@ -92,7 +96,7 @@ export function PartnerOrderDetailView({
             className="h-10 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 text-sm font-semibold shadow-md shadow-indigo-200/50 hover:from-[#4F46E5] hover:to-[#7C3AED]"
             asChild
           >
-            <Link href={`/partner/orders/${order.id}/delivery`}>View Delivery</Link>
+            <Link href={`${basePath}/orders/${order.id}/delivery`}>View Delivery</Link>
           </Button>
         )}
       </div>
@@ -110,7 +114,7 @@ export function PartnerOrderDetailView({
             </div>
             {project && (
               <Button variant="outline" size="sm" className="ml-1 h-8 rounded-lg text-xs" asChild>
-                <Link href={`/partner/projects/${project.id}`}>
+                <Link href={`${basePath}/projects/${project.id}`}>
                   <FolderKanban className="mr-1.5 h-3.5 w-3.5" />
                   Project
                 </Link>
@@ -123,7 +127,9 @@ export function PartnerOrderDetailView({
               ["Ordered", new Date(order.created_at).toLocaleDateString()],
               ["TAT", service?.estimated_tat || "—"],
               ["Payment", payment ? formatCurrency(payment.amount) : "—"],
-              ["Earnings", commission > 0 ? formatCurrency(commission) : "—"],
+              ...(showCommission
+                ? [["Earnings", commission > 0 ? formatCurrency(commission) : "—"] as const]
+                : []),
             ].map(([label, value]) => (
               <div key={label}>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-[#94A3B8]">
@@ -152,7 +158,7 @@ export function PartnerOrderDetailView({
             </p>
           </div>
           <Button size="sm" className="rounded-lg bg-[#059669] hover:bg-[#047857]" asChild>
-            <Link href={`/partner/orders/${order.id}/delivery`}>Open Delivery Page</Link>
+            <Link href={`${basePath}/orders/${order.id}/delivery`}>Open Delivery Page</Link>
           </Button>
         </div>
       )}
@@ -207,7 +213,7 @@ export function PartnerOrderDetailView({
             </div>
             {showDelivery && (
               <Link
-                href={`/partner/orders/${order.id}/delivery`}
+                href={`${basePath}/orders/${order.id}/delivery`}
                 className="text-xs font-semibold text-[#635BFF] hover:underline"
               >
                 View all on Delivery page →

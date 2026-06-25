@@ -34,10 +34,30 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "premium-advisory": Briefcase,
 };
 
+export const CATEGORY_SHORT_LABELS: Record<string, string> = {
+  "listing-services": "Listing",
+  "explorer-services": "Explorer",
+  "wallet-listing": "Wallet",
+  "market-making": "Markets",
+  "token-security": "Security",
+  "liquidity-lock": "Liquidity",
+  "pr-distribution": "PR",
+  "influencer-marketing": "Influencer",
+  "community-management": "Comms",
+  "trending-services": "Trending",
+  "ai-services": "AI",
+  "development-services": "Dev",
+  "premium-advisory": "Advisory",
+};
+
+export function getCategoryShortLabel(slug: string, name: string) {
+  return CATEGORY_SHORT_LABELS[slug] || name.replace(/\s+services?$/i, "").trim() || name;
+}
+
 export const BADGE_STYLES = {
-  hot: "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]",
-  popular: "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]",
-  new: "bg-[#EEF2FF] text-[#635BFF] border-[#C7D2FE]",
+  hot: "border-destructive/30 bg-destructive/10 text-destructive",
+  popular: "border-chart-2/30 bg-chart-2/10 text-chart-2",
+  new: "border-primary/30 bg-primary/10 text-primary",
 } as const;
 
 export const BADGE_LABELS = {
@@ -47,11 +67,11 @@ export const BADGE_LABELS = {
 } as const;
 
 const LOGO_COLORS = [
-  "bg-[#EEF2FF] text-[#635BFF]",
-  "bg-[#ECFDF5] text-[#10B981]",
-  "bg-[#FFFBEB] text-[#F59E0B]",
-  "bg-[#F5F3FF] text-[#8B5CF6]",
-  "bg-[#F0FDFA] text-[#14B8A6]",
+  "bg-primary/10 text-primary",
+  "bg-chart-2/10 text-chart-2",
+  "bg-chart-3/10 text-chart-3",
+  "bg-chart-4/10 text-chart-4",
+  "bg-chart-5/10 text-chart-5",
 ];
 
 export const SERVICE_ACCENT_GRADIENTS = [

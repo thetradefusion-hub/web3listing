@@ -72,6 +72,8 @@ export function OrderDeliveryView({
   manager,
   relatedServices,
   quotationCommission,
+  basePath = "/partner",
+  showCommission = true,
 }: {
   order: Order;
   service: Service;
@@ -85,6 +87,8 @@ export function OrderDeliveryView({
   manager: AccountManager | null;
   relatedServices: { name: string; slug: string; price: number | null }[];
   quotationCommission?: number | null;
+  basePath?: string;
+  showCommission?: boolean;
 }) {
   const commission = calculateOrderCommission(service, {
     quotationCommission,
@@ -137,7 +141,7 @@ export function OrderDeliveryView({
             <dd className="text-[#635BFF]">{formatCurrency(servicePrice)}</dd>
           </div>
         </dl>
-        {commission > 0 && (
+        {showCommission && commission > 0 && (
           <div className="mt-3 rounded-xl bg-[#ECFDF5] px-3 py-2.5 text-center text-sm">
             Your Earnings ({service.commission_value}%):{" "}
             <span className="font-bold text-[#059669]">{formatCurrency(commission)}</span>
@@ -161,7 +165,7 @@ export function OrderDeliveryView({
                   )}
                 </div>
                 <Button size="sm" className="h-7 shrink-0 rounded-lg bg-[#635BFF] px-2.5 text-[10px]" asChild>
-                  <Link href={`/partner/services/${s.slug}`}>Order</Link>
+                  <Link href={`${basePath}/services/${s.slug}`}>Order</Link>
                 </Button>
               </div>
             ))}
@@ -185,16 +189,16 @@ export function OrderDeliveryView({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
           <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-lg" asChild>
-            <Link href={`/partner/orders/${order.id}`} aria-label="Back to order">
+            <Link href={`${basePath}/orders/${order.id}`} aria-label="Back to order">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
           <div className="min-w-0">
             <h1 className="text-xl font-bold text-[#0F172A] sm:text-2xl">Service Delivery</h1>
             <nav className="mt-1 flex flex-wrap items-center gap-1 text-xs text-[#94A3B8] sm:text-sm">
-              <Link href="/partner/orders" className="hover:text-[#635BFF]">My Orders</Link>
+              <Link href={`${basePath}/orders`} className="hover:text-[#635BFF]">My Orders</Link>
               <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-              <Link href={`/partner/orders/${order.id}`} className="truncate hover:text-[#635BFF]">
+              <Link href={`${basePath}/orders/${order.id}`} className="truncate hover:text-[#635BFF]">
                 #{order.order_number}
               </Link>
               <ChevronRight className="h-3.5 w-3.5 shrink-0" />
@@ -215,7 +219,7 @@ export function OrderDeliveryView({
               <p className="truncate text-base font-bold text-[#0F172A] sm:text-lg">{project.project_name}</p>
               <p className="text-xs text-[#64748B] sm:text-sm">{project.blockchain_network}</p>
               <Button variant="outline" size="sm" className="mt-2 h-8 rounded-lg text-xs" asChild>
-                <Link href={`/partner/projects/${project.id}`}>View Project</Link>
+                <Link href={`${basePath}/projects/${project.id}`}>View Project</Link>
               </Button>
             </div>
           </div>
@@ -250,7 +254,7 @@ export function OrderDeliveryView({
       </section>
 
       {/* Mobile summary strip — earnings quick view */}
-      {commission > 0 && (
+      {showCommission && commission > 0 && (
         <div className="rounded-xl bg-[#ECFDF5] px-4 py-3 text-center text-sm lg:hidden">
           Your Earnings ({service.commission_value}%):{" "}
           <span className="font-bold text-[#059669]">{formatCurrency(commission)}</span>

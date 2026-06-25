@@ -8,11 +8,11 @@ export const ORDER_STATUS_GROUPS: Record<string, OrderStatus[]> = {
 };
 
 export const DONUT_COLORS: Record<string, string> = {
-  Pending: "#F59E0B",
-  "In Progress": "#3B82F6",
-  "Under Review": "#8B5CF6",
-  Completed: "#10B981",
-  Cancelled: "#EF4444",
+  Pending: "var(--chart-3)",
+  "In Progress": "var(--primary)",
+  "Under Review": "var(--chart-4)",
+  Completed: "var(--chart-2)",
+  Cancelled: "var(--destructive)",
 };
 
 export function buildRevenueSeries(
@@ -87,7 +87,7 @@ export function buildRecentActivities(input: {
       title: "New Order Created",
       description: `Order #${o.order_number} — ${o.status.replace(/_/g, " ")}`,
       time: o.created_at,
-      tone: "bg-[#EEF2FF] text-[#6366F1]",
+      tone: "bg-primary/10 text-primary",
     });
   });
 
@@ -97,7 +97,7 @@ export function buildRecentActivities(input: {
       title: "Payment Received",
       description: `$${Number(p.amount).toLocaleString()} confirmed`,
       time: p.created_at,
-      tone: "bg-[#ECFDF5] text-[#059669]",
+      tone: "bg-chart-2/10 text-chart-2",
     });
   });
 
@@ -107,7 +107,7 @@ export function buildRecentActivities(input: {
       title: "KYC Pending",
       description: `${input.kycCount} submissions awaiting review`,
       time: new Date().toISOString(),
-      tone: "bg-[#FFF7ED] text-[#EA580C]",
+      tone: "bg-chart-3/10 text-chart-3",
     });
   }
 
@@ -117,7 +117,7 @@ export function buildRecentActivities(input: {
       title: "Project Submitted",
       description: `${input.projectCount} projects need approval`,
       time: new Date().toISOString(),
-      tone: "bg-[#F5F3FF] text-[#7C3AED]",
+      tone: "bg-chart-4/10 text-chart-4",
     });
   }
 

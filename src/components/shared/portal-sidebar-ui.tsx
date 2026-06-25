@@ -14,21 +14,28 @@ export function PortalSidebarShell({
   className,
   collapsed,
   collapsible = true,
+  variant = "default",
 }: {
   children: ReactNode;
   className?: string;
   collapsed?: boolean;
   collapsible?: boolean;
+  variant?: "default" | "partner";
 }) {
   return (
     <aside
       className={cn(
         "portal-sidebar relative flex h-full shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#0B1020] text-white transition-[width] duration-300 ease-in-out",
         collapsed ? "w-[72px]" : "w-[260px]",
+        variant === "partner" && "partner-sidebar",
         className
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#635BFF]/8 via-transparent to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent opacity-80" />
+      <div
+        className="pointer-events-none absolute -right-16 top-24 size-48 rounded-full bg-primary/10 blur-3xl"
+        aria-hidden
+      />
       <div className="relative flex min-h-0 flex-1 flex-col">{children}</div>
       {collapsible && <PortalSidebarCollapseToggle collapsed={collapsed} />}
     </aside>
@@ -42,10 +49,11 @@ function PortalSidebarCollapseToggle({ collapsed }: { collapsed?: boolean }) {
     <button
       type="button"
       onClick={toggleCollapsed}
-      className="relative hidden shrink-0 items-center justify-center border-t border-white/[0.06] py-3 text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300 md:flex"
+      className="relative mx-3 mb-3 hidden shrink-0 items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] py-2.5 text-xs font-medium text-slate-500 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-slate-300 md:flex"
       aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
     >
-      {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+      {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+      {!collapsed && <span>Collapse</span>}
     </button>
   );
 }
@@ -54,24 +62,26 @@ export function PortalSidebarBrand({
   href,
   badge,
   collapsed,
+  variant = "default",
 }: {
   href: string;
   badge: string;
   collapsed?: boolean;
+  variant?: "default" | "partner";
 }) {
   return (
     <div
       className={cn(
         "border-b border-white/[0.06]",
-        collapsed ? "flex justify-center px-2 py-4" : "px-5 py-5"
+        collapsed ? "flex justify-center px-2 py-4" : "px-4 py-4 sm:px-5 sm:py-5"
       )}
     >
-      <Link href={href} onClick={(e) => e.stopPropagation()} className="group block">
+      <Link href={href} onClick={(e) => e.stopPropagation()} className="group block min-w-0">
         {collapsed ? (
           <Tooltip>
             <TooltipTrigger
               render={
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF007A] via-[#7C3AED] to-[#0070F3] text-sm font-bold text-white">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF007A] via-[#7C3AED] to-[#0070F3] text-sm font-bold text-white shadow-lg shadow-primary/20">
                   T
                 </span>
               }
@@ -81,7 +91,14 @@ export function PortalSidebarBrand({
         ) : (
           <>
             <BrandLogo size="sm" className="max-w-[200px]" />
-            <span className="mt-3 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+            <span
+              className={cn(
+                "mt-2.5 inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                variant === "partner"
+                  ? "border-primary/25 bg-primary/10 text-primary-foreground/90"
+                  : "border-white/10 bg-white/[0.04] text-slate-400"
+              )}
+            >
               {badge}
             </span>
           </>
@@ -103,8 +120,8 @@ export function PortalSidebarNav({
   return (
     <nav
       className={cn(
-        "flex-1 overflow-y-auto py-4 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.1)_transparent]",
-        collapsed ? "space-y-2 px-2" : "space-y-6 px-3",
+        "flex-1 overflow-y-auto py-3 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.12)_transparent]",
+        collapsed ? "space-y-2 px-2" : "space-y-5 px-2.5",
         className
       )}
     >
@@ -125,12 +142,34 @@ export function PortalSidebarSection({
   return (
     <div>
       {!collapsed && (
-        <p className="mb-2 px-3 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500">
-          {label}
-        </p>
+        <div className="mb-2 flex items-center gap-2 px-2.5">
+          <p className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {label}
+          </p>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+        </div>
       )}
-      <div className={cn("flex flex-col", collapsed ? "gap-1" : "gap-1")}>{children}</div>
+      <div className="flex flex-col gap-0.5">{children}</div>
     </div>
+  );
+}
+
+function navItemClasses(isActive: boolean, collapsed?: boolean) {
+  return cn(
+    "group relative flex items-center rounded-xl transition-all duration-200",
+    collapsed ? "justify-center p-2" : "gap-2.5 px-2 py-1.5",
+    isActive
+      ? "bg-primary/12 text-white"
+      : "text-slate-400 hover:bg-white/[0.05] hover:text-slate-100"
+  );
+}
+
+function navIconClasses(isActive: boolean) {
+  return cn(
+    "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors",
+    isActive
+      ? "bg-primary/25 text-white shadow-sm shadow-primary/20"
+      : "bg-white/[0.04] text-slate-500 group-hover:bg-white/[0.08] group-hover:text-slate-300"
   );
 }
 
@@ -149,27 +188,19 @@ export function PortalSidebarNavItem({
   onClick?: () => void;
   collapsed?: boolean;
 }) {
-  const link = (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={cn(
-        "group flex items-center rounded-full text-[13px] font-medium transition-all duration-200",
-        collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
-        isActive
-          ? "border border-[rgba(99,91,255,0.2)] bg-[rgba(99,91,255,0.15)] text-white shadow-[0_0_20px_rgba(99,91,255,0.35)]"
-          : "border border-transparent text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
-      )}
-    >
-      <Icon
-        className={cn(
-          "h-4 w-4 shrink-0",
-          isActive ? "text-[#A5A0FF]" : "text-slate-500 group-hover:text-slate-300"
-        )}
-        strokeWidth={isActive ? 2.25 : 2}
-      />
-      {!collapsed && <span className="flex-1 truncate">{label}</span>}
-    </Link>
+  const content = (
+    <>
+      {isActive && !collapsed ? (
+        <span
+          className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-full bg-primary"
+          aria-hidden
+        />
+      ) : null}
+      <span className={navIconClasses(isActive)}>
+        <Icon className="size-4" strokeWidth={isActive ? 2.25 : 2} />
+      </span>
+      {!collapsed && <span className="flex-1 truncate text-[13px] font-medium">{label}</span>}
+    </>
   );
 
   if (collapsed) {
@@ -180,20 +211,11 @@ export function PortalSidebarNavItem({
             <Link
               href={href}
               onClick={onClick}
-              className={cn(
-                "group flex items-center justify-center rounded-full px-2 py-2.5 text-[13px] font-medium transition-all duration-200",
-                isActive
-                  ? "border border-[rgba(99,91,255,0.2)] bg-[rgba(99,91,255,0.15)] text-white shadow-[0_0_20px_rgba(99,91,255,0.35)]"
-                  : "border border-transparent text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
-              )}
+              className={cn(navItemClasses(isActive, true), isActive && "ring-1 ring-primary/25")}
             >
-              <Icon
-                className={cn(
-                  "h-4 w-4 shrink-0",
-                  isActive ? "text-[#A5A0FF]" : "text-slate-500 group-hover:text-slate-300"
-                )}
-                strokeWidth={isActive ? 2.25 : 2}
-              />
+              <span className={navIconClasses(isActive)}>
+                <Icon className="size-4" strokeWidth={isActive ? 2.25 : 2} />
+              </span>
             </Link>
           }
         />
@@ -202,7 +224,11 @@ export function PortalSidebarNavItem({
     );
   }
 
-  return link;
+  return (
+    <Link href={href} onClick={onClick} className={navItemClasses(isActive, false)}>
+      {content}
+    </Link>
+  );
 }
 
 export function PortalSidebarFooter({
@@ -215,7 +241,7 @@ export function PortalSidebarFooter({
   collapsed?: boolean;
 }) {
   return (
-    <div className={cn("border-t border-white/[0.06]", collapsed ? "p-2" : "p-4", className)}>
+    <div className={cn("border-t border-white/[0.06] bg-black/10", collapsed ? "p-2" : "p-3", className)}>
       {children}
     </div>
   );
@@ -231,12 +257,74 @@ export function PortalSidebarCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4",
+        "rounded-xl border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-sm",
         className
       )}
     >
       {children}
     </div>
+  );
+}
+
+export function PortalSidebarUserCard({
+  name,
+  subtitle,
+  initials,
+  badge,
+  collapsed,
+}: {
+  name: string;
+  subtitle?: string;
+  initials: string;
+  badge?: ReactNode;
+  collapsed?: boolean;
+}) {
+  if (collapsed) return null;
+
+  return (
+    <PortalSidebarCard className="mb-2">
+      <div className="flex items-center gap-2.5">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground shadow-sm">
+          {initials}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-white">{name}</p>
+          {subtitle ? <p className="truncate text-[11px] text-slate-500">{subtitle}</p> : null}
+        </div>
+        {badge}
+      </div>
+    </PortalSidebarCard>
+  );
+}
+
+export function PortalSidebarQuickAction({
+  href,
+  label,
+  icon: Icon,
+  onClick,
+  collapsed,
+}: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  onClick?: () => void;
+  collapsed?: boolean;
+}) {
+  if (collapsed) {
+    return (
+      <PortalSidebarIconAction href={href} label={label} icon={Icon} onClick={onClick} />
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="mb-2 flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/15 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-primary/22"
+    >
+      <Icon className="size-4" strokeWidth={2.25} />
+      {label}
+    </Link>
   );
 }
 
@@ -252,11 +340,13 @@ export function PortalSidebarLogout({
       type="button"
       onClick={onLogout}
       className={cn(
-        "flex w-full items-center rounded-xl text-[13px] font-medium text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300",
-        collapsed ? "justify-center px-2 py-2.5" : "gap-2 px-3 py-2.5"
+        "flex w-full items-center rounded-xl border border-transparent text-[13px] font-medium text-slate-500 transition hover:border-white/[0.06] hover:bg-white/[0.04] hover:text-slate-300",
+        collapsed ? "justify-center px-2 py-2.5" : "gap-2.5 px-2.5 py-2"
       )}
     >
-      <LogOut className="h-4 w-4 shrink-0" />
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04]">
+        <LogOut className="size-4 shrink-0" />
+      </span>
       {!collapsed && "Sign out"}
     </button>
   );
@@ -269,9 +359,11 @@ export function PortalSidebarLogout({
             <button
               type="button"
               onClick={onLogout}
-              className="flex w-full items-center justify-center rounded-xl px-2 py-2.5 text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
+              className="flex w-full items-center justify-center rounded-xl p-2 text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
             >
-              <LogOut className="h-4 w-4 shrink-0" />
+              <span className="flex size-8 items-center justify-center rounded-lg bg-white/[0.04]">
+                <LogOut className="size-4 shrink-0" />
+              </span>
             </button>
           }
         />
@@ -301,9 +393,9 @@ export function PortalSidebarIconAction({
           <Link
             href={href}
             onClick={onClick}
-            className="flex w-full items-center justify-center rounded-xl border border-[rgba(99,91,255,0.25)] bg-[rgba(99,91,255,0.12)] py-2.5 text-white transition hover:bg-[rgba(99,91,255,0.18)]"
+            className="mb-2 flex w-full items-center justify-center rounded-xl border border-primary/25 bg-primary/15 py-2.5 text-white transition hover:bg-primary/22"
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="size-4" />
           </Link>
         }
       />

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { format } from "date-fns";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -10,34 +11,44 @@ import {
   Clock,
   CreditCard,
   ExternalLink,
+  FileCheck,
   FileSearch,
   FileText,
+  Flame,
   Globe,
   Headphones,
-  Heart,
   Layers,
   MessageSquare,
   Network,
-  PlayCircle,
   RotateCcw,
   Send,
   Shield,
-  Star,
-  TrendingUp,
-  Users,
+  ShieldCheck,
+  ShoppingBag,
+  Tag,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
 import { OrderForm } from "@/components/partner/order-form";
+import { PartnerPageShell } from "@/components/partner/ui";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/commission";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
+  CATEGORY_ICONS,
+  getServiceAccent,
   getServiceCardMeta,
   getServiceInitials,
   getServiceLogoColor,
   parseJsonArray,
 } from "@/lib/service-catalog";
+import { iconTintStyles } from "@/lib/theme-tokens";
 import type { Project, Service } from "@/types/database";
 import { cn } from "@/lib/utils";
 
@@ -48,18 +59,43 @@ type RecentListing = {
   completed_at: string;
 };
 
-const FEATURE_ICONS = [BadgeCheck, TrendingUp, Shield, Users, Headphones];
+const FEATURE_ICONS = [BadgeCheck, Shield, Globe, Headphones, ClipboardList];
 const PROCESS_ICONS = [ClipboardList, FileSearch, Send, MessageSquare, BadgeCheck];
 
-const LISTING_AVATAR_COLORS = [
-  "bg-[#FEF3C7] text-[#D97706]",
-  "bg-[#FEE2E2] text-[#DC2626]",
-  "bg-[#DBEAFE] text-[#2563EB]",
-  "bg-[#F3E8FF] text-[#7C3AED]",
-];
+const TAB_TRIGGER_CLASS =
+  "shrink-0 snap-start rounded-none border-b-2 border-transparent px-3 py-2.5 text-xs font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none sm:px-4 sm:py-3 sm:text-sm";
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-base font-bold text-[#0F172A]">{children}</h3>;
+const TAB_LABELS: Record<string, { short: string; full: string }> = {
+  overview: { short: "Overview", full: "Overview" },
+  included: { short: "Included", full: "Included" },
+  proof: { short: "Proof", full: "Proof" },
+  requirements: { short: "Req.", full: "Requirements" },
+  faq: { short: "FAQ", full: "FAQ" },
+  terms: { short: "Terms", full: "Terms" },
+};
+
+function MetricPill({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  label: string;
+  value: string | null | undefined;
+  tone: string;
+}) {
+  return (
+    <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-2 py-2 sm:gap-2 sm:px-3 sm:py-2.5">
+      <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg ring-1", tone)}>
+        <Icon className="size-3.5" strokeWidth={2.25} />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="break-words text-[11px] font-bold leading-snug text-foreground sm:text-xs">{value || "—"}</p>
+      </div>
+    </div>
+  );
 }
 
 function SummaryRow({
@@ -72,13 +108,13 @@ function SummaryRow({
   value: string | null | undefined;
 }) {
   return (
-    <div className="flex items-start gap-3 border-b border-[#F1F5F9] py-3 last:border-0">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#94A3B8]">
-        <Icon className="h-4 w-4" strokeWidth={2} />
+    <div className="flex items-center gap-3 py-2.5">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground">
+        <Icon className="size-4" strokeWidth={2} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-medium text-[#94A3B8]">{label}</p>
-        <p className="mt-0.5 text-sm font-semibold text-[#0F172A]">{value || "—"}</p>
+        <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="break-words text-sm font-semibold text-foreground">{value || "—"}</p>
       </div>
     </div>
   );
@@ -92,6 +128,8 @@ export function ServiceDetailView({
   defaultProjectId,
   recentListings,
   managerTelegramLink,
+  basePath = "/partner",
+  showCommission = true,
 }: {
   service: Service;
   categoryName: string;
@@ -100,9 +138,13 @@ export function ServiceDetailView({
   defaultProjectId?: string;
   recentListings: RecentListing[];
   managerTelegramLink?: string | null;
+  basePath?: string;
+  showCommission?: boolean;
 }) {
   const meta = getServiceCardMeta(service);
   const logoColor = getServiceLogoColor(service.name);
+  const accent = getServiceAccent(service.name);
+  const CatIcon = CATEGORY_ICONS[categorySlug] || Layers;
   const whatsIncluded = parseJsonArray<string>(service.whats_included);
   const platforms = parseJsonArray<string>(service.supported_platforms);
   const processSteps = parseJsonArray<{ title: string; description?: string }>(service.process_steps);
@@ -113,459 +155,468 @@ export function ServiceDetailView({
   const servicePrice = service.price ?? 0;
   const total = service.pricing_model === "fixed" ? servicePrice + platformFee : null;
   const platformFeePercent = servicePrice > 0 ? Math.round((platformFee / servicePrice) * 100) : 0;
-
   const overviewText = service.overview || service.description;
+  const projectQuery = defaultProjectId ? `?project=${defaultProjectId}` : "";
 
   return (
-    <div className="space-y-5">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <Button
-          variant="outline"
-          size="icon"
-          className="mt-0.5 h-9 w-9 shrink-0 rounded-lg border-[#E2E8F0] bg-white"
-          asChild
-        >
-          <Link href="/partner/services" aria-label="Back to services">
-            <ArrowLeft className="h-4 w-4" />
+    <PartnerPageShell compact fullWidth className="gap-4 pb-24 sm:gap-5 lg:pb-0">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:items-start sm:gap-3">
+        <nav className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground sm:hidden">
+          <Link href={`${basePath}/services${projectQuery}`} className="shrink-0 transition hover:text-primary">
+            Marketplace
+          </Link>
+          <span aria-hidden>›</span>
+          <span className="truncate font-medium text-foreground">{service.name}</span>
+        </nav>
+
+        <nav className="hidden min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:flex">
+          <Link href={basePath} className="transition hover:text-primary">
+            Dashboard
+          </Link>
+          <span aria-hidden>›</span>
+          <Link href={`${basePath}/services`} className="transition hover:text-primary">
+            Marketplace
+          </Link>
+          <span aria-hidden>›</span>
+          <Link
+            href={`${basePath}/services?category=${categorySlug}${defaultProjectId ? `&project=${defaultProjectId}` : ""}`}
+            className="transition hover:text-primary"
+          >
+            {categoryName}
+          </Link>
+          <span aria-hidden>›</span>
+          <span className="max-w-[200px] truncate font-medium text-foreground md:max-w-none">{service.name}</span>
+        </nav>
+
+        <Button variant="outline" size="sm" className="h-8 shrink-0 rounded-xl px-2.5 text-xs font-semibold sm:h-9 sm:px-3" asChild>
+          <Link href={`${basePath}/services${projectQuery}`} aria-label="Back to services">
+            <ArrowLeft data-icon="inline-start" />
+            <span className="hidden sm:inline">Back</span>
           </Link>
         </Button>
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold text-[#0F172A] sm:text-2xl">Service Details</h1>
-          <nav className="mt-1 flex flex-wrap items-center gap-1 text-xs text-[#94A3B8] sm:text-sm">
-            <Link href="/partner/services" className="hover:text-[#635BFF]">
-              All Services
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-            <Link href={`/partner/services?category=${categorySlug}`} className="hover:text-[#635BFF]">
-              {categoryName}
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-            <span className="text-[#64748B]">{service.name}</span>
-          </nav>
-        </div>
       </div>
 
-      {/* Hero card */}
-      <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">
-          <div
-            className={cn(
-              "flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-lg font-bold sm:h-[72px] sm:w-[72px]",
-              logoColor
-            )}
-          >
-            {service.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={service.logo_url} alt="" className="h-full w-full object-cover" />
-            ) : (
-              getServiceInitials(service.name)
-            )}
-          </div>
+      {/* Hero */}
+      <Card size="sm" className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 py-0">
+        <div className={cn("absolute inset-y-0 left-0 w-1 bg-gradient-to-b", accent)} aria-hidden />
+        <CardContent className="flex flex-col gap-4 p-4 pl-5 sm:p-5 sm:pl-6 lg:flex-row lg:items-start lg:gap-5">
+          <div className="flex min-w-0 gap-3 sm:gap-4 lg:min-w-0 lg:flex-1">
+            <div
+              className={cn(
+                "flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl shadow-md ring-2 ring-border/50 sm:size-16 lg:size-[72px]",
+                logoColor
+              )}
+            >
+              {service.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={service.logo_url} alt="" className="size-full object-cover" />
+              ) : (
+                <span className="text-base font-bold sm:text-lg">{getServiceInitials(service.name)}</span>
+              )}
+            </div>
 
-          <div className="min-w-0 flex-1">
-            {service.badge ? (
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-semibold",
-                  BADGE_STYLES[service.badge]
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base font-bold leading-tight text-foreground sm:text-xl lg:text-2xl">{service.name}</h1>
+
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+                {service.badge ? (
+                  <span
+                    className={cn(
+                      "inline-flex h-5 items-center gap-1 rounded-full border px-2 text-[10px] font-semibold",
+                      BADGE_STYLES[service.badge]
+                    )}
+                  >
+                    {service.badge === "hot" && <Flame className="size-3" strokeWidth={2.5} />}
+                    {BADGE_LABELS[service.badge]}
+                  </span>
+                ) : null}
+                <span className="inline-flex h-5 max-w-full items-center gap-1 rounded-full border border-border bg-muted/40 px-2 text-[10px] font-semibold text-muted-foreground">
+                  <CatIcon className="size-3 shrink-0" strokeWidth={2} />
+                  <span className="truncate">{categoryName}</span>
+                </span>
+              </div>
+
+              <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">{service.description}</p>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {(service.proof_of_work || service.proof_of_work_url) && (
+                  <a
+                    href={service.proof_of_work_url || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => !service.proof_of_work_url && e.preventDefault()}
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/15"
+                  >
+                    <FileCheck className="size-3" strokeWidth={2} />
+                    Proof of Work
+                  </a>
                 )}
-              >
-                {BADGE_LABELS[service.badge]} Service
-              </span>
-            ) : (
-              <span className="inline-flex items-center rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2 py-0.5 text-[11px] font-semibold text-[#059669]">
-                Popular Service
-              </span>
-            )}
+                {service.demo_link && (
+                  <a
+                    href={service.demo_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-full bg-chart-2/10 px-2.5 py-1 text-[11px] font-semibold text-chart-2 transition-colors hover:bg-chart-2/15"
+                  >
+                    <ShieldCheck className="size-3" strokeWidth={2} />
+                    Demo
+                  </a>
+                )}
+              </div>
 
-            <h2 className="mt-2 text-xl font-bold text-[#0F172A] sm:text-2xl">{service.name}</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#64748B]">
-              {service.description}
-            </p>
-
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-medium text-[#635BFF]">
-              {(service.proof_of_work || service.proof_of_work_url) && (
-                <a
-                  href={service.proof_of_work_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 hover:underline"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Proof of Work
-                </a>
-              )}
-              {service.demo_link && (
-                <a
-                  href={service.demo_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 hover:underline"
-                >
-                  <PlayCircle className="h-3.5 w-3.5" />
-                  Demo
-                </a>
-              )}
-              <span className="inline-flex items-center gap-1.5 text-[#F59E0B]">
-                <Star className="h-3.5 w-3.5 fill-current" />
-                Top Rated
-              </span>
+              <div className="mt-4 hidden grid-cols-3 gap-2 lg:grid">
+                <MetricPill icon={Tag} label="Price" value={meta.priceLabel} tone={iconTintStyles.blue} />
+                <MetricPill icon={Clock} label="TAT" value={service.estimated_tat} tone={iconTintStyles.orange} />
+                <MetricPill icon={CreditCard} label="Payment" value={service.payment_terms} tone={iconTintStyles.green} />
+              </div>
             </div>
           </div>
 
-          <div className="w-full shrink-0 lg:w-[190px] lg:text-right">
-            <p className="text-2xl font-bold text-[#0F172A] sm:text-[28px]">{meta.priceLabel}</p>
-            {meta.commissionLabel && (
-              <p className="mt-1 text-sm text-[#64748B]">
-                Earn Commission{" "}
-                <span className="font-semibold text-[#059669]">{meta.commissionLabel}</span>
-              </p>
-            )}
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row lg:flex-col">
-              <Button
-                className="h-10 rounded-xl bg-[#635BFF] text-sm font-semibold hover:bg-[#5248E6]"
-                asChild
-              >
-                <a href="#order-section">{meta.ctaLabel}</a>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-10 rounded-xl border-[#E2E8F0] text-sm font-medium text-[#64748B]"
-              >
-                <Heart className="mr-2 h-4 w-4" />
-                Add to Wishlist
-              </Button>
-            </div>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 lg:hidden">
+            <MetricPill icon={Tag} label="Price" value={meta.priceLabel} tone={iconTintStyles.blue} />
+            <MetricPill icon={Clock} label="TAT" value={service.estimated_tat} tone={iconTintStyles.orange} />
+            <MetricPill icon={CreditCard} label="Pay" value={service.payment_terms} tone={iconTintStyles.green} />
           </div>
-        </div>
-      </section>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
-        {/* Left column */}
-        <div className="min-w-0 space-y-5">
-          <Tabs defaultValue="overview" className="rounded-2xl border border-[#E2E8F0] bg-white shadow-sm">
-            <TabsList className="h-auto w-full justify-start gap-0 overflow-x-auto rounded-none border-b border-[#F1F5F9] bg-transparent p-0">
-              {[
-                ["overview", "Overview"],
-                ["included", "What's Included"],
-                ["proof", "Proof of Work"],
-                ["requirements", "Requirements"],
-                ["faq", "FAQ"],
-                ["terms", "Terms & Conditions"],
-              ].map(([tab, label]) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-3.5 text-sm font-medium text-[#64748B] data-[state=active]:border-[#635BFF] data-[state=active]:bg-transparent data-[state=active]:text-[#635BFF] data-[state=active]:shadow-none"
-                >
-                  {label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+          <div className="hidden w-full shrink-0 flex-col gap-2 sm:flex lg:w-[172px]">
+            <p className="text-center text-xl font-bold tabular-nums text-foreground sm:text-2xl lg:text-right">{meta.priceLabel}</p>
+            {showCommission && meta.commissionLabel && (
+              <div className="rounded-xl border border-chart-2/20 bg-chart-2/10 px-3 py-2 text-center lg:text-right">
+                <p className="text-[10px] font-medium text-muted-foreground">Earn Commission</p>
+                <p className="text-sm font-bold text-chart-2">{meta.commissionLabel}</p>
+              </div>
+            )}
+            <Button className="h-10 rounded-xl font-semibold shadow-sm" asChild>
+              <a href="#order-section">
+                <ShoppingBag data-icon="inline-start" />
+                {meta.ctaLabel}
+              </a>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-            <TabsContent value="overview" className="space-y-8 p-5 sm:p-6">
-              <section>
-                <SectionTitle>Service Overview</SectionTitle>
-                <p className="mt-3 text-sm leading-relaxed text-[#64748B]">
-                  {overviewText}
-                </p>
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(260px,300px)] lg:items-start lg:gap-5">
+        <div className="order-2 flex min-w-0 flex-col gap-4 lg:order-none lg:col-start-1">
+          <Card size="sm" className="gap-0 overflow-hidden py-0">
+            <Tabs defaultValue="overview">
+              <TabsList className="h-auto w-full justify-start gap-0 overflow-x-auto rounded-none border-b border-border bg-transparent p-0 snap-x snap-mandatory [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1">
+                {Object.entries(TAB_LABELS).map(([tab, labels]) => (
+                  <TabsTrigger key={tab} value={tab} className={TAB_TRIGGER_CLASS}>
+                    <span className="sm:hidden">{labels.short}</span>
+                    <span className="hidden sm:inline">{labels.full}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
-                {whatsIncluded.length > 0 && (
-                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                    {whatsIncluded.slice(0, 5).map((item, i) => {
-                      const Icon = FEATURE_ICONS[i % FEATURE_ICONS.length];
-                      return (
-                        <div
-                          key={item}
-                          className="rounded-xl border border-[#EDE9FE] bg-[#F5F3FF] px-3 py-4 text-center"
-                        >
-                          <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#635BFF] shadow-sm">
-                            <Icon className="h-4 w-4" strokeWidth={2} />
-                          </span>
-                          <p className="mt-2.5 text-[11px] font-semibold leading-snug text-[#475569]">
-                            {item}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </section>
-
-              <section>
-                <SectionTitle>About {service.name.split("(")[0].trim()}</SectionTitle>
-                <p className="mt-3 text-sm leading-relaxed text-[#64748B]">
-                  {service.description}
-                </p>
-              </section>
-
-              {processSteps.length > 0 && (
+              <TabsContent value="overview" className="flex flex-col gap-6 p-4 sm:p-5">
                 <section>
-                  <SectionTitle>Our Process</SectionTitle>
-                  <div className="mt-5 flex items-start gap-1 overflow-x-auto pb-1 sm:gap-2">
-                    {processSteps.map((step, i) => {
-                      const Icon = PROCESS_ICONS[i % PROCESS_ICONS.length];
-                      return (
-                        <div key={step.title} className="flex shrink-0 items-start">
-                          <div className="flex w-[100px] flex-col items-center text-center sm:w-[110px]">
-                            <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#E0E7FF] bg-[#EEF2FF] text-[#635BFF]">
-                              <Icon className="h-5 w-5" strokeWidth={2} />
-                            </span>
-                            <p className="mt-2 text-[11px] font-medium leading-snug text-[#475569]">
-                              {step.title}
+                  <h3 className="text-sm font-bold text-foreground">Service Overview</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{overviewText}</p>
+                  {whatsIncluded.length > 0 && (
+                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                      {whatsIncluded.slice(0, 5).map((item, i) => {
+                        const Icon = FEATURE_ICONS[i % FEATURE_ICONS.length];
+                        return (
+                          <Card key={item} size="sm" className="gap-0 border-primary/15 bg-primary/5 py-0 text-center ring-0">
+                            <CardContent className="flex flex-col items-center gap-2 p-3">
+                              <span className="flex size-9 items-center justify-center rounded-full bg-card text-primary shadow-sm ring-1 ring-border/50">
+                                <Icon className="size-4" strokeWidth={2} />
+                              </span>
+                              <p className="text-[10px] font-semibold leading-snug text-muted-foreground">{item}</p>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+
+                {processSteps.length > 0 && (
+                  <section>
+                    <h3 className="text-sm font-bold text-foreground">Our Process</h3>
+                    <div className="mt-4 flex snap-x snap-mandatory items-start gap-1 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                      {processSteps.map((step, i) => {
+                        const Icon = PROCESS_ICONS[i % PROCESS_ICONS.length];
+                        return (
+                          <div key={step.title} className="flex shrink-0 items-start">
+                            <div className="flex w-[96px] flex-col items-center text-center sm:w-[104px]">
+                              <span className="flex size-11 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/10 text-primary">
+                                <Icon className="size-5" strokeWidth={2} />
+                              </span>
+                              <p className="mt-2 text-[10px] font-medium leading-snug text-muted-foreground">{step.title}</p>
+                              {step.description ? (
+                                <p className="mt-0.5 line-clamp-2 text-[9px] text-muted-foreground/80">{step.description}</p>
+                              ) : null}
+                            </div>
+                            {i < processSteps.length - 1 && (
+                              <ChevronRight className="mx-0.5 mt-3 size-4 shrink-0 text-border" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+
+                {platforms.length > 0 && (
+                  <section>
+                    <h3 className="text-sm font-bold text-foreground">Supported Platforms</h3>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {platforms.map((p) => (
+                        <span
+                          key={p}
+                          className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 text-xs font-medium text-muted-foreground"
+                        >
+                          <Globe className="size-3 shrink-0" />
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </TabsContent>
+
+              <TabsContent value="included" className="p-4 sm:p-5">
+                {whatsIncluded.length > 0 ? (
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {whatsIncluded.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2 rounded-xl border border-border bg-muted/20 px-3 py-2.5 text-sm text-muted-foreground"
+                      >
+                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-chart-2" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Empty className="border-0 bg-transparent py-6">
+                    <EmptyHeader>
+                      <EmptyTitle className="text-sm">Nothing listed yet</EmptyTitle>
+                      <EmptyDescription>Included items will appear here.</EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                )}
+              </TabsContent>
+
+              <TabsContent value="proof" className="p-4 sm:p-5">
+                {service.proof_of_work ? (
+                  <p className="text-sm leading-relaxed text-muted-foreground">{service.proof_of_work}</p>
+                ) : (
+                  <Empty className="border-0 bg-transparent py-6">
+                    <EmptyHeader>
+                      <EmptyTitle className="text-sm">Proof coming soon</EmptyTitle>
+                    </EmptyHeader>
+                  </Empty>
+                )}
+                {service.proof_of_work_url && (
+                  <Button variant="outline" className="mt-4 rounded-xl font-semibold" asChild>
+                    <a href={service.proof_of_work_url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink data-icon="inline-start" />
+                      View Proof of Work
+                    </a>
+                  </Button>
+                )}
+              </TabsContent>
+
+              <TabsContent value="requirements" className="p-4 sm:p-5">
+                {requiredDocs.length > 0 ? (
+                  <ul className="flex flex-col gap-2">
+                    {requiredDocs.map((doc, i) => (
+                      <li
+                        key={doc}
+                        className="flex items-start gap-2.5 rounded-xl border border-border bg-muted/20 px-3.5 py-3 text-sm text-muted-foreground"
+                      >
+                        <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                          {i + 1}
+                        </span>
+                        {doc}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Requirements shared during order placement.</p>
+                )}
+              </TabsContent>
+
+              <TabsContent value="faq" className="p-4 sm:p-5">
+                {faqs.length > 0 ? (
+                  <div className="flex flex-col gap-3">
+                    {faqs.map((faq) => (
+                      <Card key={faq.question} size="sm" className="gap-0 border-border py-0 ring-0">
+                        <CardHeader className="gap-1 p-3.5 pb-2">
+                          <CardTitle className="text-sm font-semibold text-foreground">{faq.question}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-3.5 pt-0">
+                          <CardDescription className="text-sm leading-relaxed">{faq.answer}</CardDescription>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Empty className="border-0 bg-transparent py-6">
+                    <EmptyHeader>
+                      <EmptyTitle className="text-sm">No FAQs yet</EmptyTitle>
+                    </EmptyHeader>
+                  </Empty>
+                )}
+              </TabsContent>
+
+              <TabsContent value="terms" className="p-4 sm:p-5">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {service.terms_conditions || "Standard platform terms apply. Third-party approvals are not guaranteed."}
+                </p>
+              </TabsContent>
+            </Tabs>
+          </Card>
+
+          {recentListings.length > 0 && (
+            <DashboardPanel
+              title="Recent Successful Listings"
+              description="Projects that completed this service"
+              icon={CheckCircle2}
+              iconColor="green"
+              action={
+                <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-semibold" asChild>
+                  <Link href={`${basePath}/orders`}>View All</Link>
+                </Button>
+              }
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                {recentListings.map((item) => {
+                  const initials = (item.token_symbol || item.project_name).slice(0, 2).toUpperCase();
+                  const avatarColor = getServiceLogoColor(item.project_name);
+                  return (
+                    <Card key={item.id} size="sm" className="gap-0 bg-muted/20 py-0 ring-0">
+                      <CardContent className="flex flex-col gap-2.5 p-3.5">
+                        <div className="flex items-start gap-2.5">
+                          <Avatar className="size-10 ring-2 ring-border/50">
+                            <AvatarFallback className={cn("text-[11px] font-bold", avatarColor)}>
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-foreground">{item.project_name}</p>
+                            <p className="text-[11px] text-muted-foreground">{categoryName}</p>
+                            <p className="text-[11px] text-muted-foreground">
+                              {format(new Date(item.completed_at), "MMM d, yyyy")}
                             </p>
                           </div>
-                          {i < processSteps.length - 1 && (
-                            <ChevronRight className="mx-0.5 mt-3 h-4 w-4 shrink-0 text-[#CBD5E1] sm:mx-1" />
-                          )}
                         </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
-
-              {platforms.length > 0 && (
-                <section>
-                  <SectionTitle>Supported Platforms</SectionTitle>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {platforms.map((p) => (
-                      <span
-                        key={p}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#FAFBFC] px-3 py-1.5 text-xs font-medium text-[#475569]"
-                      >
-                        <Globe className="h-3.5 w-3.5 text-[#94A3B8]" />
-                        {p}
-                      </span>
-                    ))}
-                    {platforms.length >= 3 && (
-                      <span className="inline-flex items-center gap-1 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-1.5 text-xs font-semibold text-[#2563EB]">
-                        And More...
-                      </span>
-                    )}
-                  </div>
-                </section>
-              )}
-            </TabsContent>
-
-            <TabsContent value="included" className="p-5 sm:p-6">
-              {whatsIncluded.length > 0 ? (
-                <ul className="grid gap-2 sm:grid-cols-2">
-                  {whatsIncluded.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2 rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] px-3.5 py-3 text-sm text-[#475569]"
-                    >
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#635BFF]" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-[#94A3B8]">No included items listed yet.</p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="proof" className="p-5 sm:p-6">
-              {service.proof_of_work ? (
-                <p className="text-sm leading-relaxed text-[#64748B]">{service.proof_of_work}</p>
-              ) : (
-                <p className="text-sm text-[#94A3B8]">Proof of work details coming soon.</p>
-              )}
-              {service.proof_of_work_url && (
-                <a
-                  href={service.proof_of_work_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#635BFF] hover:underline"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  View Proof of Work
-                </a>
-              )}
-            </TabsContent>
-
-            <TabsContent value="requirements" className="p-5 sm:p-6">
-              {requiredDocs.length > 0 ? (
-                <ul className="space-y-2">
-                  {requiredDocs.map((doc, i) => (
-                    <li
-                      key={doc}
-                      className="flex items-start gap-2.5 rounded-xl border border-[#F1F5F9] px-3.5 py-3 text-sm text-[#475569]"
-                    >
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-[10px] font-bold text-[#635BFF]">
-                        {i + 1}
-                      </span>
-                      {doc}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-[#94A3B8]">
-                  Requirements will be shared during order placement.
-                </p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="faq" className="p-5 sm:p-6">
-              {faqs.length > 0 ? (
-                <div className="divide-y divide-[#F1F5F9]">
-                  {faqs.map((faq) => (
-                    <div key={faq.question} className="py-4 first:pt-0 last:pb-0">
-                      <p className="text-sm font-semibold text-[#0F172A]">{faq.question}</p>
-                      <p className="mt-1.5 text-sm leading-relaxed text-[#64748B]">{faq.answer}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-[#94A3B8]">No FAQs added for this service yet.</p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="terms" className="p-5 sm:p-6">
-              <p className="text-sm leading-relaxed text-[#64748B]">
-                {service.terms_conditions ||
-                  "Standard platform terms apply. Third-party approvals are not guaranteed."}
-              </p>
-            </TabsContent>
-          </Tabs>
-
-          {/* Recent listings — below tabs */}
-          {recentListings.length > 0 && (
-            <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <SectionTitle>Recent Successful Listings</SectionTitle>
-                <Link href="/partner/orders" className="text-xs font-semibold text-[#635BFF] hover:underline">
-                  View All
-                </Link>
+                        <span className="w-fit rounded-full border border-chart-2/30 bg-chart-2/10 px-2 py-0.5 text-[10px] font-semibold text-chart-2">
+                          Completed
+                        </span>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {recentListings.map((item, i) => (
-                  <div
-                    key={item.id}
-                    className="rounded-xl border border-[#E2E8F0] bg-[#FAFBFC] p-3.5"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <div
-                        className={cn(
-                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
-                          LISTING_AVATAR_COLORS[i % LISTING_AVATAR_COLORS.length]
-                        )}
-                      >
-                        {(item.token_symbol || item.project_name).slice(0, 2).toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-[#0F172A]">{item.project_name}</p>
-                        <p className="text-[11px] text-[#94A3B8]">Listed on {categoryName}</p>
-                        <p className="mt-0.5 text-[11px] text-[#94A3B8]">
-                          {new Date(item.completed_at).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="mt-2.5 inline-flex rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-semibold text-[#059669]">
-                      Completed
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
+            </DashboardPanel>
           )}
         </div>
 
-        {/* Right sidebar */}
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5">
-            <h3 className="text-sm font-bold text-[#0F172A]">Service Summary</h3>
-            <dl className="mt-1">
+        <aside className="order-1 flex min-w-0 flex-col gap-4 lg:order-none lg:col-start-2 lg:sticky lg:top-20 lg:self-start">
+          <DashboardPanel title="Service Summary" icon={Layers} iconColor="blue" className="hidden sm:block">
+            <div className="flex flex-col divide-y divide-border">
               <SummaryRow icon={Layers} label="Category" value={categoryName} />
               <SummaryRow icon={Clock} label="Estimated TAT" value={service.estimated_tat} />
               <SummaryRow icon={CreditCard} label="Payment Terms" value={service.payment_terms} />
               <SummaryRow icon={FileText} label="Listing Type" value={service.listing_type} />
               <SummaryRow icon={Network} label="Networks" value={service.networks} />
-              <SummaryRow
-                icon={RotateCcw}
-                label="Refund Policy"
-                value={service.refund_policy || "Non-Refundable"}
-              />
-              <SummaryRow icon={Headphones} label="Support" value="24/7 Telegram Support" />
-            </dl>
-          </div>
+              <SummaryRow icon={RotateCcw} label="Refund Policy" value={service.refund_policy || "Non-Refundable"} />
+              <SummaryRow icon={Headphones} label="Support" value="24/7 Telegram" />
+            </div>
+          </DashboardPanel>
 
-          <div
-            id="order-section"
-            className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm sm:p-5"
-          >
-            <h3 className="text-sm font-bold text-[#0F172A]">Pricing & Earnings</h3>
-
-            {service.pricing_model === "fixed" && total != null ? (
-              <dl className="mt-4 space-y-2.5 text-sm">
-                <div className="flex justify-between text-[#64748B]">
-                  <dt>Service Price</dt>
-                  <dd className="font-medium text-[#0F172A]">{formatCurrency(servicePrice)}</dd>
-                </div>
-                <div className="flex justify-between text-[#64748B]">
-                  <dt>Platform Fee ({platformFeePercent}%)</dt>
-                  <dd className="font-medium text-[#0F172A]">{formatCurrency(platformFee)}</dd>
-                </div>
-                <div className="flex justify-between border-t border-[#F1F5F9] pt-2.5">
-                  <dt className="font-bold text-[#0F172A]">Total Amount</dt>
-                  <dd className="text-base font-bold text-[#635BFF]">{formatCurrency(total)}</dd>
-                </div>
-              </dl>
-            ) : (
-              <p className="mt-3 text-lg font-bold text-[#0F172A]">{meta.priceLabel}</p>
-            )}
-
-            {meta.commissionLabel && (
-              <div className="mt-4 rounded-xl bg-[#ECFDF5] px-3 py-2.5 text-center text-sm">
-                <span className="text-[#64748B]">Your Earnings ({service.commission_value}%): </span>
-                <span className="font-bold text-[#059669]">{meta.commissionLabel}</span>
-              </div>
-            )}
-
-            <div className="mt-4 border-t border-[#F1F5F9] pt-4">
-              {projects.length > 0 ? (
-                <OrderForm service={service} projects={projects} defaultProjectId={defaultProjectId} />
+          <Card id="order-section" size="sm" className="scroll-mt-20 gap-0 overflow-hidden py-0 shadow-md sm:scroll-mt-24">
+            <CardHeader className="border-b border-border p-4 pb-3">
+              <CardTitle className="text-sm font-bold">Pricing & Order</CardTitle>
+              <CardDescription className="text-xs">Place an order for this service</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 p-4">
+              {service.pricing_model === "fixed" && total != null ? (
+                <dl className="flex flex-col gap-2 text-sm">
+                  <div className="flex justify-between text-muted-foreground">
+                    <dt>Service Price</dt>
+                    <dd className="font-medium text-foreground">{formatCurrency(servicePrice)}</dd>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <dt>Platform Fee ({platformFeePercent}%)</dt>
+                    <dd className="font-medium text-foreground">{formatCurrency(platformFee)}</dd>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between">
+                    <dt className="font-bold text-foreground">Total</dt>
+                    <dd className="text-base font-bold text-primary">{formatCurrency(total)}</dd>
+                  </div>
+                </dl>
               ) : (
-                <div className="space-y-2 text-center">
-                  <p className="text-xs text-[#64748B]">Create a project to place an order</p>
-                  <Button className="w-full rounded-xl bg-[#635BFF] hover:bg-[#5248E6]" asChild>
-                    <Link href="/partner/projects/new">Create Project</Link>
-                  </Button>
+                <p className="text-lg font-bold text-foreground">{meta.priceLabel}</p>
+              )}
+
+              {showCommission && meta.commissionLabel && (
+                <div className="rounded-xl border border-chart-2/20 bg-chart-2/10 px-3 py-2.5 text-center text-sm">
+                  <p className="text-muted-foreground">
+                    Your Earnings ({service.commission_value}%):{" "}
+                    <span className="font-bold text-chart-2">{meta.commissionLabel}</span>
+                  </p>
                 </div>
               )}
-            </div>
 
-            <p className="mt-4 text-center text-xs leading-relaxed text-[#94A3B8]">
-              Need this service for multiple tokens? Contact your manager for custom pricing.
-            </p>
+              {projects.length > 0 ? (
+                <OrderForm service={service} projects={projects} defaultProjectId={defaultProjectId} basePath={basePath} />
+              ) : (
+                <Empty className="rounded-xl border border-dashed py-6">
+                  <EmptyHeader>
+                    <EmptyTitle className="text-sm">No project yet</EmptyTitle>
+                    <EmptyDescription>Create a project to place an order.</EmptyDescription>
+                  </EmptyHeader>
+                  <EmptyContent>
+                    <Button className="w-full rounded-xl font-semibold" asChild>
+                      <Link href={`${basePath}/projects/new`}>Create Project</Link>
+                    </Button>
+                  </EmptyContent>
+                </Empty>
+              )}
+            </CardContent>
+            <CardFooter className="flex-col items-stretch gap-2 border-t border-border bg-muted/20 p-4">
+              <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+                Multiple tokens? Contact your manager for custom pricing.
+              </p>
+              {managerTelegramLink ? (
+                <Button variant="outline" className="h-9 w-full rounded-xl text-sm font-semibold" asChild>
+                  <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
+                    <Send data-icon="inline-start" />
+                    Message on Telegram
+                  </a>
+                </Button>
+              ) : null}
+            </CardFooter>
+          </Card>
 
-            {managerTelegramLink && (
-              <a
-                href={managerTelegramLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 flex h-10 w-full items-center justify-center rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#DBEAFE]"
-              >
-                Message on Telegram
-              </a>
-            )}
-          </div>
-
-          <div className="flex items-start gap-2.5 rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3">
-            <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]" />
-            <p className="text-xs leading-relaxed text-[#475569]">
-              <span className="font-semibold text-[#2563EB]">Safe & Secure:</span> Your payment and
-              data are 100% secure with us.
-            </p>
-          </div>
+          <Alert className="hidden border-primary/20 bg-primary/5 sm:flex">
+            <Shield className="text-primary" />
+            <AlertTitle className="text-xs font-semibold text-foreground">Safe & Secure</AlertTitle>
+            <AlertDescription className="text-xs text-muted-foreground">
+              Your payment and data are protected on our platform.
+            </AlertDescription>
+          </Alert>
         </aside>
       </div>
-    </div>
+
+      {/* Mobile sticky order bar */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-card/80 sm:hidden">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[10px] font-medium text-muted-foreground">{service.name}</p>
+            <p className="text-lg font-bold tabular-nums text-primary">{meta.priceLabel}</p>
+          </div>
+          <Button className="h-10 shrink-0 rounded-xl px-4 font-semibold shadow-sm" asChild>
+            <a href="#order-section">{meta.ctaLabel}</a>
+          </Button>
+        </div>
+      </div>
+    </PartnerPageShell>
   );
 }

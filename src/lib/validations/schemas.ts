@@ -6,6 +6,14 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+export const signupSchema = z.object({
+  email: z.string().email("Valid email required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  full_name: z.string().min(2, "Name is required"),
+  company_name: z.string().optional(),
+  country: z.string().min(2, "Country is required"),
+});
+
 export const projectSchema = z.object({
   project_name: z.string().min(2, "Project name required"),
   token_name: z.string().min(1, "Token name required"),

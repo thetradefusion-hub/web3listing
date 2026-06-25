@@ -39,6 +39,7 @@ export default async function AdminDashboard() {
 
   const [
     { count: partnerCount },
+    { count: userCount },
     { count: orderCount },
     { count: activeProjects },
     { count: pendingKyc },
@@ -56,6 +57,7 @@ export default async function AdminDashboard() {
     { data: allOrdersWithDates },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "agent"),
+    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "user"),
     supabase.from("orders").select("*", { count: "exact", head: true }),
     supabase.from("projects").select("*", { count: "exact", head: true }).eq("status", "approved"),
     supabase.from("kyc_submissions").select("*", { count: "exact", head: true }).eq("status", "pending"),
@@ -130,6 +132,7 @@ export default async function AdminDashboard() {
         ordersTrend: calcTrend(ordersCurrent, ordersPrev),
         totalPartners: partnerCount || 0,
         partnersTrend: calcTrend(partnersCurrent, partnersPrev),
+        totalUsers: userCount || 0,
         activeProjects: activeProjects || 0,
         projectsTrend: undefined,
         totalCommission,

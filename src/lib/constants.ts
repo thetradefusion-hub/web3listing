@@ -24,6 +24,17 @@ export const PRICING_BADGES: Record<string, { label: string; className: string }
 
 export const ADMIN_ROLES: UserRole[] = ["super_admin", "operations_manager"];
 export const ALL_STAFF_ROLES: UserRole[] = ["super_admin", "operations_manager", "service_team"];
+export const PARTNER_ROLE: UserRole = "agent";
+export const CLIENT_ROLE: UserRole = "user";
+export const OWNER_ROLES: UserRole[] = ["agent", "user"];
+
+export function isPartnerRole(role: UserRole) {
+  return role === PARTNER_ROLE;
+}
+
+export function isClientRole(role: UserRole) {
+  return role === CLIENT_ROLE;
+}
 
 export const BLOCKCHAIN_NETWORKS = [
   "Ethereum", "BSC", "Polygon", "Arbitrum", "Base", "Solana", "Avalanche", "Tron", "Other",

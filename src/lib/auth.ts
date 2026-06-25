@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/types/database";
+import { CLIENT_ROLE, PARTNER_ROLE } from "@/lib/constants";
 
 export async function getCurrentUser() {
   const supabase = await createClient();
@@ -32,4 +33,16 @@ export function isAdminRole(role: UserRole) {
 
 export function isStaffRole(role: UserRole) {
   return isAdminRole(role) || role === "service_team";
+}
+
+export function isPartnerRole(role: UserRole) {
+  return role === PARTNER_ROLE;
+}
+
+export function isClientRole(role: UserRole) {
+  return role === CLIENT_ROLE;
+}
+
+export function isOwnerRole(role: UserRole) {
+  return isPartnerRole(role) || isClientRole(role);
 }

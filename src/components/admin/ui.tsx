@@ -16,4 +16,10 @@ export {
   projectStatusVariant,
 } from "@/components/partner/ui";
 
+export {
+  PartnerStatCard as AdminDashboardStatCard,
+  DashboardPanel,
+  ProjectTokenChip,
+} from "@/components/partner/dashboard/dashboard-premium";
+
 export { OrderStatusBadge } from "@/components/partner/dashboard/ui";
