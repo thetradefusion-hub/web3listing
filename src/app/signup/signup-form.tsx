@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -28,7 +27,6 @@ import { toast } from "sonner";
 const inputClass = "h-11 rounded-xl border-input bg-background pl-10 shadow-sm";
 
 export default function SignupForm() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -58,8 +56,7 @@ export default function SignupForm() {
     }
 
     toast.success("Account created successfully");
-    router.push("/user");
-    router.refresh();
+    window.location.href = "/user";
   }
 
   if (emailSent) {

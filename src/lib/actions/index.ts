@@ -7,8 +7,8 @@ import { sendEmail, credentialsEmail, kycStatusEmail, orderUpdateEmail, quoteRea
 import { calculateQuotation, calculateOrderCommission, isCommissionEligibleStatus } from "@/lib/commission";
 import { MIN_WITHDRAWAL, OWNER_ROLES } from "@/lib/constants";
 import { requireAuth, isAdminRole } from "@/lib/auth";
-import { getPortalForRole, PORTALS } from "@/lib/portal-config";
-import type { OrderStatus, PaymentMethod, Profile, WithdrawalStatus } from "@/types/database";
+import { getPortalForRole, getPortalPathForRole, PORTALS } from "@/lib/portal-config";
+import type { OrderStatus, PaymentMethod, Profile, UserRole, WithdrawalStatus } from "@/types/database";
 
 function ownerBasePath(role: Profile["role"]) {
   const portal = getPortalForRole(role);
@@ -23,7 +23,25 @@ export async function signIn(email: string, password: string) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
-  return { success: true };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Sign in failed. Please try again." };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  revalidatePath("/", "layout");
+
+  const redirectTo = profile?.role
+    ? getPortalPathForRole(profile.role as UserRole)
+    : "/";
+
+  return { success: true, redirectTo };
 }
 
 export async function signUp(data: {

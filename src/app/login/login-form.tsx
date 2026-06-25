@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -75,7 +75,6 @@ function FeatureItem({
 }
 
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -92,9 +91,9 @@ export default function LoginForm() {
       return;
     }
 
-    const redirect = searchParams.get("redirect");
-    router.push(redirect || "/");
-    router.refresh();
+    const redirectParam = searchParams.get("redirect");
+    const destination = redirectParam || result.redirectTo || "/";
+    window.location.href = destination;
   }
 
   return (
