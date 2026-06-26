@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/shared/theme-provider";
+import { RouteLoader } from "@/components/shared/route-loader";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -31,6 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen font-sans antialiased">
         <ThemeProvider>
           <TooltipProvider>
+            <Suspense fallback={null}>
+              <RouteLoader />
+            </Suspense>
             {children}
             <Toaster richColors position="top-right" />
           </TooltipProvider>

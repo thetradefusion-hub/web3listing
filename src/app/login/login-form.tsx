@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { signIn } from "@/lib/actions";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { NAVIGATION_START_EVENT } from "@/components/shared/route-loader";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,15 +85,16 @@ export default function LoginForm() {
     setLoading(true);
     const form = new FormData(e.currentTarget);
     const result = await signIn(form.get("email") as string, form.get("password") as string);
-    setLoading(false);
 
     if (result.error) {
+      setLoading(false);
       toast.error(result.error);
       return;
     }
 
     const redirectParam = searchParams.get("redirect");
     const destination = redirectParam || result.redirectTo || "/";
+    window.dispatchEvent(new Event(NAVIGATION_START_EVENT));
     window.location.href = destination;
   }
 

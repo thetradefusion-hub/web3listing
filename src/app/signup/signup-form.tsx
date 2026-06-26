@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { signUp } from "@/lib/actions";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { NAVIGATION_START_EVENT } from "@/components/shared/route-loader";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,20 +43,22 @@ export default function SignupForm() {
       company_name: (form.get("company_name") as string) || undefined,
       country: form.get("country") as string,
     });
-    setLoading(false);
 
     if (result.error) {
+      setLoading(false);
       toast.error(result.error);
       return;
     }
 
     if (result.needsEmailConfirmation) {
+      setLoading(false);
       setEmailSent(true);
       toast.success("Check your email to confirm your account");
       return;
     }
 
     toast.success("Account created successfully");
+    window.dispatchEvent(new Event(NAVIGATION_START_EVENT));
     window.location.href = "/user";
   }
 
