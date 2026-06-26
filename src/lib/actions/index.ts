@@ -1133,8 +1133,36 @@ export async function upsertService(
   if (error) return { error: error.message };
 
   revalidatePath("/admin/services");
+  revalidatePath("/admin/services/new");
   revalidatePath("/services");
   revalidatePath("/partner/services");
+  return { success: true };
+}
+
+export async function deleteService(id: string) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const { count, error: countError } = await supabase
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("service_id", id);
+
+  if (countError) return { error: countError.message };
+  if (count && count > 0) {
+    return {
+      error: `Cannot delete — this service has ${count} order${count === 1 ? "" : "s"}. Remove or reassign orders first.`,
+    };
+  }
+
+  const { error } = await supabase.from("services").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/services");
+  revalidatePath("/admin/services/new");
+  revalidatePath("/services");
+  revalidatePath("/partner/services");
+  revalidatePath("/user/services");
   return { success: true };
 }
 
@@ -1144,6 +1172,7 @@ export async function toggleServiceActive(id: string, isActive: boolean) {
   const { error } = await supabase.from("services").update({ is_active: isActive }).eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/admin/services");
+  revalidatePath("/admin/services/new");
   revalidatePath("/services");
   revalidatePath("/partner/services");
   return { success: true };

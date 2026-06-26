@@ -58,7 +58,7 @@ export function CreatePartnerDialog() {
     <>
       <Button
         onClick={() => { setCredentials(null); setOpen(true); }}
-        className="rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg hover:opacity-90"
+        className="h-11 rounded-xl shadow-sm"
       >
         Create Partner
       </Button>

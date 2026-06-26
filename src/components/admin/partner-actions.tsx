@@ -45,15 +45,15 @@ export function PartnerActions({
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
         {kycStatus === "pending" && (
-          <Button size="sm" variant="outline" onClick={handleApproveKyc} disabled={loading} className="gap-1 rounded-xl border-slate-200">
-            <UserCheck className="h-3.5 w-3.5" />
+          <Button size="sm" variant="outline" onClick={handleApproveKyc} disabled={loading} className="rounded-xl">
+            <UserCheck data-icon="inline-start" />
             Approve KYC
           </Button>
         )}
-        <Button size="sm" variant="outline" onClick={handleResetPassword} disabled={loading} className="gap-1 rounded-xl border-slate-200">
-          <KeyRound className="h-3.5 w-3.5" />
+        <Button size="sm" variant="outline" onClick={handleResetPassword} disabled={loading} className="rounded-xl">
+          <KeyRound data-icon="inline-start" />
           Reset Password
         </Button>
       </div>
