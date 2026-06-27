@@ -96,3 +96,12 @@ export const serviceSchema = z.object({
   payment_terms: z.string().optional(),
   requires_third_party_ack: z.boolean().optional(),
 });
+
+export const serviceCategorySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  slug: z.string().min(2, "Slug must be at least 2 characters"),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+  sort_order: z.number().int().min(0).optional(),
+  is_active: z.boolean().optional(),
+});

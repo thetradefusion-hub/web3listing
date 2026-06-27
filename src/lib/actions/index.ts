@@ -1178,6 +1178,80 @@ export async function toggleServiceActive(id: string, isActive: boolean) {
   return { success: true };
 }
 
+export async function upsertServiceCategory(
+  data: {
+    name: string;
+    slug?: string;
+    description?: string | null;
+    icon?: string | null;
+    sort_order?: number;
+    is_active?: boolean;
+  },
+  id?: string
+) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const slug =
+    data.slug?.trim() ||
+    data.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  const payload = {
+    name: data.name.trim(),
+    slug,
+    description: data.description?.trim() || null,
+    icon: data.icon?.trim() || null,
+    sort_order: data.sort_order ?? 0,
+    is_active: data.is_active ?? true,
+  };
+
+  if (id) {
+    const { error } = await supabase.from("service_categories").update(payload).eq("id", id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("service_categories").insert(payload);
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/services");
+  revalidatePath("/admin/services/new");
+  revalidatePath("/services");
+  revalidatePath("/partner/services");
+  revalidatePath("/user/services");
+  return { success: true };
+}
+
+export async function deleteServiceCategory(id: string) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const { count, error: countError } = await supabase
+    .from("services")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", id);
+
+  if (countError) return { error: countError.message };
+  if (count && count > 0) {
+    return {
+      error: `Cannot delete — this category has ${count} service${count === 1 ? "" : "s"}. Move or delete them first.`,
+    };
+  }
+
+  const { error } = await supabase.from("service_categories").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/services");
+  revalidatePath("/services");
+  revalidatePath("/partner/services");
+  revalidatePath("/user/services");
+  return { success: true };
+}
+
 export async function changePassword(newPassword: string) {
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password: newPassword });
