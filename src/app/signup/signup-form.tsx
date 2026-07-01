@@ -100,7 +100,7 @@ export default function SignupForm() {
 
       <main className="flex min-h-screen flex-col items-center justify-center px-4 py-24 sm:px-6">
         <div className="mb-6">
-          <BrandLogo href="/" size="lg" />
+          <BrandLogo href="/" size="lg" priority />
         </div>
 
         <Card size="sm" className="relative w-full max-w-[420px] overflow-hidden border-border/80 bg-card/90 py-0 shadow-xl backdrop-blur-xl">

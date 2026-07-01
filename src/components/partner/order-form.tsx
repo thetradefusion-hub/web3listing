@@ -11,17 +11,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { PRICING_CTA } from "@/lib/pricing";
 import type { Service, Project } from "@/types/database";
+import { cn } from "@/lib/utils";
 
 export function OrderForm({
   service,
   projects,
   defaultProjectId,
   basePath = "/partner",
+  comfortable = false,
 }: {
   service: Service;
   projects: Project[];
   defaultProjectId?: string;
   basePath?: string;
+  comfortable?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -30,6 +33,12 @@ export function OrderForm({
   const [thirdPartyAck, setThirdPartyAck] = useState(false);
 
   const needsRequirements = service.pricing_model === "quote" || service.pricing_model === "enterprise";
+
+  function projectLabel(project: Project) {
+    return `${project.project_name} (${project.token_symbol})`;
+  }
+
+  const selectedProject = projects.find((p) => p.id === projectId);
 
   async function handleOrder() {
     if (!projectId) {
@@ -67,18 +76,23 @@ export function OrderForm({
     router.push(`${basePath}/orders/${result.order?.id}`);
   }
 
+  const inputClass = comfortable ? "h-11 rounded-xl" : "h-10 rounded-xl";
+  const buttonClass = comfortable ? "h-11 w-full rounded-xl text-sm font-semibold shadow-sm" : "h-10 w-full rounded-xl font-semibold";
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label className="text-xs font-semibold text-muted-foreground">Select Project *</Label>
+        <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Select Project *</Label>
         <Select value={projectId} onValueChange={(v) => setProjectId(v || "")}>
-          <SelectTrigger className="h-10 w-full rounded-xl">
-            <SelectValue placeholder="Choose a project" />
+          <SelectTrigger className={cn("w-full", inputClass)}>
+            <SelectValue placeholder="Choose a project">
+              {selectedProject ? projectLabel(selectedProject) : null}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {projects.map((p) => (
               <SelectItem key={p.id} value={p.id}>
-                {p.project_name} ({p.token_symbol})
+                {projectLabel(p)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -132,7 +146,7 @@ export function OrderForm({
       )}
 
       <Button
-        className="h-10 w-full rounded-xl font-semibold"
+        className={buttonClass}
         onClick={handleOrder}
         disabled={loading || (service.requires_third_party_ack && !thirdPartyAck)}
       >

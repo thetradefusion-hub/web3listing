@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -25,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { BRAND_ICON_PATH, SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -51,7 +53,8 @@ const PARTNER_FEATURES = [
   },
 ] as const;
 
-const inputClass = "h-11 rounded-xl border-input bg-background pl-10 shadow-sm";
+const inputClass =
+  "h-11 rounded-xl border-input bg-background pl-10 shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25";
 
 function FeatureItem({
   icon: Icon,
@@ -63,8 +66,8 @@ function FeatureItem({
   description: string;
 }) {
   return (
-    <li className="flex gap-3 rounded-xl border border-border/60 bg-card/50 p-3.5 backdrop-blur-sm">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+    <li className="auth-feature-card flex gap-3 rounded-xl border p-3.5 backdrop-blur-sm transition-colors">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
         <Icon className="size-4" strokeWidth={2} />
       </span>
       <div className="min-w-0">
@@ -99,15 +102,15 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-40" />
-      <div className="login-glow pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-primary/15 blur-[100px] sm:h-96 sm:w-96" />
-      <div className="login-glow pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-chart-4/15 blur-[100px] sm:h-96 sm:w-96" />
+    <div className="auth-shell relative min-h-screen bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-0 landing-grid opacity-30 dark:opacity-20" />
+      <div className="login-glow pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-primary/20 blur-[100px] sm:h-96 sm:w-96" />
+      <div className="login-glow pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-chart-2/15 blur-[100px] sm:h-96 sm:w-96" />
 
       <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-card/70 px-3 py-2 text-sm font-medium text-muted-foreground backdrop-blur-sm transition hover:border-primary/25 hover:text-foreground"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-card/70 px-3 py-2 text-sm font-medium text-muted-foreground backdrop-blur-sm transition hover:border-primary/30 hover:text-foreground"
         >
           <ArrowLeft className="size-4" strokeWidth={2} />
           <span className="hidden sm:inline">Back to website</span>
@@ -115,21 +118,45 @@ export default function LoginForm() {
         </Link>
         <ThemeToggle
           variant="outline"
-          className="size-9 rounded-xl border-border/60 bg-card/70 text-muted-foreground backdrop-blur-sm hover:text-foreground"
+          className="size-9 rounded-xl border-border/60 bg-card/70 text-muted-foreground backdrop-blur-sm hover:border-primary/30 hover:text-foreground"
         />
       </header>
 
       <div className="relative flex min-h-screen flex-col lg:flex-row">
-        {/* Brand panel — desktop */}
-        <aside className="relative hidden overflow-hidden border-r border-border lg:flex lg:w-[44%] lg:flex-col xl:w-[48%]">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-card to-chart-4/8" />
+        {/* Brand panel — desktop (always dark, symbol theme) */}
+        <aside className="auth-brand-panel relative hidden overflow-hidden border-r lg:flex lg:w-[44%] lg:flex-col xl:w-[48%]">
           <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary via-chart-4 to-chart-2" aria-hidden />
+
+          <div className="pointer-events-none absolute -right-6 top-16 size-52 opacity-[0.14] sm:size-64 xl:size-72">
+            <Image
+              src={BRAND_ICON_PATH}
+              alt=""
+              width={288}
+              height={288}
+              className="login-float size-full object-contain"
+              aria-hidden
+              priority
+            />
+          </div>
 
           <div className="relative flex flex-1 flex-col justify-between p-10 xl:p-14">
             <div>
-              <BrandLogo href="/" size="lg" />
+              <div className="flex items-center gap-4">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-black/40 ring-1 ring-primary/30">
+                  <Image
+                    src={BRAND_ICON_PATH}
+                    alt={SITE_NAME}
+                    width={40}
+                    height={40}
+                    className="size-10 object-contain"
+                    priority
+                  />
+                </div>
+                <BrandLogo href="/" size="lg" priority />
+              </div>
               <h1 className="mt-8 text-3xl font-bold leading-tight tracking-tight text-foreground xl:text-4xl">
-                Grow your Web3 projects with confidence
+                Grow your{" "}
+                <span className="lh-brand-gradient">Web3 projects</span> with confidence
               </h1>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
                 Sign in to manage projects, order listing services, and track commissions from a single
@@ -143,7 +170,7 @@ export default function LoginForm() {
               ))}
             </ul>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-border/60 pt-8 text-xs text-muted-foreground">
+            <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-white/10 pt-8 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="size-3.5 text-chart-2" strokeWidth={2.5} />
                 Secure partner access
@@ -159,15 +186,28 @@ export default function LoginForm() {
         {/* Form panel */}
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-24 sm:px-6 lg:py-16">
           <div className="w-full max-w-[420px]">
-            <div className="mb-6 flex justify-center lg:hidden">
-              <BrandLogo href="/" size="lg" />
+            <div className="mb-6 flex flex-col items-center gap-3 lg:hidden">
+              <div className="flex size-16 items-center justify-center rounded-2xl bg-card ring-1 ring-primary/25 shadow-lg shadow-primary/10">
+                <Image
+                  src={BRAND_ICON_PATH}
+                  alt={SITE_NAME}
+                  width={48}
+                  height={48}
+                  className="size-12 object-contain"
+                  priority
+                />
+              </div>
+              <BrandLogo href="/" size="lg" priority />
             </div>
 
-            <Card size="sm" className="relative overflow-hidden border-border/80 bg-card/90 py-0 shadow-xl backdrop-blur-xl">
+            <Card
+              size="sm"
+              className="auth-form-card relative overflow-hidden border bg-card/90 py-0 backdrop-blur-xl"
+            >
               <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary via-chart-4 to-chart-2" aria-hidden />
               <CardContent className="p-6 sm:p-8">
                 <div className="mb-7 text-center lg:text-left">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">Welcome back</p>
+                  <p className="lh-accent text-[11px] font-semibold uppercase tracking-wide">Welcome back</p>
                   <h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Sign in</h2>
                   <p className="mt-2 text-sm text-muted-foreground">
                     Sign in to your partner or user account
@@ -200,7 +240,7 @@ export default function LoginForm() {
                       </Label>
                       <Link
                         href="/forgot-password"
-                        className="shrink-0 text-xs font-semibold text-primary transition hover:underline"
+                        className="shrink-0 text-xs font-semibold text-primary transition hover:text-chart-2 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -219,7 +259,7 @@ export default function LoginForm() {
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition hover:text-primary"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -227,7 +267,11 @@ export default function LoginForm() {
                     </div>
                   </div>
 
-                  <Button type="submit" disabled={loading} className="h-11 w-full rounded-xl font-semibold shadow-sm">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="auth-btn-primary h-11 w-full rounded-xl border-0 font-semibold"
+                  >
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 size-4 animate-spin" />
@@ -242,10 +286,10 @@ export default function LoginForm() {
                   </Button>
                 </form>
 
-                <div className="mt-6 rounded-xl border border-border bg-muted/30 p-3.5 text-center">
+                <div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-3.5 text-center">
                   <p className="text-sm text-muted-foreground">
                     Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-semibold text-primary hover:underline">
+                    <Link href="/signup" className="font-semibold text-primary hover:text-chart-2 hover:underline">
                       Create account
                     </Link>
                   </p>
@@ -255,11 +299,11 @@ export default function LoginForm() {
 
             <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
               By signing in, you agree to our{" "}
-              <Link href="/legal/terms" className="font-medium underline underline-offset-2 hover:text-foreground">
+              <Link href="/legal/terms" className="font-medium underline underline-offset-2 hover:text-primary">
                 Terms
               </Link>{" "}
               and{" "}
-              <Link href="/legal/privacy" className="font-medium underline underline-offset-2 hover:text-foreground">
+              <Link href="/legal/privacy" className="font-medium underline underline-offset-2 hover:text-primary">
                 Privacy Policy
               </Link>
             </p>

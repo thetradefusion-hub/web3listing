@@ -1,11 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
-import { BrandLogo } from "@/components/shared/brand-logo";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { BRAND_ICON_PATH, BRAND_LOGO_PATH, SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -25,7 +26,7 @@ export function PortalSidebarShell({
   return (
     <aside
       className={cn(
-        "portal-sidebar relative flex h-full shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#0B1020] text-white transition-[width] duration-300 ease-in-out",
+        "portal-sidebar relative flex h-full shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[var(--portal-sidebar-bg,#0B1020)] text-white transition-[width] duration-300 ease-in-out",
         collapsed ? "w-[72px]" : "w-[260px]",
         variant === "partner" && "partner-sidebar",
         className
@@ -81,21 +82,34 @@ export function PortalSidebarBrand({
           <Tooltip>
             <TooltipTrigger
               render={
-                <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF007A] via-[#7C3AED] to-[#0070F3] text-sm font-bold text-white shadow-lg shadow-primary/20">
-                  T
+                <span className="flex size-10 items-center justify-center overflow-hidden rounded-xl bg-black/20 shadow-lg shadow-primary/10 ring-1 ring-white/10">
+                  <Image
+                    src={BRAND_ICON_PATH}
+                    alt={SITE_NAME}
+                    width={40}
+                    height={40}
+                    className="size-8 object-contain"
+                  />
                 </span>
               }
             />
-            <TooltipContent side="right">TokenWeb3Listing</TooltipContent>
+            <TooltipContent side="right">{SITE_NAME}</TooltipContent>
           </Tooltip>
         ) : (
           <>
-            <BrandLogo size="sm" className="max-w-[200px]" />
+            <Image
+              src={BRAND_LOGO_PATH}
+              alt={SITE_NAME}
+              width={220}
+              height={48}
+              className="h-9 w-auto max-w-[210px] object-contain object-left"
+              priority
+            />
             <span
               className={cn(
                 "mt-2.5 inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
                 variant === "partner"
-                  ? "border-primary/25 bg-primary/10 text-primary-foreground/90"
+                  ? "border-chart-2/35 bg-chart-2/12 text-chart-2"
                   : "border-white/10 bg-white/[0.04] text-slate-400"
               )}
             >

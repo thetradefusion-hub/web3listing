@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { format } from "date-fns";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -28,16 +29,21 @@ import {
   Tag,
 } from "lucide-react";
 import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
-import { OrderForm } from "@/components/partner/order-form";
 import { PartnerPageShell } from "@/components/partner/ui";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatCurrency } from "@/lib/commission";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
@@ -46,10 +52,12 @@ import {
   getServiceCardMeta,
   getServiceInitials,
   getServiceLogoColor,
+  getServiceOrderPath,
   parseJsonArray,
+  parseNetworks,
 } from "@/lib/service-catalog";
 import { iconTintStyles } from "@/lib/theme-tokens";
-import type { Project, Service } from "@/types/database";
+import type { Service } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 type RecentListing = {
@@ -120,24 +128,56 @@ function SummaryRow({
   );
 }
 
+function NetworksSummaryRow({ networks }: { networks: string | null | undefined }) {
+  const options = useMemo(() => parseNetworks(networks), [networks]);
+  const [selected, setSelected] = useState("");
+
+  const value = selected || options[0] || "";
+
+  if (options.length === 0) {
+    return <SummaryRow icon={Network} label="Networks" value={undefined} />;
+  }
+
+  return (
+    <div className="flex items-center gap-3 py-2.5">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground">
+        <Network className="size-4" strokeWidth={2} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Networks</p>
+        <Select value={value} onValueChange={(v) => v && setSelected(v)}>
+          <SelectTrigger className="mt-0.5 h-9 w-full rounded-lg border-input bg-background text-sm font-semibold shadow-sm">
+            <SelectValue placeholder="Select network" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {options.map((network) => (
+                <SelectItem key={network} value={network}>
+                  {network}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
 export function ServiceDetailView({
   service,
   categoryName,
   categorySlug,
-  projects,
   defaultProjectId,
   recentListings,
-  managerTelegramLink,
   basePath = "/partner",
   showCommission = true,
 }: {
   service: Service;
   categoryName: string;
   categorySlug: string;
-  projects: Project[];
   defaultProjectId?: string;
   recentListings: RecentListing[];
-  managerTelegramLink?: string | null;
   basePath?: string;
   showCommission?: boolean;
 }) {
@@ -151,15 +191,12 @@ export function ServiceDetailView({
   const faqs = service.faqs || [];
   const requiredDocs = service.required_documents || [];
 
-  const platformFee = service.service_fee ?? 0;
-  const servicePrice = service.price ?? 0;
-  const total = service.pricing_model === "fixed" ? servicePrice + platformFee : null;
-  const platformFeePercent = servicePrice > 0 ? Math.round((platformFee / servicePrice) * 100) : 0;
   const overviewText = service.overview || service.description;
   const projectQuery = defaultProjectId ? `?project=${defaultProjectId}` : "";
+  const orderHref = getServiceOrderPath(basePath, service.slug, defaultProjectId);
 
   return (
-    <PartnerPageShell compact fullWidth className="gap-4 pb-24 sm:gap-5 lg:pb-0">
+    <PartnerPageShell compact fullWidth className="gap-4 pb-20 sm:gap-5 lg:pb-0">
       <div className="flex flex-wrap items-center justify-between gap-2 sm:items-start sm:gap-3">
         <nav className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground sm:hidden">
           <Link href={`${basePath}/services${projectQuery}`} className="shrink-0 transition hover:text-primary">
@@ -287,10 +324,10 @@ export function ServiceDetailView({
               </div>
             )}
             <Button className="h-10 rounded-xl font-semibold shadow-sm" asChild>
-              <a href="#order-section">
+              <Link href={orderHref}>
                 <ShoppingBag data-icon="inline-start" />
                 {meta.ctaLabel}
-              </a>
+              </Link>
             </Button>
           </div>
         </CardContent>
@@ -523,76 +560,33 @@ export function ServiceDetailView({
               <SummaryRow icon={Clock} label="Estimated TAT" value={service.estimated_tat} />
               <SummaryRow icon={CreditCard} label="Payment Terms" value={service.payment_terms} />
               <SummaryRow icon={FileText} label="Listing Type" value={service.listing_type} />
-              <SummaryRow icon={Network} label="Networks" value={service.networks} />
+              <NetworksSummaryRow networks={service.networks} />
               <SummaryRow icon={RotateCcw} label="Refund Policy" value={service.refund_policy || "Non-Refundable"} />
               <SummaryRow icon={Headphones} label="Support" value="24/7 Telegram" />
             </div>
           </DashboardPanel>
 
-          <Card id="order-section" size="sm" className="scroll-mt-20 gap-0 overflow-hidden py-0 shadow-md sm:scroll-mt-24">
+          <Card size="sm" className="gap-0 overflow-hidden py-0 shadow-md">
             <CardHeader className="border-b border-border p-4 pb-3">
-              <CardTitle className="text-sm font-bold">Pricing & Order</CardTitle>
-              <CardDescription className="text-xs">Place an order for this service</CardDescription>
+              <CardTitle className="text-sm font-bold">Ready to order?</CardTitle>
+              <CardDescription className="text-xs">Review pricing and place your order on the next step</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4 p-4">
-              {service.pricing_model === "fixed" && total != null ? (
-                <dl className="flex flex-col gap-2 text-sm">
-                  <div className="flex justify-between text-muted-foreground">
-                    <dt>Service Price</dt>
-                    <dd className="font-medium text-foreground">{formatCurrency(servicePrice)}</dd>
-                  </div>
-                  <div className="flex justify-between text-muted-foreground">
-                    <dt>Platform Fee ({platformFeePercent}%)</dt>
-                    <dd className="font-medium text-foreground">{formatCurrency(platformFee)}</dd>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between">
-                    <dt className="font-bold text-foreground">Total</dt>
-                    <dd className="text-base font-bold text-primary">{formatCurrency(total)}</dd>
-                  </div>
-                </dl>
-              ) : (
-                <p className="text-lg font-bold text-foreground">{meta.priceLabel}</p>
-              )}
-
-              {showCommission && meta.commissionLabel && (
-                <div className="rounded-xl border border-chart-2/20 bg-chart-2/10 px-3 py-2.5 text-center text-sm">
+            <CardContent className="flex flex-col gap-3 p-4">
+              <p className="text-2xl font-bold tabular-nums text-primary">{meta.priceLabel}</p>
+              {showCommission && meta.commissionLabel ? (
+                <div className="rounded-xl border border-chart-2/20 bg-chart-2/10 px-3 py-2 text-center text-sm">
                   <p className="text-muted-foreground">
-                    Your Earnings ({service.commission_value}%):{" "}
-                    <span className="font-bold text-chart-2">{meta.commissionLabel}</span>
+                    Your Earnings: <span className="font-bold text-chart-2">{meta.commissionLabel}</span>
                   </p>
                 </div>
-              )}
-
-              {projects.length > 0 ? (
-                <OrderForm service={service} projects={projects} defaultProjectId={defaultProjectId} basePath={basePath} />
-              ) : (
-                <Empty className="rounded-xl border border-dashed py-6">
-                  <EmptyHeader>
-                    <EmptyTitle className="text-sm">No project yet</EmptyTitle>
-                    <EmptyDescription>Create a project to place an order.</EmptyDescription>
-                  </EmptyHeader>
-                  <EmptyContent>
-                    <Button className="w-full rounded-xl font-semibold" asChild>
-                      <Link href={`${basePath}/projects/new`}>Create Project</Link>
-                    </Button>
-                  </EmptyContent>
-                </Empty>
-              )}
-            </CardContent>
-            <CardFooter className="flex-col items-stretch gap-2 border-t border-border bg-muted/20 p-4">
-              <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-                Multiple tokens? Contact your manager for custom pricing.
-              </p>
-              {managerTelegramLink ? (
-                <Button variant="outline" className="h-9 w-full rounded-xl text-sm font-semibold" asChild>
-                  <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
-                    <Send data-icon="inline-start" />
-                    Message on Telegram
-                  </a>
-                </Button>
               ) : null}
-            </CardFooter>
+              <Button className="h-10 w-full rounded-xl font-semibold shadow-sm" asChild>
+                <Link href={orderHref}>
+                  <ShoppingBag data-icon="inline-start" />
+                  {meta.ctaLabel}
+                </Link>
+              </Button>
+            </CardContent>
           </Card>
 
           <Alert className="hidden border-primary/20 bg-primary/5 sm:flex">
@@ -613,7 +607,7 @@ export function ServiceDetailView({
             <p className="text-lg font-bold tabular-nums text-primary">{meta.priceLabel}</p>
           </div>
           <Button className="h-10 shrink-0 rounded-xl px-4 font-semibold shadow-sm" asChild>
-            <a href="#order-section">{meta.ctaLabel}</a>
+            <Link href={orderHref}>{meta.ctaLabel}</Link>
           </Button>
         </div>
       </div>

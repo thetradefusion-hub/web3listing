@@ -38,6 +38,16 @@ export type TicketStatus = "open" | "in_progress" | "closed";
 
 export type LeadStatus = "new" | "contacted" | "qualified" | "converted" | "lost";
 
+export type CustomRequirementStatus =
+  | "submitted"
+  | "under_review"
+  | "quoted"
+  | "accepted"
+  | "rejected"
+  | "closed";
+
+export type CustomRequirementQuoteStatus = "draft" | "sent" | "accepted" | "rejected";
+
 export interface Profile {
   id: string;
   email: string;
@@ -301,6 +311,29 @@ export interface Lead {
   status: LeadStatus;
   assigned_to: string | null;
   created_at: string;
+}
+
+export interface CustomRequirement {
+  id: string;
+  user_id: string;
+  project_id: string | null;
+  title: string;
+  service_type: string;
+  description: string;
+  budget_range: string | null;
+  timeline: string | null;
+  telegram: string | null;
+  status: CustomRequirementStatus;
+  admin_notes: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  quoted_price: number | null;
+  quote_notes: string | null;
+  quote_status: CustomRequirementQuoteStatus | null;
+  quoted_at: string | null;
+  quoted_by: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Notification {

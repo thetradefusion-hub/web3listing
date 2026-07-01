@@ -69,7 +69,7 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
         <Card className="h-fit border-white/10 bg-white/[0.02]">
           <CardContent className="pt-6">
             <ServicePricingCard service={service}>
-              <Button className="w-full bg-cyan-500 text-black hover:bg-cyan-400" asChild>
+              <Button className="lh-btn-cta w-full" asChild>
                 <Link href="/login">{PRICING_CTA[model]}</Link>
               </Button>
               <p className="mt-3 text-center text-xs text-muted-foreground">

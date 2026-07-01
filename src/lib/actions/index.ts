@@ -1258,3 +1258,184 @@ export async function changePassword(newPassword: string) {
   if (error) return { error: error.message };
   return { success: true };
 }
+
+export async function submitCustomRequirement(data: {
+  title: string;
+  project_id?: string;
+  service_type: string;
+  description: string;
+  budget_range?: string;
+  timeline?: string;
+  telegram?: string;
+}) {
+  const profile = await requireAuth(["user"]);
+  const supabase = await createClient();
+
+  const { data: row, error } = await supabase
+    .from("custom_requirements")
+    .insert({
+      user_id: profile.id,
+      project_id: data.project_id || null,
+      title: data.title,
+      service_type: data.service_type,
+      description: data.description,
+      budget_range: data.budget_range || null,
+      timeline: data.timeline || null,
+      telegram: data.telegram || profile.telegram_username || null,
+      status: "submitted",
+    })
+    .select("id")
+    .single();
+
+  if (error) return { error: error.message };
+
+  await notifyAdmins(
+    "New Custom Requirement",
+    `${profile.full_name || profile.email} submitted: ${data.title}`,
+    `/admin/custom-requirements/${row.id}`,
+    "custom_requirement"
+  );
+
+  revalidatePath("/user/custom-requirements");
+  revalidatePath("/admin/custom-requirements");
+  return { success: true, id: row.id };
+}
+
+export async function updateCustomRequirementStatus(
+  id: string,
+  status: "submitted" | "under_review" | "quoted" | "accepted" | "rejected" | "closed",
+  adminNotes?: string
+) {
+  const admin = await requireAuth(["super_admin", "operations_manager", "service_team"]);
+  const supabase = createAdminClient();
+
+  const { data: req } = await supabase
+    .from("custom_requirements")
+    .select("user_id, title")
+    .eq("id", id)
+    .single();
+  if (!req) return { error: "Not found" };
+
+  const { error } = await supabase
+    .from("custom_requirements")
+    .update({
+      status,
+      admin_notes: adminNotes ?? undefined,
+      reviewed_by: admin.id,
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+
+  if (status === "under_review") {
+    await supabase.from("notifications").insert({
+      user_id: req.user_id,
+      title: "Requirement Under Review",
+      message: `Your request "${req.title}" is being reviewed by our team.`,
+      type: "custom_requirement",
+      link: `/user/custom-requirements/${id}`,
+    });
+  }
+
+  revalidatePath("/admin/custom-requirements");
+  revalidatePath(`/admin/custom-requirements/${id}`);
+  revalidatePath("/user/custom-requirements");
+  revalidatePath(`/user/custom-requirements/${id}`);
+  return { success: true };
+}
+
+export async function sendCustomRequirementQuote(data: {
+  requirement_id: string;
+  quoted_price: number;
+  quote_notes?: string;
+  admin_notes?: string;
+}) {
+  const admin = await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const { data: req } = await supabase
+    .from("custom_requirements")
+    .select("user_id, title")
+    .eq("id", data.requirement_id)
+    .single();
+  if (!req) return { error: "Not found" };
+
+  const { error } = await supabase
+    .from("custom_requirements")
+    .update({
+      quoted_price: data.quoted_price,
+      quote_notes: data.quote_notes || null,
+      admin_notes: data.admin_notes ?? undefined,
+      quote_status: "sent",
+      quoted_at: new Date().toISOString(),
+      quoted_by: admin.id,
+      status: "quoted",
+      reviewed_by: admin.id,
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", data.requirement_id);
+
+  if (error) return { error: error.message };
+
+  await supabase.from("notifications").insert({
+    user_id: req.user_id,
+    title: "Custom Quote Ready",
+    message: `Your quote for "${req.title}" is ready: $${data.quoted_price.toFixed(2)}`,
+    type: "custom_requirement",
+    link: `/user/custom-requirements/${data.requirement_id}`,
+  });
+
+  revalidatePath("/admin/custom-requirements");
+  revalidatePath(`/admin/custom-requirements/${data.requirement_id}`);
+  revalidatePath("/user/custom-requirements");
+  revalidatePath(`/user/custom-requirements/${data.requirement_id}`);
+  return { success: true };
+}
+
+export async function respondToCustomRequirementQuote(
+  requirementId: string,
+  response: "accepted" | "rejected"
+) {
+  const profile = await requireAuth(["user"]);
+  const supabase = await createClient();
+
+  const { data: req } = await supabase
+    .from("custom_requirements")
+    .select("*")
+    .eq("id", requirementId)
+    .eq("user_id", profile.id)
+    .single();
+
+  if (!req || req.quote_status !== "sent") return { error: "No active quote" };
+
+  const status = response === "accepted" ? "accepted" : "rejected";
+
+  const { error } = await supabase
+    .from("custom_requirements")
+    .update({
+      quote_status: response,
+      status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", requirementId);
+
+  if (error) return { error: error.message };
+
+  if (response === "accepted") {
+    await notifyAdmins(
+      "Quote Accepted",
+      `${profile.full_name || profile.email} accepted quote for "${req.title}"`,
+      `/admin/custom-requirements/${requirementId}`,
+      "custom_requirement"
+    );
+  }
+
+  revalidatePath("/user/custom-requirements");
+  revalidatePath(`/user/custom-requirements/${requirementId}`);
+  revalidatePath("/admin/custom-requirements");
+  revalidatePath(`/admin/custom-requirements/${requirementId}`);
+  return { success: true };
+}

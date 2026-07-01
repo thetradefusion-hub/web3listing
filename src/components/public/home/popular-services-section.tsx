@@ -68,7 +68,7 @@ export function PopularServicesSection({ services }: { services: ServiceRow[] | 
                         {CatIcon ? <CatIcon className="size-4" /> : getServiceInitials(service.name)}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="text-sm font-semibold leading-snug text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 sm:text-base">
+                        <h3 className="text-sm font-semibold leading-snug text-foreground group-hover:text-primary dark:group-hover:text-chart-2 sm:text-base">
                           {service.name}
                         </h3>
                         {service.service_categories?.name ? (
@@ -83,12 +83,12 @@ export function PopularServicesSection({ services }: { services: ServiceRow[] | 
                     </div>
                   </div>
 
-                  <p className="mt-4 pl-2 text-xl font-bold text-cyan-600 dark:text-cyan-400">
+                  <p className="mt-4 pl-2 text-xl font-bold text-primary dark:text-chart-2">
                     {getServicePriceLabel(service)}
                   </p>
                   <p className="mt-1 pl-2 text-xs text-muted-foreground">{service.estimated_tat}</p>
 
-                  <span className="mt-auto flex items-center gap-1 pl-2 pt-4 text-xs font-semibold text-muted-foreground transition group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
+                  <span className="mt-auto flex items-center gap-1 pl-2 pt-4 text-xs font-semibold text-muted-foreground transition group-hover:text-primary dark:group-hover:text-chart-2">
                     View details
                     <ArrowUpRight className="size-3.5 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>

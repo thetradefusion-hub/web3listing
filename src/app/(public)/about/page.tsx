@@ -31,7 +31,7 @@ export default function AboutPage() {
       <ul className="mt-6 grid gap-3 md:grid-cols-2">
         {services.map((s) => (
           <li key={s} className="flex items-center gap-2 text-muted-foreground">
-            <CheckCircle2 className="h-4 w-4 text-cyan-400" />{s}
+            <CheckCircle2 className="h-4 w-4 text-chart-2" />{s}
           </li>
         ))}
       </ul>
@@ -47,7 +47,7 @@ export default function AboutPage() {
       </div>
 
       <div className="mt-8">
-        <Button className="bg-cyan-500 text-black hover:bg-cyan-400" asChild>
+        <Button className="lh-btn-cta" asChild>
           <Link href="/contact">Contact Us</Link>
         </Button>
       </div>

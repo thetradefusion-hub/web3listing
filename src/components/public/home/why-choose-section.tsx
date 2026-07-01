@@ -24,11 +24,11 @@ export function WhyChooseSection() {
         </div>
 
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-          <div className="relative overflow-hidden rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-500/10 via-card to-cyan-500/10 p-6 sm:p-8">
-            <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-violet-500/20 blur-3xl" />
-            <p className="lh-label text-violet-600 dark:text-violet-400">Partner program</p>
+          <div className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-chart-2/10 p-6 sm:p-8">
+            <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-primary/20 blur-3xl" />
+            <p className="lh-label text-primary">Partner program</p>
             <h3 className="mt-3 text-2xl font-bold text-foreground sm:mt-4">Become a partner & earn</h3>
-            <p className="mt-2 text-sm font-medium text-violet-700 dark:text-violet-300">Web3 Partner Program</p>
+            <p className="mt-2 text-sm font-medium text-primary/90">Web3 Partner Program</p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Earn recurring commissions by referring projects to our marketplace.
             </p>
@@ -36,13 +36,13 @@ export function WhyChooseSection() {
             <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {PARTNER_BENEFITS.map((item) => (
                 <li key={item} className="flex items-center gap-2 text-sm text-foreground/90">
-                  <CheckCircle2 className="size-4 shrink-0 text-violet-600 dark:text-violet-400" />
+                  <CheckCircle2 className="size-4 shrink-0 text-primary" />
                   {item}
                 </li>
               ))}
             </ul>
             <Button
-              className="mt-6 h-11 w-full rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-sm font-semibold text-white hover:opacity-90 sm:mt-8 sm:w-auto sm:rounded-full sm:px-8"
+              className="mt-6 h-11 w-full rounded-xl bg-gradient-to-r from-primary to-chart-2 text-sm font-semibold text-white hover:opacity-90 sm:mt-8 sm:w-auto sm:rounded-full sm:px-8"
               asChild
             >
               <Link href="/login">
@@ -56,13 +56,13 @@ export function WhyChooseSection() {
             <ul className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
               {PARTNER_AUDIENCE.map((item) => (
                 <li key={item} className="flex items-center gap-2 text-sm text-foreground/90">
-                  <CheckCircle2 className="size-4 shrink-0 text-cyan-600 dark:text-cyan-400" />
+                  <CheckCircle2 className="size-4 shrink-0 text-chart-2" />
                   {item}
                 </li>
               ))}
             </ul>
             <div className="mt-8 flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4">
-              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-600 ring-1 ring-cyan-500/20 dark:text-cyan-400">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-chart-2/10 text-chart-2 ring-1 ring-chart-2/20">
                 <Globe className="size-6" />
               </div>
               <div className="min-w-0">

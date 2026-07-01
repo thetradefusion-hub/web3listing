@@ -15,7 +15,7 @@ export default async function ServicesPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  let query = supabase
+  const query = supabase
     .from("services")
     .select("*, service_categories(name, slug)")
     .eq("is_active", true)
@@ -36,25 +36,42 @@ export default async function ServicesPage({
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold">Service Marketplace</h1>
-        <p className="mt-4 text-muted-foreground">Browse all Web3 listing, marketing, and growth services</p>
-      </div>
+    <div className="mx-auto max-w-6xl px-4 py-16">
+      <h1 className="text-4xl font-bold">Service Marketplace</h1>
+      <p className="mt-2 text-muted-foreground">
+        Browse all Web3 listing, marketing, and growth services
+      </p>
 
-      <div className="mb-8 flex flex-wrap justify-center gap-2">
-        <Link href="/services" className="rounded-full border px-4 py-1.5 text-sm hover:bg-muted">All</Link>
+      <div className="mt-8 flex flex-wrap gap-2">
+        <Link
+          href="/services"
+          className={`rounded-full border px-4 py-1.5 text-sm transition ${
+            !params.category
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border text-muted-foreground hover:border-primary/30"
+          }`}
+        >
+          All
+        </Link>
         {categories?.map((cat) => (
-          <Link key={cat.id} href={`/services?category=${cat.slug}`} className="rounded-full border px-4 py-1.5 text-sm hover:bg-muted">
+          <Link
+            key={cat.id}
+            href={`/services?category=${cat.slug}`}
+            className={`rounded-full border px-4 py-1.5 text-sm transition ${
+              params.category === cat.slug
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-primary/30"
+            }`}
+          >
             {cat.name}
           </Link>
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered?.map((service) => (
           <Link key={service.id} href={`/services/${service.slug}`}>
-            <Card className="h-full transition-colors hover:border-cyan-500/30">
+            <Card className="h-full transition-colors hover:border-primary/30">
               <CardHeader>
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle className="text-lg">{service.name}</CardTitle>
@@ -64,10 +81,8 @@ export default async function ServicesPage({
               </CardHeader>
               <CardContent>
                 <p className="line-clamp-2 text-sm text-muted-foreground">{service.description}</p>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="font-semibold text-cyan-400">
-                    {getServicePriceLabel(service)}
-                  </span>
+                <div className="mt-4 flex items-baseline justify-between gap-2">
+                  <span className="font-semibold text-chart-2">{getServicePriceLabel(service)}</span>
                   <span className="text-xs text-muted-foreground">{service.estimated_tat}</span>
                 </div>
               </CardContent>

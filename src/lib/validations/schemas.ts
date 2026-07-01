@@ -69,6 +69,23 @@ export const leadSchema = z.object({
   message: z.string().min(10),
 });
 
+export const customRequirementSchema = z.object({
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  project_id: z.string().uuid().optional().or(z.literal("")),
+  service_type: z.string().min(2, "Select a service type"),
+  description: z.string().min(30, "Please describe your requirements in more detail"),
+  budget_range: z.string().optional(),
+  timeline: z.string().optional(),
+  telegram: z.string().optional(),
+});
+
+export const customRequirementQuoteSchema = z.object({
+  requirement_id: z.string().uuid(),
+  quoted_price: z.number().min(1, "Price must be greater than 0"),
+  quote_notes: z.string().optional(),
+  admin_notes: z.string().optional(),
+});
+
 export const ticketSchema = z.object({
   subject: z.string().min(5),
   message: z.string().min(10),

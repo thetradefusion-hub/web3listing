@@ -8,14 +8,14 @@ export function HomeHero() {
     <section className="relative overflow-hidden border-b border-border">
       <div className="pointer-events-none absolute inset-0 landing-grid opacity-40 dark:opacity-30" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent)]" />
-      <div className="pointer-events-none absolute -left-32 top-1/4 size-48 rounded-full bg-violet-600/10 blur-[80px] sm:size-64 sm:blur-[100px]" />
-      <div className="pointer-events-none absolute -right-24 bottom-0 size-56 rounded-full bg-cyan-500/10 blur-[80px] sm:size-72 sm:blur-[100px]" />
+      <div className="pointer-events-none absolute -left-32 top-1/4 size-48 rounded-full bg-primary/10 blur-[80px] sm:size-64 sm:blur-[100px]" />
+      <div className="pointer-events-none absolute -right-24 bottom-0 size-56 rounded-full bg-chart-2/10 blur-[80px] sm:size-72 sm:blur-[100px]" />
 
       <div className="landing-container relative pb-10 pt-8 sm:pb-16 sm:pt-12 lg:pb-24 lg:pt-16">
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           <h1 className="hero-title text-balance text-foreground">
             One platform for{" "}
-            <span className="bg-gradient-to-r from-cyan-600 via-cyan-500 to-violet-600 bg-clip-text text-transparent dark:from-cyan-400 dark:via-sky-300 dark:to-violet-400">
+            <span className="lh-brand-gradient">
               listings, marketing & growth
             </span>
           </h1>
@@ -28,7 +28,7 @@ export function HomeHero() {
           <div className="mt-6 flex w-full max-w-md flex-col gap-2.5 sm:mt-8 sm:flex-row sm:justify-center sm:gap-3">
             <Button
               size="lg"
-              className="h-11 w-full rounded-xl bg-cyan-500 text-sm font-semibold text-slate-950 shadow-[0_8px_24px_rgba(34,211,238,0.35)] hover:bg-cyan-400 sm:h-12 sm:w-auto sm:px-8"
+              className="lh-btn-cta h-11 w-full rounded-xl text-sm font-semibold sm:h-12 sm:w-auto sm:px-8"
               asChild
             >
               <Link href="/signup">
@@ -52,7 +52,7 @@ export function HomeHero() {
                 key={item}
                 className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground sm:text-xs"
               >
-                <CheckCircle2 className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className="size-3.5 shrink-0 text-chart-2" />
                 <span className="min-w-0 leading-snug">{item}</span>
               </li>
             ))}

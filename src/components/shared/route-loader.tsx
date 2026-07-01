@@ -154,7 +154,7 @@ export function RouteLoader() {
         <ProgressTrack className="h-0.5 rounded-none bg-transparent">
           <ProgressIndicator
             className={cn(
-              "rounded-none bg-gradient-to-r from-cyan-500 via-primary to-violet-500 transition-[width] duration-300 ease-out"
+              "rounded-none bg-gradient-to-r from-primary via-chart-2 to-primary transition-[width] duration-300 ease-out"
             )}
           />
         </ProgressTrack>

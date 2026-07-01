@@ -2,6 +2,11 @@ import type { UserRole } from "@/types/database";
 
 export const SITE_NAME = "TokenWeb3Listing";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+export const BRAND_LOGO_PATH = "/web3Listing png green text.png";
+export const BRAND_ICON_PATH = "/web3Listing  symbol.png";
+export const BRAND_PURPLE = "#8B2CF5";
+export const BRAND_LIME = "#A3E635";
+export const BRAND_BLACK = "#000000";
 export const MIN_WITHDRAWAL = 10;
 
 export const ORDER_STATUS_LABELS: Record<string, string> = {
@@ -42,3 +47,32 @@ export const BLOCKCHAIN_NETWORKS = [
 
 export const TELEGRAM_SUPPORT =
   process.env.NEXT_PUBLIC_TELEGRAM_SUPPORT_GROUP_URL || "https://t.me/TokenWeb3Listing";
+
+export const CUSTOM_REQUIREMENT_STATUS_LABELS: Record<string, string> = {
+  submitted: "Submitted",
+  under_review: "Under Review",
+  quoted: "Quote Sent",
+  accepted: "Accepted",
+  rejected: "Rejected",
+  closed: "Closed",
+};
+
+export const CUSTOM_REQUIREMENT_SERVICE_TYPES = [
+  "Exchange Listing",
+  "Marketing & PR",
+  "Market Making",
+  "Smart Contract Audit",
+  "Wallet Integration",
+  "Community Growth",
+  "Data Platform (CMC/CG)",
+  "Other",
+] as const;
+
+export const CUSTOM_REQUIREMENT_BUDGET_RANGES = [
+  "Under $2,000",
+  "$2,000 – $5,000",
+  "$5,000 – $15,000",
+  "$15,000 – $50,000",
+  "$50,000+",
+  "Not sure yet",
+] as const;

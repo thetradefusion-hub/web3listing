@@ -105,6 +105,39 @@ export function parseJsonArray<T>(value: unknown): T[] {
   return [];
 }
 
+/** Parse admin-entered networks (comma, newline, or "Name (STD)" chunks). */
+export function parseNetworks(value: string | null | undefined): string[] {
+  if (!value?.trim()) return [];
+  const trimmed = value.trim();
+
+  for (const sep of ["\n", ",", ";", "|"]) {
+    if (trimmed.includes(sep)) {
+      return trimmed.split(sep).map((s) => s.trim()).filter(Boolean);
+    }
+  }
+
+  const withParens = trimmed.match(/[A-Za-z0-9](?:[A-Za-z0-9\s-]*[A-Za-z0-9])?\s*\([^)]+\)/g);
+  let remainder = trimmed;
+  const networks: string[] = [];
+
+  if (withParens?.length) {
+    for (const part of withParens) {
+      networks.push(part.trim());
+      remainder = remainder.replace(part, " ");
+    }
+  }
+
+  remainder = remainder.replace(/\s+/g, " ").trim();
+  if (remainder) {
+    const tokens = remainder.match(/\bCore DAO\b|[A-Za-z0-9]+/g);
+    if (tokens?.length) {
+      tokens.forEach((token) => networks.push(token));
+    }
+  }
+
+  return networks.length > 0 ? networks : [trimmed];
+}
+
 export function getCategoryCounts(services: Service[]) {
   const counts: Record<string, number> = {};
   services.forEach((s) => {
@@ -192,4 +225,9 @@ export function getServiceCardMeta(service: Service) {
         ? formatCurrency(getServiceCommissionPreview(service)!)
         : null,
   };
+}
+
+export function getServiceOrderPath(basePath: string, serviceSlug: string, projectId?: string) {
+  const query = projectId ? `?project=${encodeURIComponent(projectId)}` : "";
+  return `${basePath}/services/${serviceSlug}/order${query}`;
 }

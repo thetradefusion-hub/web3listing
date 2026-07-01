@@ -36,7 +36,8 @@ export function PublicHeader() {
           <BrandLogo
             href="/"
             size="md"
-            className="min-w-0 truncate text-base sm:text-xl md:text-2xl"
+            priority
+            className="max-w-[min(48vw,180px)] sm:max-w-[200px]"
           />
         </div>
 
@@ -64,7 +65,7 @@ export function PublicHeader() {
           </Button>
           <Button
             size="sm"
-            className="h-9 rounded-lg bg-cyan-500 px-3 text-xs font-semibold text-slate-950 shadow-sm hover:bg-cyan-400 sm:h-9 sm:px-4 sm:text-sm"
+            className="lh-btn-cta h-9 rounded-lg px-3 text-xs font-semibold shadow-sm sm:h-9 sm:px-4 sm:text-sm"
             asChild
           >
             <Link href="/signup">
@@ -109,7 +110,7 @@ export function PublicHeader() {
                     Log in
                   </Link>
                 </Button>
-                <Button className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400" asChild>
+                <Button className="lh-btn-cta w-full" asChild>
                   <Link href="/signup" onClick={() => setOpen(false)}>
                     Get started
                   </Link>

@@ -18,7 +18,7 @@ export default async function BlogPage() {
       <div className="space-y-6">
         {posts?.map((post) => (
           <Link key={post.id} href={`/blog/${post.slug}`}>
-            <Card className="transition-colors hover:border-cyan-500/30">
+            <Card className="transition-colors hover:border-primary/30">
               <CardHeader>
                 <CardTitle>{post.title}</CardTitle>
                 <CardDescription>{post.excerpt}</CardDescription>

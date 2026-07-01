@@ -18,12 +18,12 @@ export function PricingPackages() {
               className={cn(
                 "relative flex flex-col rounded-xl border p-5 sm:rounded-2xl sm:p-7 lg:p-8",
                 pkg.featured
-                  ? "border-cyan-500/40 bg-gradient-to-b from-cyan-500/10 via-card to-card shadow-lg shadow-cyan-500/10 lg:scale-[1.02]"
+                  ? "border-primary/40 bg-gradient-to-b from-primary/10 via-card to-card shadow-lg shadow-primary/10 lg:scale-[1.02]"
                   : "border-border bg-card/80"
               )}
             >
               {pkg.featured ? (
-                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-cyan-500 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-950">
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-chart-2 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0a0a0a]">
                   Most popular
                 </span>
               ) : null}
@@ -33,7 +33,7 @@ export function PricingPackages() {
                   {pkg.name}
                 </p>
                 <h3 className="mt-1.5 text-lg font-bold text-foreground sm:mt-2 sm:text-2xl">{pkg.subtitle}</h3>
-                <span className="mt-2 inline-block max-w-full rounded-full border border-border bg-muted/50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-700 dark:text-cyan-300 sm:mt-3 sm:px-3 sm:py-1 sm:text-[11px]">
+                <span className="mt-2 inline-block max-w-full rounded-full border border-border bg-muted/50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary sm:mt-3 sm:px-3 sm:py-1 sm:text-[11px]">
                   {pkg.badge}
                 </span>
               </div>
@@ -46,7 +46,7 @@ export function PricingPackages() {
               <ul className="mt-5 flex-1 space-y-2 sm:mt-8 sm:space-y-3">
                 {pkg.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm text-foreground/90">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-chart-2" />
                     <span className="min-w-0 leading-snug">{feature}</span>
                   </li>
                 ))}
@@ -56,7 +56,7 @@ export function PricingPackages() {
                 className={cn(
                   "mt-5 h-11 w-full rounded-xl text-sm font-semibold sm:mt-8 sm:h-12",
                   pkg.featured
-                    ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400 sm:rounded-full"
+                    ? "lh-btn-cta sm:rounded-full"
                     : "sm:rounded-full"
                 )}
                 variant={pkg.featured ? "default" : "outline"}

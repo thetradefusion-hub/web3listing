@@ -39,14 +39,14 @@ export function ServicePillars() {
                 href={pillar.href}
                 className="group flex flex-col rounded-2xl border border-border bg-card/50 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5 sm:p-6"
               >
-                <div className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 ring-1 ring-cyan-500/20 transition group-hover:bg-cyan-500/15 dark:text-cyan-400">
+                <div className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20 transition group-hover:bg-primary/15">
                   <Icon className="size-5" strokeWidth={2} />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 sm:text-xl">
+                <h3 className="text-lg font-semibold text-foreground group-hover:text-primary dark:group-hover:text-chart-2 sm:text-xl">
                   {pillar.title}
                 </h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:mt-3">{pillar.desc}</p>
-                <span className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-cyan-600 transition group-hover:gap-2 dark:text-cyan-400">
+                <span className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-primary transition group-hover:gap-2 dark:text-chart-2">
                   Explore
                   <ArrowUpRight className="size-3.5 sm:size-4" />
                 </span>

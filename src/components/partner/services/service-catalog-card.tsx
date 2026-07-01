@@ -11,6 +11,7 @@ import {
   getServiceCardMeta,
   getServiceInitials,
   getServiceLogoColor,
+  getServiceOrderPath,
 } from "@/lib/service-catalog";
 import { iconTintStyles } from "@/lib/theme-tokens";
 import type { Service } from "@/types/database";
@@ -57,7 +58,7 @@ export function ServiceCatalogCard({
   const portalBase = basePath ?? "/partner";
   const displayCommission = showCommission ?? true;
   const href = `${portalBase}/services/${service.slug}${projectQuery || ""}`;
-  const orderHref = `${href}${projectQuery ? (projectQuery.includes("?") ? "&" : "?") + "order=1" : "?order=1"}`;
+  const orderHref = getServiceOrderPath(portalBase, service.slug, projectQuery?.replace(/^\?project=/, "") || undefined);
   const logoColor = getServiceLogoColor(service.name);
   const accent = getServiceAccent(service.name);
   const description = service.overview || service.description;

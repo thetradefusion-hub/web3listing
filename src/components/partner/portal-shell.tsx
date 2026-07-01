@@ -16,7 +16,7 @@ function PartnerMobileDrawer({ profile }: { profile: Profile }) {
       <SheetContent
         side="left"
         showCloseButton
-        className="partner-sidebar w-[min(100vw,260px)] max-w-[260px] border-0 bg-[#0B1020] p-0 text-white [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
+        className="partner-sidebar w-[min(100vw,260px)] max-w-[260px] border-0 bg-black p-0 text-white [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
       >
         <PartnerSidebar profile={profile} className="h-full w-full" onNavigate={() => setOpen(false)} />
       </SheetContent>

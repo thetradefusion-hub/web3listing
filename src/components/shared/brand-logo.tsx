@@ -1,13 +1,24 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
+import { BRAND_LOGO_PATH, SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { SITE_NAME } from "@/lib/constants";
 
 const sizeMap = {
-  xs: "text-sm",
-  sm: "text-base",
-  md: "text-xl",
-  lg: "text-2xl",
-  xl: "text-3xl",
+  xs: "h-5",
+  sm: "h-7",
+  md: "h-8",
+  lg: "h-10",
+  xl: "h-12",
+} as const;
+
+const maxWidthMap = {
+  xs: "max-w-[120px]",
+  sm: "max-w-[150px]",
+  md: "max-w-[180px]",
+  lg: "max-w-[210px]",
+  xl: "max-w-[240px]",
 } as const;
 
 type BrandLogoProps = {
@@ -21,18 +32,22 @@ export function BrandLogo({
   size = "md",
   className,
   href,
+  priority = false,
 }: BrandLogoProps) {
   const logo = (
-    <span
+    <Image
+      src={BRAND_LOGO_PATH}
+      alt={SITE_NAME}
+      width={240}
+      height={48}
+      priority={priority}
       className={cn(
-        "inline-block bg-gradient-to-r from-[#FF007A] via-[#7C3AED] to-[#0070F3] bg-clip-text font-semibold tracking-tight text-transparent",
+        "w-auto object-contain object-left",
         sizeMap[size],
+        maxWidthMap[size],
         className
       )}
-      aria-label={SITE_NAME}
-    >
-      TokenWeb3Listing
-    </span>
+    />
   );
 
   if (href) {

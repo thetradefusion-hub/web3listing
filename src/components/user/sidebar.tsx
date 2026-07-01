@@ -11,6 +11,7 @@ import {
   UserCog,
   CreditCard,
   LifeBuoy,
+  ClipboardList,
 } from "lucide-react";
 import { signOut } from "@/lib/actions";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
@@ -30,6 +31,7 @@ const navItems: NavItem[] = [
   { href: "/user/projects", label: "My Projects", icon: FolderKanban },
   { href: "/user/orders", label: "My Orders", icon: Package },
   { href: "/user/services", label: "Services", icon: Store },
+  { href: "/user/custom-requirements", label: "Custom Requirement", icon: ClipboardList },
   { href: "/user/orders?status=waiting_payment", label: "Payments", icon: CreditCard },
   { href: "/user/support", label: "Support Tickets", icon: Headphones },
   { href: "/user/profile", label: "Settings", icon: UserCog },

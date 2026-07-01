@@ -14,6 +14,7 @@ import {
   BarChart3,
   UserCheck,
   FileText,
+  ClipboardList,
 } from "lucide-react";
 import { signOut } from "@/lib/actions";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
@@ -40,6 +41,7 @@ const navSections: { label: string; items: NavItem[] }[] = [
       { href: "/admin/kyc", label: "KYC Review", icon: UserCheck },
       { href: "/admin/projects", label: "Projects", icon: FolderKanban },
       { href: "/admin/orders", label: "Orders", icon: Package },
+      { href: "/admin/custom-requirements", label: "Custom Requirements", icon: ClipboardList },
       { href: "/admin/categories", label: "Categories", icon: Tags },
       { href: "/admin/services", label: "Services", icon: Store },
     ],

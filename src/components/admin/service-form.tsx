@@ -309,12 +309,12 @@ export function ServiceForm({
           />
         </Field>
         <Field label="Networks" htmlFor="networks">
-          <Input
+          <Textarea
             id="networks"
             name="networks"
-            className={inputClass}
+            className="min-h-[88px] rounded-xl"
             defaultValue={service?.networks || ""}
-            placeholder="e.g. BSC, ETH"
+            placeholder={"One network per line, or comma-separated\ne.g. Ethereum (ERC-20), BSC, Polygon"}
           />
         </Field>
       </FormSection>
