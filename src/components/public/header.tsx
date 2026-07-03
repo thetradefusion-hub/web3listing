@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { TELEGRAM_SUPPORT } from "@/lib/constants";
 
@@ -56,9 +57,9 @@ export function PublicHeader() {
         <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2">
           <ThemeToggle className="hidden size-9 text-muted-foreground hover:text-foreground sm:inline-flex" />
           <Button variant="ghost" size="sm" className="hidden text-muted-foreground hover:text-foreground lg:inline-flex" asChild>
-            <a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">
+            <TelegramAnchor href={TELEGRAM_SUPPORT}>
               Telegram
-            </a>
+            </TelegramAnchor>
           </Button>
           <Button variant="ghost" size="sm" className="hidden text-muted-foreground hover:text-foreground md:inline-flex" asChild>
             <Link href="/login">Log in</Link>
@@ -101,9 +102,9 @@ export function PublicHeader() {
                   <ThemeToggle className="text-muted-foreground hover:text-foreground" />
                 </div>
                 <Button variant="outline" className="w-full" asChild>
-                  <a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">
+                  <TelegramAnchor href={TELEGRAM_SUPPORT}>
                     Telegram Support
-                  </a>
+                  </TelegramAnchor>
                 </Button>
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/login" onClick={() => setOpen(false)}>

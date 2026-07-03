@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { buildTelegramLink } from "@/lib/telegram";
 import type { Profile, AccountManager } from "@/types/database";
 
 function getInitials(name: string) {
@@ -116,7 +117,7 @@ export function PartnerHeader({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div className="flex items-center gap-0.5 rounded-xl border border-border/80 bg-muted/25 p-0.5 sm:gap-1 sm:p-1">
             {manager?.telegram_link ? (
-              <HeaderToolButton href={manager.telegram_link} label="Message on Telegram">
+              <HeaderToolButton href={buildTelegramLink(manager.telegram_link)} label="Message on Telegram">
                 <Send className="size-4" strokeWidth={2} />
               </HeaderToolButton>
             ) : null}

@@ -101,9 +101,14 @@ export function ServiceActions({
                 )}
               </Button>
             ) : (
-              <Button variant="outline" onClick={() => setDeleteOpen(false)} className="rounded-xl">
-                Understood
-              </Button>
+              <>
+                <Button variant="outline" onClick={() => setDeleteOpen(false)} className="rounded-xl" asChild>
+                  <Link href={`/admin/orders?service=${service.id}`}>Manage linked orders</Link>
+                </Button>
+                <Button variant="outline" onClick={() => setDeleteOpen(false)} className="rounded-xl">
+                  Close
+                </Button>
+              </>
             )}
           </DialogFooter>
         </DialogContent>

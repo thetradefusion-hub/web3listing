@@ -123,6 +123,7 @@ export function ServiceForm({
         slug: (form.get("slug") as string) || undefined,
         description: (form.get("description") as string) || null,
         overview: (form.get("overview") as string) || null,
+        about_service: (form.get("about_service") as string) || null,
         demo_link: (form.get("demo_link") as string) || null,
         proof_of_work: (form.get("proof_of_work") as string) || null,
         proof_of_work_url: (form.get("proof_of_work_url") as string) || null,
@@ -232,7 +233,17 @@ export function ServiceForm({
         </Field>
       </FormSection>
 
-      <FormSection title="Detail page content" description="Overview, deliverables, and process">
+      <FormSection title="Detail page content" description="About, overview, deliverables, and process">
+        <Field label="About this service" htmlFor="about_service" className="sm:col-span-2 xl:col-span-3">
+          <Textarea
+            id="about_service"
+            name="about_service"
+            rows={5}
+            className={textareaClass}
+            defaultValue={service?.about_service || ""}
+            placeholder="Longer description shown on the service details page under “About this service”"
+          />
+        </Field>
         <Field label="Overview" htmlFor="overview" className="sm:col-span-2 xl:col-span-3">
           <Textarea id="overview" name="overview" rows={5} className={textareaClass} defaultValue={service?.overview || ""} />
         </Field>

@@ -15,6 +15,7 @@ import { KycForm } from "@/components/partner/kyc-form";
 import { DashboardPanel, PartnerStatCard } from "@/components/partner/dashboard/dashboard-premium";
 import { PartnerBadge, PartnerPageShell, kycStatusVariant } from "@/components/partner/ui";
 import { Button } from "@/components/ui/button";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { KycStatus, KycSubmission, Profile } from "@/types/database";
@@ -335,10 +336,10 @@ export function PartnerKycView({
               </p>
               {managerTelegramLink ? (
                 <Button size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>
-                  <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
+                  <TelegramAnchor href={managerTelegramLink}>
                     <Send data-icon="inline-start" />
                     Message on Telegram
-                  </a>
+                  </TelegramAnchor>
                 </Button>
               ) : (
                 <Button variant="outline" size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>

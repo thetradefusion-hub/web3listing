@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { TELEGRAM_SUPPORT } from "@/lib/constants";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 
 export default function ForgotPasswordPage() {
   return (
@@ -19,9 +20,9 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Button asChild className="w-full bg-cyan-500 text-black hover:bg-cyan-400">
-            <a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">
+            <TelegramAnchor href={TELEGRAM_SUPPORT}>
               Contact Support on Telegram
-            </a>
+            </TelegramAnchor>
           </Button>
           <Button variant="ghost" asChild className="w-full">
             <Link href="/login">Back to Login</Link>

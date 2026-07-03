@@ -2,7 +2,7 @@
 
 -- Default Account Manager
 INSERT INTO account_managers (name, telegram_id, telegram_link, support_hours) VALUES
-('Abhay', '@Abhay_TWL', 'https://t.me/Abhay_TWL', 'Monday - Saturday, 9AM - 6PM UTC');
+('Abhay', '@blackbox1920', 'https://t.me/blackbox1920', 'Monday - Saturday, 9AM - 6PM UTC');
 
 -- Legal Pages
 INSERT INTO legal_pages (slug, title, content) VALUES

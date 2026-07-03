@@ -1,58 +1,41 @@
 import { createClient } from "@/lib/supabase/server";
-import {
-  AdminPageShell,
-  AdminPageHeader,
-  AdminPanel,
-  AdminPanelBody,
-  AdminBadge,
-  AdminEmptyState,
-  rel,
-} from "@/components/admin/ui";
+import { AdminTicketsUI, type AdminTicketRow } from "@/components/admin/admin-tickets-ui";
 
-function ticketVariant(status: string): "success" | "warning" | "info" | "muted" {
-  if (status === "closed") return "muted";
-  if (status === "in_progress") return "info";
-  return "warning";
+function rel<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) return null;
+  return Array.isArray(value) ? value[0] ?? null : value;
 }
 
 export default async function AdminTicketsPage() {
   const supabase = await createClient();
+
   const { data: tickets } = await supabase
     .from("tickets")
-    .select("*, profiles!tickets_user_id_fkey(full_name, email)")
+    .select(
+      `
+      *,
+      profiles!tickets_user_id_fkey(full_name, email, role, company_name),
+      ticket_messages(
+        id,
+        ticket_id,
+        user_id,
+        message,
+        attachment_url,
+        created_at,
+        profiles!ticket_messages_user_id_fkey(full_name, role)
+      )
+    `
+    )
     .order("created_at", { ascending: false });
 
-  return (
-    <AdminPageShell>
-      <AdminPageHeader
-        title="Support Tickets"
-        description="Manage partner support requests"
-      />
+  const rows: AdminTicketRow[] = (tickets || []).map((ticket) => ({
+    ...ticket,
+    profiles: rel(ticket.profiles),
+    ticket_messages: (ticket.ticket_messages || []).map((msg: AdminTicketRow["ticket_messages"][number]) => ({
+      ...msg,
+      profiles: rel(msg.profiles),
+    })),
+  }));
 
-      {tickets && tickets.length > 0 ? (
-        <div className="space-y-3">
-          {tickets.map((ticket) => {
-            const profile = rel(ticket.profiles);
-            return (
-              <AdminPanel key={ticket.id}>
-                <AdminPanelBody>
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-slate-900">{ticket.subject}</p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        {profile?.full_name || profile?.email} · {new Date(ticket.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                    <AdminBadge variant={ticketVariant(ticket.status)}>{ticket.status.replace(/_/g, " ")}</AdminBadge>
-                  </div>
-                </AdminPanelBody>
-              </AdminPanel>
-            );
-          })}
-        </div>
-      ) : (
-        <AdminEmptyState title="No tickets" description="Support tickets from partners will appear here." />
-      )}
-    </AdminPageShell>
-  );
+  return <AdminTicketsUI tickets={rows} />;
 }

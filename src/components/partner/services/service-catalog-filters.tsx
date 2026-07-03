@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Banknote, Clock3, RotateCcw, Send, SlidersHorizontal } from "lucide-react";
 import { catalogToolbarRowClass } from "@/components/partner/services/service-catalog-toolbar";
 import { Button } from "@/components/ui/button";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -282,10 +283,10 @@ export function ServiceCatalogFilters({
         </p>
         {managerTelegramLink ? (
           <Button size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>
-            <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
+            <TelegramAnchor href={managerTelegramLink}>
               <Send data-icon="inline-start" />
               Message on Telegram
-            </a>
+            </TelegramAnchor>
           </Button>
         ) : (
           <Button variant="outline" size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>

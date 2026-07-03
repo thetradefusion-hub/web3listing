@@ -1,8 +1,11 @@
 import type { UserRole } from "@/types/database";
+import { buildTelegramLink, DEFAULT_MANAGER_TELEGRAM_USERNAME } from "@/lib/telegram";
 
 export const SITE_NAME = "TokenWeb3Listing";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-export const BRAND_LOGO_PATH = "/web3Listing png green text.png";
+export const BRAND_LOGO_LIGHT_PATH = "/web3Listing png 1.png";
+export const BRAND_LOGO_DARK_PATH = "/web3Listing png green text.png";
+export const BRAND_LOGO_PATH = BRAND_LOGO_DARK_PATH;
 export const BRAND_ICON_PATH = "/web3Listing  symbol.png";
 export const BRAND_PURPLE = "#8B2CF5";
 export const BRAND_LIME = "#A3E635";
@@ -46,7 +49,14 @@ export const BLOCKCHAIN_NETWORKS = [
 ];
 
 export const TELEGRAM_SUPPORT =
-  process.env.NEXT_PUBLIC_TELEGRAM_SUPPORT_GROUP_URL || "https://t.me/TokenWeb3Listing";
+  process.env.NEXT_PUBLIC_TELEGRAM_SUPPORT_GROUP_URL ||
+  buildTelegramLink(DEFAULT_MANAGER_TELEGRAM_USERNAME);
+
+export const TICKET_STATUS_LABELS: Record<string, string> = {
+  open: "Open",
+  in_progress: "In Progress",
+  closed: "Closed",
+};
 
 export const CUSTOM_REQUIREMENT_STATUS_LABELS: Record<string, string> = {
   submitted: "Submitted",

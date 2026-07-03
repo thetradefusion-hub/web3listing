@@ -13,20 +13,54 @@ import {
   MobileDataRow,
   ResponsiveTableShell,
 } from "@/components/shared/responsive-table";
+import { Button } from "@/components/ui/button";
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ service?: string }>;
+}) {
+  const { service: serviceId } = await searchParams;
   const supabase = await createClient();
-  const { data: orders } = await supabase
+
+  let ordersQuery = supabase
     .from("orders")
     .select("*, services(name, estimated_tat), profiles!orders_agent_id_fkey(full_name, role), projects(project_name, token_symbol)")
     .order("created_at", { ascending: false });
+
+  if (serviceId) {
+    ordersQuery = ordersQuery.eq("service_id", serviceId);
+  }
+
+  const [{ data: orders }, { data: filteredService }] = await Promise.all([
+    ordersQuery,
+    serviceId
+      ? supabase.from("services").select("id, name").eq("id", serviceId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
 
   return (
     <AdminPageShell>
       <AdminPageHeader
         title="Order Management"
-        description="Review, quote, and manage all partner orders"
+        description={
+          filteredService
+            ? `Orders linked to ${filteredService.name}`
+            : "Review, quote, and manage all partner orders"
+        }
       />
+
+      {filteredService && (
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-900">
+          <span>
+            Showing orders for <span className="font-semibold">{filteredService.name}</span>. Delete or
+            reassign them to remove this service from the catalog.
+          </span>
+          <Button size="sm" variant="outline" className="rounded-xl bg-white" asChild>
+            <Link href="/admin/orders">Clear filter</Link>
+          </Button>
+        </div>
+      )}
 
       {orders && orders.length > 0 ? (
         <AdminPanel className="overflow-hidden">
@@ -114,7 +148,14 @@ export default async function AdminOrdersPage() {
           />
         </AdminPanel>
       ) : (
-        <AdminEmptyState title="No orders yet" description="Orders from partners will appear here." />
+        <AdminEmptyState
+          title={filteredService ? "No orders for this service" : "No orders yet"}
+          description={
+            filteredService
+              ? "This service has no linked orders. You can delete it from the services catalog."
+              : "Orders from partners will appear here."
+          }
+        />
       )}
     </AdminPageShell>
   );

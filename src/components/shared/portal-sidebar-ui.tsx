@@ -6,7 +6,8 @@ import type { LucideIcon } from "lucide-react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { BRAND_ICON_PATH, BRAND_LOGO_PATH, SITE_NAME } from "@/lib/constants";
+import { BRAND_ICON_PATH, SITE_NAME } from "@/lib/constants";
+import { SidebarBrandLogo } from "@/components/shared/brand-logo";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -97,14 +98,7 @@ export function PortalSidebarBrand({
           </Tooltip>
         ) : (
           <>
-            <Image
-              src={BRAND_LOGO_PATH}
-              alt={SITE_NAME}
-              width={220}
-              height={48}
-              className="h-9 w-auto max-w-[210px] object-contain object-left"
-              priority
-            />
+            <SidebarBrandLogo priority />
             <span
               className={cn(
                 "mt-2.5 inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",

@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BRAND_ICON_PATH, SITE_NAME } from "@/lib/constants";
+import { BRAND_ICON_PATH } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -141,19 +141,7 @@ export default function LoginForm() {
 
           <div className="relative flex flex-1 flex-col justify-between p-10 xl:p-14">
             <div>
-              <div className="flex items-center gap-4">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-black/40 ring-1 ring-primary/30">
-                  <Image
-                    src={BRAND_ICON_PATH}
-                    alt={SITE_NAME}
-                    width={40}
-                    height={40}
-                    className="size-10 object-contain"
-                    priority
-                  />
-                </div>
-                <BrandLogo href="/" size="lg" priority />
-              </div>
+              <BrandLogo href="/" size="lg" priority />
               <h1 className="mt-8 text-3xl font-bold leading-tight tracking-tight text-foreground xl:text-4xl">
                 Grow your{" "}
                 <span className="lh-brand-gradient">Web3 projects</span> with confidence
@@ -186,17 +174,7 @@ export default function LoginForm() {
         {/* Form panel */}
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-24 sm:px-6 lg:py-16">
           <div className="w-full max-w-[420px]">
-            <div className="mb-6 flex flex-col items-center gap-3 lg:hidden">
-              <div className="flex size-16 items-center justify-center rounded-2xl bg-card ring-1 ring-primary/25 shadow-lg shadow-primary/10">
-                <Image
-                  src={BRAND_ICON_PATH}
-                  alt={SITE_NAME}
-                  width={48}
-                  height={48}
-                  className="size-12 object-contain"
-                  priority
-                />
-              </div>
+            <div className="mb-6 flex justify-center lg:hidden">
               <BrandLogo href="/" size="lg" priority />
             </div>
 

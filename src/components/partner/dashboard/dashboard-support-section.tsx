@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import type { AccountManager } from "@/types/database";
 
 function HelpListItem({ children }: { children: React.ReactNode }) {
@@ -90,10 +91,10 @@ export function DashboardSupportSection({
         <CardFooter className="flex flex-col gap-2 border-t bg-muted/20 sm:flex-row">
           {manager?.telegram_link ? (
             <Button asChild className="h-9 flex-1 rounded-xl font-semibold">
-              <a href={manager.telegram_link} target="_blank" rel="noopener noreferrer">
+              <TelegramAnchor href={manager.telegram_link}>
                 <Send data-icon="inline-start" />
                 Telegram
-              </a>
+              </TelegramAnchor>
             </Button>
           ) : null}
           <Button asChild variant="outline" className="h-9 flex-1 rounded-xl">
@@ -152,10 +153,10 @@ export function DashboardSupportSection({
         {manager?.telegram_link ? (
           <CardFooter className="border-t bg-muted/20">
             <Button asChild className="h-9 w-full rounded-xl font-semibold">
-              <a href={manager.telegram_link} target="_blank" rel="noopener noreferrer">
+              <TelegramAnchor href={manager.telegram_link}>
                 <MessageCircle data-icon="inline-start" />
                 Message Manager
-              </a>
+              </TelegramAnchor>
             </Button>
           </CardFooter>
         ) : null}

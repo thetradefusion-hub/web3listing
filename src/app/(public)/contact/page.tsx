@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { TELEGRAM_SUPPORT } from "@/lib/constants";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 
 export default function ContactPage() {
   const [loading, setLoading] = useState(false);
@@ -48,9 +49,9 @@ export default function ContactPage() {
               For fastest response, contact us on Telegram.
             </p>
             <Button className="lh-btn-cta w-full" asChild>
-              <a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">
+              <TelegramAnchor href={TELEGRAM_SUPPORT}>
                 Open Telegram Support
-              </a>
+              </TelegramAnchor>
             </Button>
             <p className="text-xs text-muted-foreground">
               Business Hours: Monday - Saturday · 24/7 Ticket Support

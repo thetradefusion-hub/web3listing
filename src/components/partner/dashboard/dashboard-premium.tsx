@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import type { LucideIcon } from "lucide-react";
 
 export function PartnerStatCard({
@@ -183,9 +184,9 @@ export function ManagerProfileCard({
       </div>
       {telegramLink ? (
         <Button asChild size="sm" variant="outline" className="w-full">
-          <a href={telegramLink} target="_blank" rel="noopener noreferrer">
+          <TelegramAnchor href={telegramLink}>
             Message
-          </a>
+          </TelegramAnchor>
         </Button>
       ) : null}
     </div>

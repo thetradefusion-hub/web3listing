@@ -5,9 +5,9 @@ import { format } from "date-fns";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   BadgeCheck,
   CheckCircle2,
-  ChevronRight,
   ClipboardList,
   Clock,
   CreditCard,
@@ -347,6 +347,15 @@ export function ServiceDetailView({
               </TabsList>
 
               <TabsContent value="overview" className="flex flex-col gap-6 p-4 sm:p-5">
+                {service.about_service ? (
+                  <section>
+                    <h3 className="text-sm font-bold text-foreground">About this service</h3>
+                    <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                      {service.about_service}
+                    </p>
+                  </section>
+                ) : null}
+
                 <section>
                   <h3 className="text-sm font-bold text-foreground">Service Overview</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{overviewText}</p>
@@ -372,22 +381,26 @@ export function ServiceDetailView({
                 {processSteps.length > 0 && (
                   <section>
                     <h3 className="text-sm font-bold text-foreground">Our Process</h3>
-                    <div className="mt-4 flex snap-x snap-mandatory items-start gap-1 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                    <div className="mt-4 flex snap-x snap-mandatory items-start gap-0.5 overflow-x-auto pb-1 [scrollbar-width:thin]">
                       {processSteps.map((step, i) => {
                         const Icon = PROCESS_ICONS[i % PROCESS_ICONS.length];
                         return (
                           <div key={step.title} className="flex shrink-0 items-start">
-                            <div className="flex w-[96px] flex-col items-center text-center sm:w-[104px]">
-                              <span className="flex size-11 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/10 text-primary">
-                                <Icon className="size-5" strokeWidth={2} />
+                            <div className="flex w-[76px] flex-col items-center text-center sm:w-[84px]">
+                              <span className="flex size-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary">
+                                <Icon className="size-3.5" strokeWidth={2.25} />
                               </span>
-                              <p className="mt-2 text-[10px] font-medium leading-snug text-muted-foreground">{step.title}</p>
+                              <p className="mt-1.5 text-[10px] font-medium leading-snug text-muted-foreground">{step.title}</p>
                               {step.description ? (
                                 <p className="mt-0.5 line-clamp-2 text-[9px] text-muted-foreground/80">{step.description}</p>
                               ) : null}
                             </div>
                             {i < processSteps.length - 1 && (
-                              <ChevronRight className="mx-0.5 mt-3 size-4 shrink-0 text-border" />
+                              <ArrowRight
+                                className="mx-1 mt-2.5 size-5 shrink-0 text-foreground/80 dark:text-foreground/70"
+                                strokeWidth={2.25}
+                                aria-hidden
+                              />
                             )}
                           </div>
                         );

@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProjectForm } from "@/components/partner/project-form";
 import { CopyTextButton } from "@/components/partner/projects/copy-text-button";
@@ -384,10 +385,10 @@ export function ProjectDetailView({
           </div>
           {managerTelegramLink ? (
             <Button className="h-10 shrink-0 rounded-xl font-semibold" asChild>
-              <a href={managerTelegramLink} target="_blank" rel="noopener noreferrer">
+              <TelegramAnchor href={managerTelegramLink}>
                 <Send data-icon="inline-start" />
                 Book Consultation
-              </a>
+              </TelegramAnchor>
             </Button>
           ) : (
             <Button className="h-10 shrink-0 rounded-xl font-semibold" asChild>

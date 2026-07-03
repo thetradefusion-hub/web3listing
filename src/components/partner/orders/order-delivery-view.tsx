@@ -14,6 +14,7 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { DeliveryTimeline } from "@/components/shared/delivery-timeline";
 import { OrderReviewForm } from "@/components/partner/orders/order-review-form";
 import { calculateOrderCommission, formatCurrency, isCommissionEligibleStatus } from "@/lib/commission";
@@ -117,14 +118,12 @@ export function OrderDeliveryView({
             </div>
           </div>
           {manager.telegram_link && (
-            <a
+            <TelegramAnchor
               href={manager.telegram_link}
-              target="_blank"
-              rel="noopener noreferrer"
               className="mt-3 flex h-10 w-full items-center justify-center rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB] hover:bg-[#DBEAFE]"
             >
               Message on Telegram
-            </a>
+            </TelegramAnchor>
           )}
         </div>
       )}

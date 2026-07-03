@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { OrderTimeline } from "@/components/shared/order-timeline";
 import { QuotationBuilder } from "@/components/admin/quotation-builder";
 import { OrderStatusUpdater, PaymentVerifier } from "@/components/admin/admin-actions";
+import { OrderDeleter, OrderServiceReassign } from "@/components/admin/order-admin-actions";
 import { DeliveryManager } from "@/components/admin/delivery-manager";
 import type { OrderStatus } from "@/types/database";
 import {
@@ -30,11 +31,13 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const service = rel(order.services);
   const partner = rel(order.profiles);
 
-  const [{ data: payment }, { data: quotation }, { data: deliverables }, { data: proofs }] = await Promise.all([
+  const [{ data: payment }, { data: quotation }, { data: deliverables }, { data: proofs }, { data: allServices }] =
+    await Promise.all([
     supabase.from("payments").select("*").eq("order_id", id).order("created_at", { ascending: false }).limit(1).single(),
     supabase.from("quotations").select("*").eq("order_id", id).order("created_at", { ascending: false }).limit(1).single(),
     supabase.from("deliverables").select("*").eq("order_id", id).order("sort_order"),
     supabase.from("order_proofs").select("*").eq("order_id", id).order("sort_order"),
+    supabase.from("services").select("id, name").order("name"),
   ]);
 
   return (
@@ -141,6 +144,27 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </AdminPanelBody>
         </AdminPanel>
       )}
+
+      <AdminPanel>
+        <AdminPanelHeader
+          title="Service & deletion"
+          description="Reassign this order to another service, or delete it to unblock service removal from the catalog"
+        />
+        <AdminPanelBody className="space-y-6">
+          <OrderServiceReassign
+            orderId={id}
+            currentServiceId={order.service_id}
+            services={allServices || []}
+          />
+          <div className="border-t border-slate-100 pt-6">
+            <OrderDeleter
+              orderId={id}
+              orderNumber={order.order_number}
+              serviceName={service?.name || "Service"}
+            />
+          </div>
+        </AdminPanelBody>
+      </AdminPanel>
     </AdminPageShell>
   );
 }

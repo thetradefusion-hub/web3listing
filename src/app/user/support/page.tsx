@@ -9,7 +9,19 @@ export default async function UserSupportPage() {
   const [{ data: tickets }, { data: manager }] = await Promise.all([
     supabase
       .from("tickets")
-      .select("*")
+      .select(
+        `
+        *,
+        ticket_messages(
+          id,
+          ticket_id,
+          user_id,
+          message,
+          created_at,
+          profiles!ticket_messages_user_id_fkey(full_name, role)
+        )
+      `
+      )
       .eq("user_id", profile!.id)
       .order("created_at", { ascending: false }),
     profile?.account_manager_id

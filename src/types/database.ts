@@ -153,6 +153,7 @@ export interface Service {
   badge: "hot" | "popular" | "new" | null;
   logo_url: string | null;
   overview: string | null;
+  about_service: string | null;
   whats_included: string[] | null;
   supported_platforms: string[] | null;
   process_steps: { title: string; description?: string }[] | null;

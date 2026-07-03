@@ -706,6 +706,106 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus, no
   return { success: true };
 }
 
+export async function reassignOrderService(orderId: string, newServiceId: string) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, service_id, order_number")
+    .eq("id", orderId)
+    .single();
+
+  if (!order) return { error: "Order not found" };
+  if (order.service_id === newServiceId) {
+    return { error: "This order is already assigned to that service." };
+  }
+
+  const { data: service } = await supabase
+    .from("services")
+    .select("id, name")
+    .eq("id", newServiceId)
+    .single();
+
+  if (!service) return { error: "Service not found" };
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ service_id: newServiceId })
+    .eq("id", orderId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/services");
+  revalidatePath("/partner/orders");
+  revalidatePath("/user/orders");
+  revalidatePath(`/partner/orders/${orderId}`);
+  revalidatePath(`/user/orders/${orderId}`);
+  return { success: true };
+}
+
+export async function deleteOrder(orderId: string) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, order_number, agent_id, service_id")
+    .eq("id", orderId)
+    .single();
+
+  if (!order) return { error: "Order not found" };
+
+  const { data: credits } = await supabase
+    .from("commission_ledger")
+    .select("id, user_id, amount")
+    .eq("order_id", orderId)
+    .eq("type", "credit");
+
+  if (credits?.length) {
+    for (const credit of credits) {
+      const amount = Number(credit.amount);
+      const { data: wallet } = await supabase
+        .from("wallets")
+        .select("available_balance, lifetime_earnings")
+        .eq("user_id", credit.user_id)
+        .maybeSingle();
+
+      if (wallet) {
+        await supabase
+          .from("wallets")
+          .update({
+            available_balance: Math.max(0, Number(wallet.available_balance) - amount),
+            lifetime_earnings: Math.max(0, Number(wallet.lifetime_earnings) - amount),
+          })
+          .eq("user_id", credit.user_id);
+      }
+    }
+  }
+
+  const { error: ledgerError } = await supabase
+    .from("commission_ledger")
+    .delete()
+    .eq("order_id", orderId);
+
+  if (ledgerError) return { error: ledgerError.message };
+
+  const { error } = await supabase.from("orders").delete().eq("id", orderId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin/services");
+  revalidatePath("/admin/reports");
+  revalidatePath("/partner");
+  revalidatePath("/user");
+  revalidatePath("/partner/orders");
+  revalidatePath("/user/orders");
+  return { success: true };
+}
+
 export async function saveOrderDelivery(data: {
   order_id: string;
   team_notes?: string;
@@ -997,24 +1097,102 @@ export async function createTicket(subject: string, message: string) {
   });
 
   revalidatePath("/partner/support");
+  revalidatePath("/user/support");
   return { success: true, ticket };
 }
 
 export async function replyTicket(ticketId: string, message: string) {
   const profile = await requireAuth();
-  const supabase = await createClient();
+  const trimmed = message.trim();
+  if (!trimmed) return { error: "Message is required" };
 
-  await supabase.from("ticket_messages").insert({
+  const db = isAdminRole(profile.role) || profile.role === "service_team"
+    ? createAdminClient()
+    : await createClient();
+
+  const { data: ticket } = await db
+    .from("tickets")
+    .select("id, user_id, subject, status")
+    .eq("id", ticketId)
+    .single();
+
+  if (!ticket) return { error: "Ticket not found" };
+
+  const isStaff = isAdminRole(profile.role) || profile.role === "service_team";
+  if (!isStaff && ticket.user_id !== profile.id) {
+    return { error: "Forbidden" };
+  }
+
+  const { error: msgError } = await db.from("ticket_messages").insert({
     ticket_id: ticketId,
     user_id: profile.id,
-    message,
+    message: trimmed,
   });
 
-  if (isAdminRole(profile.role)) {
-    await supabase.from("tickets").update({ status: "in_progress" }).eq("id", ticketId);
+  if (msgError) return { error: msgError.message };
+
+  if (isStaff) {
+    if (ticket.status === "open") {
+      await db.from("tickets").update({ status: "in_progress" }).eq("id", ticketId);
+    }
+
+    const { data: owner } = await db
+      .from("profiles")
+      .select("role")
+      .eq("id", ticket.user_id)
+      .single();
+
+    const supportPath = owner?.role === "user" ? "/user/support" : "/partner/support";
+
+    await db.from("notifications").insert({
+      user_id: ticket.user_id,
+      title: "Support reply",
+      message: `New reply on ticket: ${ticket.subject}`,
+      type: "support",
+      link: supportPath,
+    });
   }
 
   revalidatePath("/partner/support");
+  revalidatePath("/user/support");
+  revalidatePath("/admin/tickets");
+  return { success: true };
+}
+
+export async function updateTicketStatus(ticketId: string, status: "open" | "in_progress" | "closed") {
+  await requireAuth(["super_admin", "operations_manager", "service_team"]);
+  const supabase = createAdminClient();
+
+  const { data: ticket } = await supabase
+    .from("tickets")
+    .select("id, user_id, subject")
+    .eq("id", ticketId)
+    .single();
+
+  if (!ticket) return { error: "Ticket not found" };
+
+  const { error } = await supabase.from("tickets").update({ status }).eq("id", ticketId);
+  if (error) return { error: error.message };
+
+  const { data: owner } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", ticket.user_id)
+    .single();
+
+  const supportPath = owner?.role === "user" ? "/user/support" : "/partner/support";
+  const statusLabel = status === "closed" ? "closed" : status === "in_progress" ? "in progress" : "reopened";
+
+  await supabase.from("notifications").insert({
+    user_id: ticket.user_id,
+    title: "Ticket updated",
+    message: `Your ticket "${ticket.subject}" is now ${statusLabel}.`,
+    type: "support",
+    link: supportPath,
+  });
+
+  revalidatePath("/partner/support");
+  revalidatePath("/user/support");
   revalidatePath("/admin/tickets");
   return { success: true };
 }
@@ -1054,6 +1232,7 @@ export async function upsertService(
     slug?: string;
     description?: string | null;
     overview?: string | null;
+    about_service?: string | null;
     demo_link?: string | null;
     proof_of_work?: string | null;
     proof_of_work_url?: string | null;
@@ -1098,6 +1277,7 @@ export async function upsertService(
     slug,
     description: data.description?.trim() || null,
     overview: data.overview?.trim() || null,
+    about_service: data.about_service?.trim() || null,
     demo_link: data.demo_link?.trim() || null,
     proof_of_work: data.proof_of_work?.trim() || null,
     proof_of_work_url: data.proof_of_work_url?.trim() || null,
@@ -1136,6 +1316,7 @@ export async function upsertService(
   revalidatePath("/admin/services/new");
   revalidatePath("/services");
   revalidatePath("/partner/services");
+  revalidatePath("/user/services");
   return { success: true };
 }
 

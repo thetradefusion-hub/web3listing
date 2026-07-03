@@ -15,6 +15,8 @@ import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TELEGRAM_SUPPORT } from "@/lib/constants";
+import { buildTelegramLink } from "@/lib/telegram";
+import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { panelIconStyles } from "@/lib/theme-tokens";
 import { cn } from "@/lib/utils";
 import type { AccountManager, Ticket as SupportTicket } from "@/types/database";
@@ -30,7 +32,7 @@ export function PartnerSupportView({
   const open = tickets.filter((t) => t.status === "open").length;
   const inProgress = tickets.filter((t) => t.status === "in_progress").length;
   const closed = tickets.filter((t) => t.status === "closed").length;
-  const telegramLink = manager?.telegram_link || TELEGRAM_SUPPORT;
+  const telegramLink = buildTelegramLink(manager?.telegram_link || TELEGRAM_SUPPORT);
 
   const managerInitials = manager?.name
     .split(" ")
@@ -91,10 +93,10 @@ export function PartnerSupportView({
                 </div>
               </div>
               <Button asChild className="h-10 w-full rounded-xl font-semibold">
-                <a href={telegramLink} target="_blank" rel="noopener noreferrer">
+                <TelegramAnchor href={telegramLink}>
                   <Send data-icon="inline-start" />
                   Open Telegram
-                </a>
+                </TelegramAnchor>
               </Button>
               {manager?.support_hours ? (
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -132,10 +134,10 @@ export function PartnerSupportView({
                 </div>
                 {manager.telegram_link ? (
                   <Button asChild variant="outline" className="h-9 w-full rounded-xl font-semibold">
-                    <a href={manager.telegram_link} target="_blank" rel="noopener noreferrer">
+                    <TelegramAnchor href={manager.telegram_link}>
                       <MessageCircle data-icon="inline-start" />
                       Message Manager
-                    </a>
+                    </TelegramAnchor>
                   </Button>
                 ) : null}
               </div>

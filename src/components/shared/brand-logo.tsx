@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND_LOGO_PATH, SITE_NAME } from "@/lib/constants";
+import { BRAND_LOGO_DARK_PATH, BRAND_LOGO_LIGHT_PATH, SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const sizeMap = {
@@ -28,27 +28,47 @@ type BrandLogoProps = {
   priority?: boolean;
 };
 
+function BrandLogoImages({
+  size = "md",
+  className,
+  priority = false,
+}: Pick<BrandLogoProps, "size" | "className" | "priority">) {
+  const imageClass = cn(
+    "w-auto object-contain object-left",
+    sizeMap[size],
+    maxWidthMap[size],
+    className
+  );
+
+  return (
+    <>
+      <Image
+        src={BRAND_LOGO_LIGHT_PATH}
+        alt={SITE_NAME}
+        width={240}
+        height={48}
+        priority={priority}
+        className={cn(imageClass, "dark:hidden")}
+      />
+      <Image
+        src={BRAND_LOGO_DARK_PATH}
+        alt={SITE_NAME}
+        width={240}
+        height={48}
+        priority={priority}
+        className={cn(imageClass, "hidden dark:block")}
+      />
+    </>
+  );
+}
+
 export function BrandLogo({
   size = "md",
   className,
   href,
   priority = false,
 }: BrandLogoProps) {
-  const logo = (
-    <Image
-      src={BRAND_LOGO_PATH}
-      alt={SITE_NAME}
-      width={240}
-      height={48}
-      priority={priority}
-      className={cn(
-        "w-auto object-contain object-left",
-        sizeMap[size],
-        maxWidthMap[size],
-        className
-      )}
-    />
-  );
+  const logo = <BrandLogoImages size={size} className={className} priority={priority} />;
 
   if (href) {
     return (
@@ -62,4 +82,17 @@ export function BrandLogo({
   }
 
   return <span className="inline-flex shrink-0 items-center">{logo}</span>;
+}
+
+export function SidebarBrandLogo({ className, priority = false }: { className?: string; priority?: boolean }) {
+  return (
+    <Image
+      src={BRAND_LOGO_DARK_PATH}
+      alt={SITE_NAME}
+      width={220}
+      height={48}
+      priority={priority}
+      className={cn("h-9 w-auto max-w-[210px] object-contain object-left", className)}
+    />
+  );
 }
