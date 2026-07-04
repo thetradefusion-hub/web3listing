@@ -36,9 +36,11 @@ function HelpListItem({ children }: { children: React.ReactNode }) {
 export function DashboardSupportSection({
   manager,
   kycRequired,
+  basePath = "/partner",
 }: {
   manager: AccountManager | null;
   kycRequired: boolean;
+  basePath?: string;
 }) {
   const managerInitials = manager?.name
     .split(" ")
@@ -98,7 +100,7 @@ export function DashboardSupportSection({
             </Button>
           ) : null}
           <Button asChild variant="outline" className="h-9 flex-1 rounded-xl">
-            <Link href="/partner/support">Support Center</Link>
+            <Link href={`${basePath}/support`}>Support Center</Link>
           </Button>
         </CardFooter>
       </Card>
@@ -213,11 +215,11 @@ export function DashboardSupportSection({
         <CardFooter className="border-t bg-muted/20">
           {kycRequired ? (
             <Button asChild className="h-9 w-full rounded-xl font-semibold">
-              <Link href="/partner/kyc">Complete KYC</Link>
+              <Link href={`${basePath}/kyc`}>Complete KYC</Link>
             </Button>
           ) : (
             <Button asChild variant="outline" className="h-9 w-full rounded-xl">
-              <Link href="/partner/profile">Profile & Security</Link>
+              <Link href={`${basePath}/profile`}>Profile & Security</Link>
             </Button>
           )}
         </CardFooter>

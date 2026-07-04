@@ -146,11 +146,13 @@ export function PartnerKycView({
   kyc,
   required,
   managerTelegramLink,
+  basePath = "/partner",
 }: {
   profile: Profile;
   kyc: KycSubmission | null;
   required?: boolean;
   managerTelegramLink?: string | null;
+  basePath?: string;
 }) {
   const status = profile.kyc_status;
   const displayName = profile.full_name || profile.company_name || profile.email;
@@ -170,7 +172,7 @@ export function PartnerKycView({
   return (
     <PartnerPageShell compact fullWidth className="gap-4 sm:gap-5">
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Link href="/partner" className="transition hover:text-primary">
+        <Link href={basePath} className="transition hover:text-primary">
           Dashboard
         </Link>
         <span aria-hidden>›</span>
@@ -219,11 +221,11 @@ export function PartnerKycView({
 
           {status === "approved" ? (
             <Button asChild variant="outline" className="h-9 shrink-0 rounded-xl font-semibold">
-              <Link href="/partner/services">Browse Services</Link>
+              <Link href={`${basePath}/services`}>Browse Services</Link>
             </Button>
           ) : (
             <Button asChild variant="outline" className="h-9 shrink-0 rounded-xl font-semibold">
-              <Link href="/partner/support">
+              <Link href={`${basePath}/support`}>
                 <Headphones data-icon="inline-start" />
                 Get Help
               </Link>
@@ -343,7 +345,7 @@ export function PartnerKycView({
                 </Button>
               ) : (
                 <Button variant="outline" size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>
-                  <Link href="/partner/support">Contact Support</Link>
+                  <Link href={`${basePath}/support`}>Contact Support</Link>
                 </Button>
               )}
             </CardContent>

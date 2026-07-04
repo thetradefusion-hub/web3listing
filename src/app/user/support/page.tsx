@@ -29,5 +29,5 @@ export default async function UserSupportPage() {
       : supabase.from("account_managers").select("*").eq("is_active", true).limit(1).single(),
   ]);
 
-  return <PartnerSupportView tickets={tickets || []} manager={manager} />;
+  return <PartnerSupportView tickets={tickets || []} manager={manager} basePath="/user" />;
 }

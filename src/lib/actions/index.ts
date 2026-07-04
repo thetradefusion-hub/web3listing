@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, credentialsEmail, kycStatusEmail, orderUpdateEmail, quoteReadyEmail, withdrawalStatusEmail } from "@/lib/email";
 import { calculateQuotation, calculateOrderCommission, isCommissionEligibleStatus } from "@/lib/commission";
-import { MIN_WITHDRAWAL, OWNER_ROLES } from "@/lib/constants";
+import { MIN_WITHDRAWAL, OWNER_ROLES, LEGAL_AGREEMENT_VERSION } from "@/lib/constants";
+import { authCallbackUrl, getServerSiteUrl } from "@/lib/site-url";
 import { requireAuth, isAdminRole } from "@/lib/auth";
 import { getPortalForRole, getPortalPathForRole, PORTALS } from "@/lib/portal-config";
 import type { OrderStatus, PaymentMethod, Profile, UserRole, WithdrawalStatus } from "@/types/database";
@@ -13,6 +15,61 @@ import type { OrderStatus, PaymentMethod, Profile, UserRole, WithdrawalStatus } 
 function ownerBasePath(role: Profile["role"]) {
   const portal = getPortalForRole(role);
   return portal ? PORTALS[portal].basePath : "/partner";
+}
+
+async function getClientIp() {
+  const h = await headers();
+  return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
+}
+
+function buildLegalConsentPayload(accepted: boolean) {
+  if (!accepted) return {};
+  return {
+    legal_consent_accepted: true,
+    legal_consent_at: new Date().toISOString(),
+    legal_consent_ip: undefined as string | undefined,
+    legal_agreement_version: LEGAL_AGREEMENT_VERSION,
+  };
+}
+
+async function withRecordedConsent(accepted: boolean) {
+  const payload = buildLegalConsentPayload(accepted);
+  if (!accepted) return payload;
+  return {
+    ...payload,
+    legal_consent_ip: await getClientIp(),
+  };
+}
+
+const PROJECT_WRITABLE_FIELDS = new Set([
+  "project_name",
+  "token_name",
+  "token_symbol",
+  "blockchain_network",
+  "website_url",
+  "contract_address",
+  "whitepaper_url",
+  "tokenomics_url",
+  "official_email",
+  "logo_url",
+  "social_telegram",
+  "social_twitter",
+  "social_discord",
+  "social_medium",
+  "social_github",
+  "founder_kyc_url",
+  "team_info",
+  "status",
+]);
+
+function sanitizeProjectPayload(data: Record<string, string>) {
+  const payload: Record<string, string> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (PROJECT_WRITABLE_FIELDS.has(key)) {
+      payload[key] = value;
+    }
+  }
+  return payload;
 }
 
 function ownerOrderPath(role: Profile["role"], orderId: string) {
@@ -52,10 +109,12 @@ export async function signUp(data: {
   country: string;
 }) {
   const supabase = await createClient();
+  const siteUrl = await getServerSiteUrl();
   const { data: authData, error } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
     options: {
+      emailRedirectTo: authCallbackUrl(siteUrl, "/login"),
       data: {
         role: "user",
         full_name: data.full_name,
@@ -333,15 +392,24 @@ export async function createProject(data: Record<string, string>) {
   const supabase = await createClient();
   const base = ownerBasePath(profile.role);
 
+  const submitIntent = data.status === "submitted";
+  if (submitIntent && data.legal_consent !== "true") {
+    return { error: "You must read and agree to all policies before submitting." };
+  }
+
   let status = data.status || "draft";
   if (profile.role === "user" && status === "submitted") {
     status = "approved";
   }
 
+  const projectFields = sanitizeProjectPayload(data);
+  const consentFields = submitIntent ? await withRecordedConsent(true) : {};
+
   const { data: project, error } = await supabase.from("projects").insert({
     agent_id: profile.id,
-    ...data,
+    ...projectFields,
     status,
+    ...consentFields,
   }).select().single();
 
   if (error) return { error: error.message };
@@ -364,13 +432,25 @@ export async function updateProject(id: string, data: Record<string, string>) {
   const supabase = await createClient();
   const base = ownerBasePath(profile.role);
 
+  const submitIntent = data.status === "submitted";
+  if (submitIntent && data.legal_consent !== "true") {
+    return { error: "You must read and agree to all policies before submitting." };
+  }
+
   let status = data.status;
   if (profile.role === "user" && status === "submitted") {
     status = "approved";
     data.status = "approved";
   }
 
-  const { error } = await supabase.from("projects").update(data).eq("id", id).eq("agent_id", profile.id);
+  const projectFields = sanitizeProjectPayload(data);
+  const consentFields = submitIntent ? await withRecordedConsent(true) : {};
+
+  const { error } = await supabase
+    .from("projects")
+    .update({ ...projectFields, ...consentFields })
+    .eq("id", id)
+    .eq("agent_id", profile.id);
   if (error) return { error: error.message };
 
   if (data.status === "submitted") {

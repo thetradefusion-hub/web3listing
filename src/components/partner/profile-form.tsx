@@ -87,9 +87,11 @@ const inputClass = "h-10 rounded-xl border-input bg-background pl-10 shadow-sm";
 export function ProfileForm({
   profile,
   kycRequired,
+  basePath = "/partner",
 }: {
   profile: Profile;
   kycRequired: boolean;
+  basePath?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -285,7 +287,7 @@ export function ProfileForm({
           </ul>
           {kycRequired ? (
             <Button asChild className="mt-4 h-9 w-full rounded-xl font-semibold">
-              <Link href="/partner/kyc">Complete KYC Verification</Link>
+              <Link href={`${basePath}/kyc`}>Complete KYC Verification</Link>
             </Button>
           ) : null}
         </DashboardPanel>

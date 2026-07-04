@@ -13,6 +13,7 @@ import { HomeDisclaimer } from "@/components/public/home/disclaimer";
 import { HowItWorksSection } from "@/components/public/home/how-it-works-section";
 import { PopularServicesSection } from "@/components/public/home/popular-services-section";
 import { WhyChooseSection } from "@/components/public/home/why-choose-section";
+import { pickFeaturedServices } from "@/lib/service-catalog";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -20,8 +21,9 @@ export default async function HomePage() {
     .from("services")
     .select("*, service_categories(name, slug)")
     .eq("is_active", true)
-    .order("sort_order")
-    .limit(8);
+    .order("sort_order");
+
+  const popularServices = pickFeaturedServices(services ?? [], 8);
 
   return (
     <>
@@ -34,7 +36,7 @@ export default async function HomePage() {
       <PartnerStrip />
       <ServiceShowcase />
       <HowItWorksSection />
-      <PopularServicesSection services={services} />
+      <PopularServicesSection services={popularServices} />
       <WhyChooseSection />
       <HomeFaqSection />
       <ConsultationCta

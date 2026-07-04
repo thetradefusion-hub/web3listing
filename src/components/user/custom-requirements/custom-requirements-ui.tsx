@@ -1,24 +1,26 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BadgeCheck,
   Building2,
   ClipboardList,
   Clock,
   DollarSign,
   FileText,
+  Lightbulb,
   Megaphone,
   Plus,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
+  Users,
   Wallet,
 } from "lucide-react";
 import { CUSTOM_REQUIREMENT_STATUS_LABELS } from "@/lib/constants";
 import { PartnerStatCard } from "@/components/partner/dashboard/dashboard-premium";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   PartnerPageShell,
-  PartnerPageHeader,
   PartnerPanel,
   PartnerPanelBody,
   PartnerBadge,
@@ -37,7 +39,7 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   "Market Making": TrendingUp,
   "Smart Contract Audit": ShieldCheck,
   "Wallet Integration": Wallet,
-  "Community Growth": Sparkles,
+  "Community Growth": Users,
   "Data Platform (CMC/CG)": FileText,
   Other: ClipboardList,
 };
@@ -154,41 +156,47 @@ export function CustomRequirementsListView({ requirements }: { requirements: Req
   const accepted = requirements.filter((r) => r.status === "accepted").length;
 
   return (
-    <PartnerPageShell>
-      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-chart-2/5 p-5 sm:p-6">
-        <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-xl">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Bespoke services</p>
-            <h2 className="mt-1 text-xl font-bold text-foreground sm:text-2xl">Need something custom?</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Request tailored listing, marketing, audit, or growth work — we&apos;ll review and send a quotation.
-            </p>
+    <PartnerPageShell compact fullWidth className="gap-4 sm:gap-5">
+      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Link href="/user" className="transition hover:text-primary">
+          Dashboard
+        </Link>
+        <span aria-hidden>›</span>
+        <span className="font-medium text-foreground">Custom Requirements</span>
+      </nav>
+
+      <Card
+        size="sm"
+        className="relative gap-0 overflow-hidden border-primary/15 bg-gradient-to-br from-card via-card to-primary/5 py-0"
+      >
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-chart-4" aria-hidden />
+        <CardContent className="flex flex-col gap-3 p-4 pl-5 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex items-center gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
+              <ClipboardList className="size-5" strokeWidth={2.25} />
+            </span>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">Custom requirements</h1>
+              <p className="text-sm text-muted-foreground">Request bespoke Web3 services and track quotations</p>
+            </div>
           </div>
-          <Button asChild size="lg" className="h-11 shrink-0 rounded-xl font-semibold shadow-md">
+          <Button asChild size="sm" className="h-9 shrink-0 rounded-xl font-semibold">
             <Link href="/user/custom-requirements/new">
-              <Plus className="mr-2 size-4" />
+              <Plus data-icon="inline-start" />
               New requirement
             </Link>
           </Button>
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <PartnerPageHeader
-          title="Custom Requirements"
-          description="Track your bespoke requests and quotations"
-        />
-      </div>
+        </CardContent>
+      </Card>
 
       {requirements.length > 0 ? (
         <>
-          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             <PartnerStatCard title="Total requests" value={requirements.length} icon={ClipboardList} color="purple" />
             <PartnerStatCard title="In review" value={pending} icon={Clock} color="orange" />
             <PartnerStatCard title="Quotes received" value={quoted} icon={DollarSign} color="green" />
-            <PartnerStatCard title="Accepted" value={accepted} icon={Sparkles} color="blue" />
-          </div>
+            <PartnerStatCard title="Accepted" value={accepted} icon={BadgeCheck} color="blue" />
+          </section>
 
           <div className="space-y-3">
             {requirements.map((req) => (
@@ -238,7 +246,7 @@ export function CustomRequirementFormTips({ className }: { className?: string })
         <ul className="mt-3 space-y-2">
           {tips.map((tip) => (
             <li key={tip} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <Sparkles className="mt-0.5 size-3.5 shrink-0 text-chart-2" />
+              <Lightbulb className="mt-0.5 size-3.5 shrink-0 text-chart-2" />
               <span>{tip}</span>
             </li>
           ))}

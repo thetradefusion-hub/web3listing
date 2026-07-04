@@ -81,7 +81,13 @@ export function TopServicesList({
   );
 }
 
-export function DashboardEmptyOrders({ compact }: { compact?: boolean }) {
+export function DashboardEmptyOrders({
+  compact,
+  basePath = "/partner",
+}: {
+  compact?: boolean;
+  basePath?: string;
+}) {
   if (compact) {
     return (
       <Empty className="border-0 bg-transparent py-8">
@@ -93,7 +99,7 @@ export function DashboardEmptyOrders({ compact }: { compact?: boolean }) {
         </EmptyHeader>
         <EmptyContent>
           <Button asChild size="sm">
-            <Link href="/partner/projects/new">New Project</Link>
+            <Link href={`${basePath}/services`}>Browse Services</Link>
           </Button>
         </EmptyContent>
       </Empty>
@@ -108,15 +114,15 @@ export function DashboardEmptyOrders({ compact }: { compact?: boolean }) {
         </EmptyMedia>
         <EmptyTitle>No orders yet</EmptyTitle>
         <EmptyDescription>
-          Create a project and browse services to place your first order and start earning commissions.
+          Create a project and browse services to place your first order.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row flex-wrap justify-center gap-2">
         <Button asChild>
-          <Link href="/partner/projects/new">Create Project</Link>
+          <Link href={`${basePath}/projects/new`}>Create Project</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/partner/services">View Services</Link>
+          <Link href={`${basePath}/services`}>View Services</Link>
         </Button>
       </EmptyContent>
     </Empty>

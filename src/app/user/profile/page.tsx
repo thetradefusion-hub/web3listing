@@ -16,6 +16,7 @@ export default async function UserProfilePage() {
       profile={profile!}
       projectCount={projectCount || 0}
       orderCount={orderCount || 0}
+      basePath="/user"
     />
   );
 }

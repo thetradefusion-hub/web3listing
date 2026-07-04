@@ -32,10 +32,12 @@ export function PartnerProfileView({
   profile,
   projectCount,
   orderCount,
+  basePath = "/partner",
 }: {
   profile: Profile;
   projectCount: number;
   orderCount: number;
+  basePath?: string;
 }) {
   const displayName = profile.company_name || profile.full_name || profile.email;
   const initials = (profile.full_name || profile.email)
@@ -44,6 +46,7 @@ export function PartnerProfileView({
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase())
     .join("") || "P";
+  const isClientPortal = basePath === "/user";
   const kycRequired = profile.kyc_status !== "approved";
   const walletConfigured = Boolean(profile.wallet_address?.trim());
   const accent = getServiceAccent(displayName);
@@ -51,7 +54,7 @@ export function PartnerProfileView({
   return (
     <PartnerPageShell compact fullWidth className="gap-4 sm:gap-5">
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Link href="/partner" className="transition hover:text-primary">
+        <Link href={basePath} className="transition hover:text-primary">
           Dashboard
         </Link>
         <span aria-hidden>›</span>
@@ -79,7 +82,7 @@ export function PartnerProfileView({
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2.5 py-1">
                   <UserCog className="size-3 shrink-0" />
-                  Partner since {format(new Date(profile.created_at), "MMM yyyy")}
+                  {isClientPortal ? "Client since" : "Partner since"} {format(new Date(profile.created_at), "MMM yyyy")}
                 </span>
                 {profile.telegram_username ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 font-medium text-primary">
@@ -93,7 +96,7 @@ export function PartnerProfileView({
 
           {kycRequired ? (
             <Button asChild className="h-9 shrink-0 rounded-xl font-semibold sm:self-center">
-              <Link href="/partner/kyc">
+              <Link href={`${basePath}/kyc`}>
                 <ShieldCheck data-icon="inline-start" />
                 Complete KYC
               </Link>
@@ -102,7 +105,13 @@ export function PartnerProfileView({
         </CardContent>
       </Card>
 
-      <section aria-label="Account overview" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <section
+        aria-label="Account overview"
+        className={cn(
+          "grid grid-cols-2 gap-3 sm:gap-4",
+          isClientPortal ? "lg:grid-cols-3" : "lg:grid-cols-4"
+        )}
+      >
         <PartnerStatCard
           title="KYC Status"
           value={kycLabel(profile.kyc_status)}
@@ -130,16 +139,18 @@ export function PartnerProfileView({
           icon={Package}
           color="purple"
         />
-        <PartnerStatCard
-          title="Payout Wallet"
-          value={walletConfigured ? "Set" : "Not set"}
-          subtitle={walletConfigured ? "Ready for payouts" : "Add wallet below"}
-          icon={Wallet}
-          color={walletConfigured ? "green" : "orange"}
-        />
+        {!isClientPortal ? (
+          <PartnerStatCard
+            title="Payout Wallet"
+            value={walletConfigured ? "Set" : "Not set"}
+            subtitle={walletConfigured ? "Ready for payouts" : "Add wallet below"}
+            icon={Wallet}
+            color={walletConfigured ? "green" : "orange"}
+          />
+        ) : null}
       </section>
 
-      <ProfileForm profile={profile} kycRequired={kycRequired} />
+      <ProfileForm profile={profile} kycRequired={kycRequired} basePath={basePath} />
     </PartnerPageShell>
   );
 }

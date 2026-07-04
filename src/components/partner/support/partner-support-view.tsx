@@ -24,9 +24,11 @@ import type { AccountManager, Ticket as SupportTicket } from "@/types/database";
 export function PartnerSupportView({
   tickets,
   manager,
+  basePath = "/partner",
 }: {
   tickets: SupportTicket[];
   manager: AccountManager | null;
+  basePath?: string;
 }) {
   const total = tickets.length;
   const open = tickets.filter((t) => t.status === "open").length;
@@ -44,7 +46,7 @@ export function PartnerSupportView({
   return (
     <PartnerPageShell compact fullWidth className="gap-4 sm:gap-5">
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Link href="/partner" className="transition hover:text-primary">
+        <Link href={basePath} className="transition hover:text-primary">
           Dashboard
         </Link>
         <span aria-hidden>›</span>

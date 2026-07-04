@@ -8,7 +8,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import type { Profile, AccountManager } from "@/types/database";
 import type { ReactNode } from "react";
 
-function PartnerMobileDrawer({ profile }: { profile: Profile }) {
+function PartnerMobileDrawer() {
   const { open, setOpen } = useMobileNav();
 
   return (
@@ -18,7 +18,7 @@ function PartnerMobileDrawer({ profile }: { profile: Profile }) {
         showCloseButton
         className="partner-sidebar w-[min(100vw,260px)] max-w-[260px] border-0 bg-black p-0 text-white [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
       >
-        <PartnerSidebar profile={profile} className="h-full w-full" onNavigate={() => setOpen(false)} />
+        <PartnerSidebar className="h-full w-full" onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>
   );
@@ -35,8 +35,8 @@ function PartnerPortalInner({
 }) {
   return (
     <div className="partner-portal relative flex h-screen overflow-hidden font-sans text-foreground">
-      <PartnerSidebar profile={profile} className="hidden h-screen shrink-0 md:flex" />
-      <PartnerMobileDrawer profile={profile} />
+      <PartnerSidebar className="hidden h-screen shrink-0 md:flex" />
+      <PartnerMobileDrawer />
       <MobileNavRouteCloser />
       <div className="portal-main relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <PartnerHeader profile={profile} manager={manager} />

@@ -16,7 +16,7 @@ function UserMobileDrawer() {
       <SheetContent
         side="left"
         showCloseButton
-        className="user-sidebar w-[min(100vw,260px)] max-w-[260px] border-0 bg-[#0B1020] p-0 text-white [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
+        className="partner-sidebar w-[min(100vw,260px)] max-w-[260px] border-0 bg-black p-0 text-white [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
       >
         <UserSidebar className="h-full w-full" onNavigate={() => setOpen(false)} />
       </SheetContent>
@@ -34,13 +34,13 @@ function UserPortalInner({
   children: ReactNode;
 }) {
   return (
-    <div className="user-portal relative flex h-screen overflow-hidden font-sans text-foreground">
+    <div className="partner-portal relative flex h-screen overflow-hidden font-sans text-foreground">
       <UserSidebar className="hidden h-screen shrink-0 md:flex" />
       <UserMobileDrawer />
       <MobileNavRouteCloser />
       <div className="portal-main relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <UserHeader profile={profile} />
-        <main className="client-dashboard-canvas min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-5 sm:py-5 md:px-6">
+        <UserHeader profile={profile} manager={manager} />
+        <main className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-3.5 md:px-4 md:py-4">
           {children}
         </main>
       </div>

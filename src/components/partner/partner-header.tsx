@@ -1,28 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { HelpCircle, Plus, Send, Sparkles } from "lucide-react";
+import { HelpCircle, LayoutDashboard, Plus, Send } from "lucide-react";
 import { NotificationBell } from "@/components/shared/notification-bell";
 import { MobileMenuButton } from "@/components/shared/mobile-menu-button";
 import { SidebarToggleButton } from "@/components/shared/sidebar-toggle-button";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { PortalProfileMenu } from "@/components/shared/portal-profile-menu";
 import { PartnerBadge, kycStatusVariant } from "@/components/partner/ui";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { buildTelegramLink } from "@/lib/telegram";
 import type { Profile, AccountManager } from "@/types/database";
-
-function getInitials(name: string) {
-  return name
-    .split(/[\s@]+/)
-    .filter(Boolean)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 function kycLabel(status: Profile["kyc_status"]) {
   if (status === "approved") return "Verified";
@@ -93,7 +83,7 @@ export function PartnerHeader({
 
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="hidden size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary sm:flex">
-              <Sparkles className="size-4" strokeWidth={2.25} />
+              <LayoutDashboard className="size-4" strokeWidth={2.25} />
             </span>
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-2">
@@ -134,20 +124,20 @@ export function PartnerHeader({
             <NotificationBell userId={profile.id} variant="partner" />
           </div>
 
-          <Link
-            href="/partner/profile"
-            className="hidden items-center gap-2 rounded-xl border border-border bg-card px-2 py-1.5 transition-colors hover:border-primary/25 hover:bg-muted/30 sm:flex"
-          >
-            <Avatar className="size-8 ring-2 ring-border/60">
-              {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
-              <AvatarFallback className="bg-primary text-[11px] font-semibold text-primary-foreground">
-                {getInitials(displayName)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden max-w-[88px] truncate text-sm font-semibold text-foreground lg:max-w-[120px]">
-              {displayName}
-            </span>
-          </Link>
+          <PortalProfileMenu
+            profile={profile}
+            profileHref="/partner/profile"
+            displayName={displayName}
+            className="hidden sm:flex"
+          />
+
+          <PortalProfileMenu
+            profile={profile}
+            profileHref="/partner/profile"
+            displayName={displayName}
+            showName={false}
+            className="sm:hidden"
+          />
 
           <Button asChild size="sm" className="h-9 rounded-xl px-3 font-semibold shadow-sm shadow-primary/15 sm:px-3.5">
             <Link href="/partner/projects/new" aria-label="Create new project">

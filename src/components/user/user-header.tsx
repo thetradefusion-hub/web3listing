@@ -1,103 +1,148 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { Search } from "lucide-react";
+import { HelpCircle, LayoutDashboard, Plus, Send } from "lucide-react";
 import { NotificationBell } from "@/components/shared/notification-bell";
 import { MobileMenuButton } from "@/components/shared/mobile-menu-button";
+import { SidebarToggleButton } from "@/components/shared/sidebar-toggle-button";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { PortalProfileMenu } from "@/components/shared/portal-profile-menu";
 import { PartnerBadge, kycStatusVariant } from "@/components/partner/ui";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import type { Profile } from "@/types/database";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { buildTelegramLink } from "@/lib/telegram";
+import type { Profile, AccountManager } from "@/types/database";
 
-function getInitials(name: string) {
-  return name
-    .split(/[\s@]+/)
-    .filter(Boolean)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function clientBadgeLabel(status: Profile["kyc_status"]) {
-  if (status === "approved") return "Verified Client";
+function kycLabel(status: Profile["kyc_status"]) {
+  if (status === "approved") return "Verified";
   if (status === "pending") return "KYC Pending";
-  return "Client";
+  return "KYC Required";
 }
 
-export function UserHeader({ profile }: { profile: Profile }) {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const displayName = profile.company_name || profile.full_name || profile.email.split("@")[0];
+function HeaderToolButton({
+  children,
+  className,
+  href,
+  onClick,
+  label,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  href?: string;
+  onClick?: () => void;
+  label: string;
+}) {
+  const classes = cn(
+    "flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-card hover:text-foreground",
+    className
+  );
 
-  function handleSearch(e: FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    router.push(q ? `/user/services?q=${encodeURIComponent(q)}` : "/user/services");
+  if (href) {
+    const isExternal = href.startsWith("http");
+    if (isExternal) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer" className={classes} aria-label={label}>
+          {children}
+        </a>
+      );
+    }
+    return (
+      <Link href={href} className={classes} aria-label={label}>
+        {children}
+      </Link>
+    );
   }
 
   return (
+    <button type="button" onClick={onClick} className={classes} aria-label={label}>
+      {children}
+    </button>
+  );
+}
+
+export function UserHeader({
+  profile,
+  manager,
+}: {
+  profile: Profile;
+  manager: AccountManager | null;
+}) {
+  const displayName = profile.company_name || profile.full_name || profile.email.split("@")[0];
+  const isVerified = profile.kyc_status === "approved";
+
+  return (
     <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-card/75">
-      <div className="flex h-[4.25rem] items-center gap-3 px-3 sm:gap-4 sm:px-5 lg:px-6">
-        <MobileMenuButton className="size-10 shrink-0 rounded-xl border border-border md:hidden" />
+      <div className="flex h-[3.75rem] items-center justify-between gap-3 px-3 sm:px-4 lg:px-5">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+          <MobileMenuButton className="size-9 shrink-0 rounded-xl border border-border md:hidden" />
+          <SidebarToggleButton />
 
-        <form onSubmit={handleSearch} className="hidden min-w-0 flex-1 md:block">
-          <div className="relative mx-auto max-w-xl lg:max-w-2xl">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search for services, orders, invoices..."
-              className="h-11 rounded-xl border-border bg-muted/40 pl-10 text-sm shadow-none placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-primary/15"
-            />
-          </div>
-        </form>
+          <Separator orientation="vertical" className="hidden h-7 md:block" />
 
-        <form onSubmit={handleSearch} className="min-w-0 flex-1 md:hidden">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search..."
-              className="h-10 rounded-xl border-border bg-muted/40 pl-9 text-sm"
-            />
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="hidden size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary sm:flex">
+              <LayoutDashboard className="size-4" strokeWidth={2.25} />
+            </span>
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <p className="truncate text-sm font-bold tracking-tight text-foreground sm:text-[15px]">
+                  {displayName}
+                </p>
+                <span className="hidden shrink-0 sm:inline-flex">
+                  <PartnerBadge variant={kycStatusVariant(profile.kyc_status)}>
+                    {kycLabel(profile.kyc_status)}
+                  </PartnerBadge>
+                </span>
+              </div>
+              <p className="truncate text-[11px] text-muted-foreground sm:text-xs">
+                {isVerified ? "Client workspace" : "Complete KYC to unlock full access"}
+              </p>
+            </div>
           </div>
-        </form>
+        </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div className="flex items-center gap-0.5 rounded-xl border border-border/80 bg-muted/25 p-0.5 sm:gap-1 sm:p-1">
+            {manager?.telegram_link ? (
+              <HeaderToolButton href={buildTelegramLink(manager.telegram_link)} label="Message on Telegram">
+                <Send className="size-4" strokeWidth={2} />
+              </HeaderToolButton>
+            ) : null}
+
+            <HeaderToolButton href="/user/support" label="Help & support">
+              <HelpCircle className="size-4" strokeWidth={2} />
+            </HeaderToolButton>
+
             <ThemeToggle
               variant="ghost"
               className="size-9 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground"
             />
-            <div className="flex size-9 items-center justify-center">
-              <NotificationBell userId={profile.id} variant="partner" />
-            </div>
+
+            <NotificationBell userId={profile.id} variant="partner" />
           </div>
 
-          <Link
-            href="/user/profile"
-            className="flex items-center gap-2.5 rounded-xl border border-border bg-card py-1.5 pl-1.5 pr-3 transition hover:border-primary/25 hover:bg-muted/30"
-          >
-            <Avatar className="size-9 ring-2 ring-border/60">
-              {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
-              <AvatarFallback className="bg-gradient-to-br from-primary to-chart-4 text-xs font-bold text-primary-foreground">
-                {getInitials(displayName)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden min-w-0 sm:block">
-              <p className="max-w-[120px] truncate text-sm font-semibold text-foreground lg:max-w-[140px]">
-                {displayName}
-              </p>
-              <PartnerBadge variant={kycStatusVariant(profile.kyc_status)}>
-                {clientBadgeLabel(profile.kyc_status)}
-              </PartnerBadge>
-            </div>
-          </Link>
+          <PortalProfileMenu
+            profile={profile}
+            profileHref="/user/profile"
+            displayName={displayName}
+            className="hidden sm:flex"
+          />
+
+          <PortalProfileMenu
+            profile={profile}
+            profileHref="/user/profile"
+            displayName={displayName}
+            showName={false}
+            className="sm:hidden"
+          />
+
+          <Button asChild size="sm" className="h-9 rounded-xl px-3 font-semibold shadow-sm shadow-primary/15 sm:px-3.5">
+            <Link href="/user/services" aria-label="Place new order">
+              <Plus data-icon="inline-start" />
+              <span className="hidden sm:inline">New Order</span>
+            </Link>
+          </Button>
         </div>
       </div>
     </header>

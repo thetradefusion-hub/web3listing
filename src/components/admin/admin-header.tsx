@@ -1,24 +1,14 @@
 "use client";
 
-import { LayoutDashboard, Shield } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import { NotificationBell } from "@/components/shared/notification-bell";
 import { MobileMenuButton } from "@/components/shared/mobile-menu-button";
 import { SidebarToggleButton } from "@/components/shared/sidebar-toggle-button";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { PortalProfileMenu } from "@/components/shared/portal-profile-menu";
 import { AdminBadge } from "@/components/admin/ui";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import type { Profile } from "@/types/database";
-
-function getInitials(name: string) {
-  return name
-    .split(/[\s@]+/)
-    .filter(Boolean)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 const roleLabels: Record<string, string> = {
   super_admin: "Super Admin",
@@ -74,21 +64,20 @@ export function AdminHeader({ profile }: { profile: Profile }) {
             <NotificationBell userId={profile.id} variant="partner" />
           </div>
 
-          <div className="hidden items-center gap-2 rounded-xl border border-border bg-card px-2 py-1.5 sm:flex">
-            <Avatar className="size-8 ring-2 ring-border/60">
-              {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
-              <AvatarFallback className="bg-primary text-[11px] font-semibold text-primary-foreground">
-                {getInitials(displayName)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden max-w-[100px] truncate text-sm font-semibold text-foreground lg:max-w-[120px]">
-              {displayName}
-            </span>
-          </div>
+          <PortalProfileMenu
+            profile={profile}
+            profileHref="/admin"
+            displayName={displayName}
+            className="hidden sm:flex"
+          />
 
-          <span className="flex size-9 items-center justify-center rounded-xl border border-border bg-muted/30 text-muted-foreground sm:hidden">
-            <Shield className="size-4" strokeWidth={2} />
-          </span>
+          <PortalProfileMenu
+            profile={profile}
+            profileHref="/admin"
+            displayName={displayName}
+            showName={false}
+            className="sm:hidden"
+          />
         </div>
       </div>
     </header>

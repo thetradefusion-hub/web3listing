@@ -17,8 +17,9 @@ export default async function UserKycPage() {
     <PartnerKycView
       profile={profile!}
       kyc={kyc}
-      required={false}
+      required={profile!.kyc_status !== "approved"}
       managerTelegramLink={managerResult.data?.telegram_link}
+      basePath="/user"
     />
   );
 }

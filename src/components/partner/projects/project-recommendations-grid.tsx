@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2, Rocket } from "lucide-react";
 import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,7 +52,7 @@ export function ProjectRecommendationsGrid({
     <DashboardPanel
       title="Recommended Next Steps"
       description="Services tailored to grow visibility, trust, and adoption"
-      icon={Sparkles}
+      icon={Rocket}
       iconColor="purple"
     >
       <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">

@@ -100,6 +100,53 @@ export function getServiceInitials(name: string) {
     .toUpperCase();
 }
 
+/** Known exchange / platform logos when `logo_url` is not set in admin. */
+const BRAND_LOGO_PATTERNS: { pattern: RegExp; url: string }[] = [
+  { pattern: /binance/i, url: "https://cryptologos.cc/logos/bnb-bnb-logo.png" },
+  { pattern: /okx|oklx/i, url: "https://cryptologos.cc/logos/okx-okx-logo.png" },
+  { pattern: /mexc/i, url: "https://cryptologos.cc/logos/mexc-mexc-logo.png" },
+  { pattern: /gate/i, url: "https://cryptologos.cc/logos/gate-gt-logo.png" },
+  { pattern: /kucoin/i, url: "https://cryptologos.cc/logos/kucoin-kcs-logo.png" },
+  { pattern: /bitget/i, url: "https://cryptologos.cc/logos/bitget-token-bgb-logo.png" },
+  { pattern: /bitmart/i, url: "https://cryptologos.cc/logos/bitmart-bmx-logo.png" },
+  { pattern: /bingx/i, url: "https://cryptologos.cc/logos/bingx-bingx-logo.png" },
+  { pattern: /coinstore/i, url: "https://cryptologos.cc/logos/coinstore-coin-logo.png" },
+  { pattern: /latoken/i, url: "https://cryptologos.cc/logos/latoken-la-logo.png" },
+  { pattern: /lbank/i, url: "https://cryptologos.cc/logos/lbank-lbk-logo.png" },
+  { pattern: /blofin/i, url: "https://cryptologos.cc/logos/blofin-blo-logo.png" },
+  { pattern: /coingecko/i, url: "https://cryptologos.cc/logos/coingecko-gecko-logo.png" },
+  { pattern: /trust\s*wallet/i, url: "https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png" },
+  { pattern: /metamask/i, url: "https://cryptologos.cc/logos/metamask-mask-logo.png" },
+  { pattern: /dextools/i, url: "https://cryptologos.cc/logos/dextools-dext-logo.png" },
+  { pattern: /certik/i, url: "https://cryptologos.cc/logos/certik-ctk-logo.png" },
+];
+
+export function getServiceLogoUrl(service: { name: string; logo_url?: string | null }) {
+  const stored = service.logo_url?.trim();
+  if (stored) return stored;
+
+  for (const { pattern, url } of BRAND_LOGO_PATTERNS) {
+    if (pattern.test(service.name)) return url;
+  }
+
+  return null;
+}
+
+export function pickFeaturedServices<T extends Service>(services: T[], limit = 8): T[] {
+  const rank = (service: T) => {
+    let score = service.sort_order ?? 999;
+    if (service.badge === "hot") score -= 10_000;
+    else if (service.badge === "popular") score -= 5_000;
+    if (getServiceLogoUrl(service)) score -= 1_000;
+    const category = service.service_categories?.slug;
+    if (category === "listing-services") score -= 500;
+    if (category === "wallet-listing") score -= 400;
+    return score;
+  };
+
+  return [...services].sort((a, b) => rank(a) - rank(b)).slice(0, limit);
+}
+
 export function parseJsonArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
   return [];

@@ -10,7 +10,7 @@ import {
   MessageCircle,
   Send,
   Shield,
-  Sparkles,
+  Lightbulb,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -306,7 +306,7 @@ export function ProjectDetailView({
       <ProjectRecommendationsGrid projectId={project.id} services={services} basePath={basePath} />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <DashboardPanel title="Why These Recommendations?" icon={Sparkles} iconColor="blue">
+        <DashboardPanel title="Why These Recommendations?" icon={Lightbulb} iconColor="blue">
           <div className="space-y-3">
             {WHY_RECOMMENDATIONS.map((item, i) => {
               const Icon = WHY_ICONS[i % WHY_ICONS.length];

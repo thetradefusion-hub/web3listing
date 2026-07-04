@@ -7,7 +7,7 @@ import {
   Grid3X3,
   Layers,
   PackageSearch,
-  Sparkles,
+  ListFilter,
   Store,
 } from "lucide-react";
 import { PartnerStatCard } from "@/components/partner/dashboard/dashboard-premium";
@@ -241,7 +241,7 @@ export function ServiceCatalogView({
           title="Showing"
           value={total}
           subtitle={activeCategoryName ? `In ${activeCategoryName}` : "Matching filters"}
-          icon={Sparkles}
+          icon={ListFilter}
           color="purple"
         />
         <PartnerStatCard

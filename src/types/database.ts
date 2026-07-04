@@ -111,6 +111,10 @@ export interface Project {
   founder_kyc_url: string | null;
   team_info: string | null;
   status: ProjectStatus;
+  legal_consent_accepted?: boolean;
+  legal_consent_at: string | null;
+  legal_consent_ip: string | null;
+  legal_agreement_version: string | null;
   created_at: string;
   updated_at: string;
 }

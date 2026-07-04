@@ -58,6 +58,17 @@ export const TICKET_STATUS_LABELS: Record<string, string> = {
   closed: "Closed",
 };
 
+export const LEGAL_AGREEMENT_VERSION = "2026-06";
+
+export const PROJECT_LEGAL_POLICIES = [
+  { href: "/legal/terms", label: "Terms & Conditions" },
+  { href: "/legal/privacy", label: "Privacy Policy" },
+  { href: "/legal/aml-kyc", label: "AML & KYC Policy" },
+  { href: "/legal/refund", label: "Refund Policy" },
+  { href: "/legal/disclaimer", label: "Disclaimer" },
+  { href: "/legal/sla", label: "Service Level Agreement (SLA)" },
+] as const;
+
 export const CUSTOM_REQUIREMENT_STATUS_LABELS: Record<string, string> = {
   submitted: "Submitted",
   under_review: "Under Review",

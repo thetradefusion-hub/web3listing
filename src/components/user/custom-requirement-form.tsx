@@ -12,7 +12,7 @@ import {
   Loader2,
   MessageSquare,
   Send,
-  Sparkles,
+  Lightbulb,
   Tag,
 } from "lucide-react";
 import { submitCustomRequirement } from "@/lib/actions";
@@ -215,7 +215,7 @@ export function CustomRequirementForm({ projects }: { projects: Pick<Project, "i
 
       <div className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/8 to-chart-2/5 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-2 text-sm text-muted-foreground">
-          <Sparkles className="mt-0.5 size-4 shrink-0 text-chart-2" />
+          <Lightbulb className="mt-0.5 size-4 shrink-0 text-chart-2" />
           <span>Our team typically responds within 1–2 business days with a custom quotation.</span>
         </div>
         <Button
