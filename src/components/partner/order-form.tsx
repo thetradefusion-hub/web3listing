@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createOrder } from "@/lib/actions";
+import {
+  ServiceRequirementsForm,
+  useServiceRequirementValues,
+} from "@/components/partner/service-requirements-form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -10,6 +14,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { PRICING_CTA } from "@/lib/pricing";
+import {
+  serializeRequirementResponses,
+  validateRequirementResponses,
+} from "@/lib/service-requirements";
 import type { Service, Project } from "@/types/database";
 import { cn } from "@/lib/utils";
 
@@ -32,23 +40,54 @@ export function OrderForm({
   const [requirements, setRequirements] = useState("");
   const [thirdPartyAck, setThirdPartyAck] = useState(false);
 
-  const needsRequirements = service.pricing_model === "quote" || service.pricing_model === "enterprise";
+  const requiredDocuments = service.required_documents || [];
+  const hasStructuredRequirements = requiredDocuments.length > 0;
+  const needsFreeformRequirements =
+    !hasStructuredRequirements &&
+    (service.pricing_model === "quote" || service.pricing_model === "enterprise");
+
+  const { values: requirementValues, setValues: setRequirementValues, notes, setNotes } =
+    useServiceRequirementValues(requiredDocuments);
+
+  const selectedProject = projects.find((p) => p.id === projectId) || null;
 
   function projectLabel(project: Project) {
     return `${project.project_name} (${project.token_symbol})`;
   }
 
-  const selectedProject = projects.find((p) => p.id === projectId);
+  const projectItems = useMemo(
+    () => [
+      { label: "Choose a project", value: null as string | null },
+      ...projects.map((p) => ({
+        label: projectLabel(p),
+        value: p.id,
+      })),
+    ],
+    [projects]
+  );
 
   async function handleOrder() {
     if (!projectId) {
       toast.error("Please select a project");
       return;
     }
-    if (needsRequirements && !requirements.trim()) {
+
+    let requirementsPayload: string | undefined;
+
+    if (hasStructuredRequirements) {
+      const validationError = validateRequirementResponses(requiredDocuments, requirementValues);
+      if (validationError) {
+        toast.error(validationError);
+        return;
+      }
+      requirementsPayload = serializeRequirementResponses(requirementValues, notes);
+    } else if (needsFreeformRequirements && !requirements.trim()) {
       toast.error("Please submit your requirements before continuing");
       return;
+    } else {
+      requirementsPayload = requirements.trim() || undefined;
     }
+
     if (service.requires_third_party_ack && !thirdPartyAck) {
       toast.error("You must acknowledge third-party approval terms");
       return;
@@ -58,7 +97,7 @@ export function OrderForm({
     const result = await createOrder({
       project_id: projectId,
       service_id: service.id,
-      requirements: requirements.trim() || undefined,
+      requirements: requirementsPayload,
       third_party_ack: thirdPartyAck,
     });
     setLoading(false);
@@ -83,23 +122,39 @@ export function OrderForm({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Select Project *</Label>
-        <Select value={projectId} onValueChange={(v) => setProjectId(v || "")}>
+        <Select
+          items={projectItems}
+          value={projectId || null}
+          onValueChange={(v) => setProjectId(v ?? "")}
+        >
           <SelectTrigger className={cn("w-full", inputClass)}>
-            <SelectValue placeholder="Choose a project">
-              {selectedProject ? projectLabel(selectedProject) : null}
-            </SelectValue>
+            <SelectValue placeholder="Choose a project" />
           </SelectTrigger>
           <SelectContent>
-            {projects.map((p) => (
-              <SelectItem key={p.id} value={p.id}>
-                {projectLabel(p)}
-              </SelectItem>
-            ))}
+            {projectItems
+              .filter((item) => item.value != null)
+              .map((item) => (
+                <SelectItem key={item.value} value={item.value!}>
+                  {item.label}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
 
-      {needsRequirements && (
+      {hasStructuredRequirements ? (
+        <ServiceRequirementsForm
+          requiredDocuments={requiredDocuments}
+          selectedProject={selectedProject}
+          values={requirementValues}
+          onChange={setRequirementValues}
+          notes={notes}
+          onNotesChange={setNotes}
+          comfortable={comfortable}
+        />
+      ) : null}
+
+      {needsFreeformRequirements ? (
         <div className="space-y-2">
           <Label htmlFor="requirements">Requirements / Scope *</Label>
           <Textarea
@@ -115,9 +170,9 @@ export function OrderForm({
             className="rounded-xl"
           />
         </div>
-      )}
+      ) : null}
 
-      {service.pricing_model === "fixed" && (
+      {!hasStructuredRequirements && service.pricing_model === "fixed" ? (
         <div className="space-y-2">
           <Label htmlFor="requirements">Additional Notes (optional)</Label>
           <Textarea
@@ -129,7 +184,7 @@ export function OrderForm({
             className="rounded-xl"
           />
         </div>
-      )}
+      ) : null}
 
       {service.requires_third_party_ack && (
         <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3">

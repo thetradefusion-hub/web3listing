@@ -20,7 +20,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { KycStatus, KycSubmission, Profile } from "@/types/database";
 
-function kycLabel(status: KycStatus) {
+/** True only after the user has submitted documents for admin review. */
+export function isKycUnderReview(status: KycStatus, kyc: KycSubmission | null) {
+  if (status !== "pending" || !kyc) return false;
+  return Boolean(kyc.passport_url?.trim() || kyc.selfie_url?.trim());
+}
+
+function kycLabel(status: KycStatus, underReview: boolean) {
+  if (status === "pending" && !underReview) return "Not Started";
   const labels: Record<KycStatus, string> = {
     approved: "Verified",
     pending: "Under Review",
@@ -29,12 +36,15 @@ function kycLabel(status: KycStatus) {
   return labels[status];
 }
 
-function kycDescription(status: KycStatus) {
+function kycDescription(status: KycStatus, underReview: boolean) {
   if (status === "approved") {
     return "Your identity is verified. You have full access to place orders and earn commissions.";
   }
-  if (status === "pending") {
+  if (status === "pending" && underReview) {
     return "Your documents are being reviewed. We typically respond within 1–2 business days.";
+  }
+  if (status === "pending") {
+    return "Complete the form below and upload your identity documents to submit for review.";
   }
   if (status === "rejected") {
     return "Your submission needs corrections. Update your details and resubmit below.";
@@ -51,19 +61,23 @@ const VERIFICATION_STEPS = [
 
 function VerificationStepper({
   status,
+  underReview,
   personalDone,
   contactDone,
   documentsDone,
 }: {
   status: KycStatus;
+  underReview: boolean;
   personalDone: boolean;
   contactDone: boolean;
   documentsDone: boolean;
 }) {
   const stepState = (index: number): "completed" | "active" | "pending" => {
     if (status === "approved") return "completed";
-    if (status === "pending" && index < 3) return "completed";
-    if (status === "pending" && index === 3) return "active";
+    if (underReview) {
+      if (index < 3) return "completed";
+      return "active";
+    }
 
     const done = [personalDone, contactDone, documentsDone, false][index];
     if (status === "rejected") {
@@ -155,6 +169,7 @@ export function PartnerKycView({
   basePath?: string;
 }) {
   const status = profile.kyc_status;
+  const underReview = isKycUnderReview(status, kyc);
   const displayName = profile.full_name || profile.company_name || profile.email;
   const personalDone = Boolean(profile.full_name?.trim());
   const contactDone = Boolean(
@@ -203,9 +218,9 @@ export function PartnerKycView({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-lg font-bold text-foreground sm:text-xl">Identity Verification</h1>
-                <PartnerBadge variant={kycStatusVariant(status)}>{kycLabel(status)}</PartnerBadge>
+                <PartnerBadge variant={kycStatusVariant(status)}>{kycLabel(status, underReview)}</PartnerBadge>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">{kycDescription(status)}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{kycDescription(status, underReview)}</p>
               <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <User className="size-3.5 shrink-0" />
                 {displayName}
@@ -237,7 +252,7 @@ export function PartnerKycView({
       <section aria-label="Verification overview" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <PartnerStatCard
           title="Status"
-          value={kycLabel(status)}
+          value={kycLabel(status, underReview)}
           subtitle={status === "approved" ? "Fully verified" : "Verification progress"}
           icon={ShieldCheck}
           color={status === "approved" ? "green" : status === "rejected" ? "purple" : "orange"}
@@ -265,28 +280,24 @@ export function PartnerKycView({
         />
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-5">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-5">
         <div className="flex flex-col gap-4">
           <DashboardPanel
-            title="Verification Progress"
-            description="Complete each step to submit for review"
-            icon={ShieldCheck}
-            iconColor="green"
+            className="h-auto"
+            contentClassName="flex-none gap-5"
+            title="KYC Application"
+            description="Passport, Aadhaar, Voter ID, or other supported ID with selfie verification"
+            icon={FileText}
+            iconColor="blue"
           >
             <VerificationStepper
               status={status}
+              underReview={underReview}
               personalDone={personalDone}
               contactDone={contactDone}
               documentsDone={documentsDone}
             />
-          </DashboardPanel>
 
-          <DashboardPanel
-            title="KYC Application"
-            description="Passport/ID, company registration, and selfie verification"
-            icon={FileText}
-            iconColor="blue"
-          >
             {kyc?.review_notes && status !== "approved" ? (
               <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
                 <p className="text-xs font-semibold text-destructive">Review notes</p>
@@ -296,12 +307,14 @@ export function PartnerKycView({
 
             <KycForm
               kycStatus={status}
+              underReview={underReview}
               defaultValues={{
                 full_name: profile.full_name || "",
                 company_name: profile.company_name || "",
                 mobile: profile.mobile || "",
                 telegram_username: profile.telegram_username || "",
                 country: profile.country || "",
+                identity_document_type: kyc?.identity_document_type || "Passport",
                 passport_url: kyc?.passport_url || "",
                 selfie_url: kyc?.selfie_url || "",
                 company_registration_url: kyc?.company_registration_url || "",
@@ -312,18 +325,18 @@ export function PartnerKycView({
         </div>
 
         <aside className="flex flex-col gap-4">
-          <DashboardPanel title="What you'll need" icon={FileText} iconColor="purple">
+          <DashboardPanel className="h-auto" contentClassName="flex-none" title="What you'll need" icon={FileText} iconColor="purple">
             <ul className="flex flex-col gap-2.5">
-              <RequirementItem>Government-issued passport or national ID</RequirementItem>
-              <RequirementItem>Clear selfie holding your ID document</RequirementItem>
+              <RequirementItem>Upload a clear photo of Passport, Aadhaar, Voter ID, or other supported ID</RequirementItem>
+              <RequirementItem>Upload a selfie holding the same ID document</RequirementItem>
               <RequirementItem>Company registration (if applying as a business)</RequirementItem>
               <RequirementItem>Valid Telegram username for verification contact</RequirementItem>
             </ul>
           </DashboardPanel>
 
-          <DashboardPanel title="Tips for faster approval" icon={CheckCircle2} iconColor="green">
+          <DashboardPanel className="h-auto" contentClassName="flex-none" title="Tips for faster approval" icon={CheckCircle2} iconColor="green">
             <ul className="flex flex-col gap-2.5">
-              <RequirementItem>Upload high-resolution, uncropped document images</RequirementItem>
+              <RequirementItem>Upload high-resolution JPG, PNG, WEBP, or PDF files</RequirementItem>
               <RequirementItem>Ensure all text on ID is readable</RequirementItem>
               <RequirementItem>Match the name on your ID with the form</RequirementItem>
               <RequirementItem>Use a well-lit photo for your selfie verification</RequirementItem>

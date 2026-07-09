@@ -78,6 +78,7 @@ export interface AccountManager {
 export interface KycSubmission {
   id: string;
   user_id: string;
+  identity_document_type: string | null;
   passport_url: string | null;
   company_registration_url: string | null;
   selfie_url: string | null;

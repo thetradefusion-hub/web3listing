@@ -11,6 +11,10 @@ import { MIN_WITHDRAWAL, OWNER_ROLES, LEGAL_AGREEMENT_VERSION } from "@/lib/cons
 import { authCallbackUrl, getServerSiteUrl } from "@/lib/site-url";
 import { requireAuth, isAdminRole } from "@/lib/auth";
 import { getPortalForRole, getPortalPathForRole, getKycBlockError, PORTALS } from "@/lib/portal-config";
+import {
+  parseOrderRequirements,
+  validateRequirementResponses,
+} from "@/lib/service-requirements";
 import type { OrderStatus, PaymentMethod, Profile, UserRole, WithdrawalStatus } from "@/types/database";
 
 function ownerBasePath(role: Profile["role"]) {
@@ -226,9 +230,89 @@ export async function updateProfile(data: Record<string, string>) {
   return { success: true };
 }
 
+const KYC_UPLOAD_FIELDS = new Set(["identity", "selfie", "company", "tax"]);
+const KYC_ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
+const KYC_MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+function sanitizeKycFileName(name: string) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120);
+}
+
+export async function uploadKycDocument(formData: FormData) {
+  const profile = await requireAuth();
+  const file = formData.get("file");
+  const field = String(formData.get("field") || "");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Please choose a file to upload" };
+  }
+  if (!KYC_UPLOAD_FIELDS.has(field)) {
+    return { error: "Invalid document type" };
+  }
+  if (!KYC_ALLOWED_MIME_TYPES.has(file.type)) {
+    return { error: "Only JPG, PNG, WEBP, or PDF files are allowed" };
+  }
+  if (file.size > KYC_MAX_FILE_SIZE) {
+    return { error: "File must be 10 MB or smaller" };
+  }
+
+  const extension = file.name.includes(".") ? file.name.split(".").pop() : "bin";
+  const objectPath = `${profile.id}/${field}/${Date.now()}-${sanitizeKycFileName(file.name || `document.${extension}`)}`;
+
+  const supabase = await createClient();
+  const { error } = await supabase.storage.from("kyc-documents").upload(objectPath, file, {
+    contentType: file.type,
+    upsert: true,
+  });
+
+  if (error) return { error: error.message };
+  return { success: true, path: objectPath };
+}
+
+export async function getKycDocumentSignedUrl(path: string) {
+  const profile = await requireAuth();
+  const trimmed = path.trim();
+  if (!trimmed) return { error: "Document not found" };
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return { url: trimmed };
+  }
+
+  const isOwner = trimmed.startsWith(`${profile.id}/`);
+  if (!isOwner && !isAdminRole(profile.role)) {
+    return { error: "You do not have access to this document" };
+  }
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.storage.from("kyc-documents").createSignedUrl(trimmed, 60 * 60);
+  if (error || !data?.signedUrl) {
+    return { error: error?.message || "Could not open document" };
+  }
+
+  return { url: data.signedUrl };
+}
+
 export async function submitKyc(data: Record<string, string>) {
   const profile = await requireAuth();
   const supabase = await createClient();
+  const identityDocumentUrl = data.passport_url?.trim();
+  const selfieUrl = data.selfie_url?.trim();
+  const identityDocumentType = data.identity_document_type?.trim();
+
+  if (!identityDocumentType) {
+    return { error: "Please select an identity document type" };
+  }
+  if (!identityDocumentUrl) {
+    return { error: "Please upload your identity document" };
+  }
+  if (!selfieUrl) {
+    return { error: "Please upload your selfie verification photo" };
+  }
 
   await supabase.from("profiles").update({
     full_name: data.full_name,
@@ -241,9 +325,10 @@ export async function submitKyc(data: Record<string, string>) {
 
   const { error } = await supabase.from("kyc_submissions").upsert({
     user_id: profile.id,
-    passport_url: data.passport_url,
+    identity_document_type: identityDocumentType,
+    passport_url: identityDocumentUrl,
     company_registration_url: data.company_registration_url,
-    selfie_url: data.selfie_url,
+    selfie_url: selfieUrl,
     tax_document_url: data.tax_document_url,
     status: "pending",
   }, { onConflict: "user_id" });
@@ -572,7 +657,16 @@ export async function createOrder(data: {
     return { error: "You must acknowledge third-party approval terms" };
   }
 
-  if (
+  const requiredDocuments = (service.required_documents || []).filter(Boolean);
+
+  if (requiredDocuments.length > 0) {
+    const parsed = parseOrderRequirements(data.requirements);
+    if (parsed?.kind !== "structured") {
+      return { error: "Please complete all service requirements" };
+    }
+    const validationError = validateRequirementResponses(requiredDocuments, parsed.responses);
+    if (validationError) return { error: validationError };
+  } else if (
     (service.pricing_model === "quote" || service.pricing_model === "enterprise") &&
     !data.requirements?.trim()
   ) {

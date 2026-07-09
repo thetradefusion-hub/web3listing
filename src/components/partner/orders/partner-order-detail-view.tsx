@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PaymentSection, QuotationSection } from "@/components/partner/payment-section";
 import { OrderDetailTimeline } from "@/components/partner/orders/order-detail-timeline";
+import { OrderRequirementsDisplay } from "@/components/shared/order-requirements-display";
 import { OrderStatusBadge } from "@/components/partner/dashboard/ui";
 import { calculateOrderCommission, formatCurrency, isCommissionEligibleStatus } from "@/lib/commission";
 import type {
@@ -189,6 +190,15 @@ export function PartnerOrderDetailView({
               <p className="mt-2 text-sm font-medium text-[#64748B]">Payment details pending</p>
             </section>
           )}
+
+          {order.requirements ? (
+            <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+              <h2 className="text-base font-bold text-[#0F172A]">Submitted Requirements</h2>
+              <div className="mt-3">
+                <OrderRequirementsDisplay requirements={order.requirements} />
+              </div>
+            </section>
+          ) : null}
 
           {order.progress_notes && (
             <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">

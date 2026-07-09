@@ -2,7 +2,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HomeHero } from "@/components/public/home/hero";
 import { WhySection } from "@/components/public/home/why-section";
-import { StatsBanner } from "@/components/public/home/stats-banner";
 import { ServicePillars } from "@/components/public/home/service-pillars";
 import { PricingPackages } from "@/components/public/home/pricing-packages";
 import { PartnerStrip } from "@/components/public/home/partner-strip";
@@ -28,7 +27,6 @@ export default async function HomePage() {
     <>
       <HomeHero />
       <WhySection />
-      <StatsBanner />
       <ServicePillars />
       <ConsultationCta
         title="Get a free consultation"

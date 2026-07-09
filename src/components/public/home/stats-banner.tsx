@@ -27,24 +27,20 @@ const STAT_META: Record<
 
 const accentStyles = {
   purple: {
-    bar: "from-primary to-chart-4",
+    bar: "from-primary/80 to-chart-4/70",
     icon: "bg-primary/12 text-primary ring-primary/20",
-    glow: "group-hover:shadow-primary/10",
   },
   green: {
-    bar: "from-chart-2 to-chart-3",
+    bar: "from-chart-2/80 to-chart-3/70",
     icon: "bg-chart-2/12 text-chart-2 ring-chart-2/25",
-    glow: "group-hover:shadow-chart-2/10",
   },
   blue: {
-    bar: "from-chart-4 to-primary",
+    bar: "from-chart-4/80 to-primary/70",
     icon: "bg-chart-4/12 text-chart-4 ring-chart-4/20",
-    glow: "group-hover:shadow-chart-4/10",
   },
   amber: {
-    bar: "from-chart-3 to-chart-2",
+    bar: "from-chart-3/80 to-chart-2/70",
     icon: "bg-chart-3/12 text-chart-3 ring-chart-3/25",
-    glow: "group-hover:shadow-chart-3/10",
   },
 } as const;
 
@@ -80,29 +76,29 @@ export function StatsBanner() {
               <div
                 key={stat.label}
                 className={cn(
-                  "stats-card group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/70 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-card hover:shadow-xl sm:p-5",
-                  styles.glow
+                  "stats-card group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-4 text-left shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card sm:p-5"
                 )}
               >
                 <div
                   className={cn(
-                    "absolute inset-y-0 left-0 w-0.5 bg-gradient-to-b opacity-60 transition-opacity group-hover:opacity-100",
+                    "absolute inset-y-0 left-0 w-px bg-gradient-to-b opacity-70 transition-opacity group-hover:opacity-100",
                     styles.bar
                   )}
                   aria-hidden
                 />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-transparent opacity-60" aria-hidden />
                 <div
                   className={cn(
-                    "mx-auto mb-3 flex size-10 items-center justify-center rounded-xl ring-1 transition-transform group-hover:scale-105",
+                    "mb-4 flex size-10 items-center justify-center rounded-xl ring-1 transition-transform group-hover:scale-105",
                     styles.icon
                   )}
                 >
                   <Icon className="size-4" strokeWidth={2.25} />
                 </div>
-                <p className="lh-stat-value text-foreground transition-colors group-hover:text-primary dark:group-hover:text-chart-2">
+                <p className="lh-stat-value text-foreground">
                   {stat.value}
                 </p>
-                <p className="mt-2 text-[9px] font-semibold uppercase leading-snug tracking-[0.12em] text-muted-foreground sm:text-[10px] sm:tracking-[0.14em]">
+                <p className="mt-2 text-[10px] font-semibold uppercase leading-snug tracking-[0.11em] text-muted-foreground/90 sm:text-[11px]">
                   {stat.label}
                 </p>
               </div>

@@ -94,6 +94,7 @@ export function ProfileForm({
   basePath?: string;
 }) {
   const router = useRouter();
+  const isClientPortal = basePath === "/user";
   const [loading, setLoading] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
 
@@ -200,19 +201,23 @@ export function ProfileForm({
             </div>
           </FormSection>
 
-          <Separator />
+          {!isClientPortal ? (
+            <>
+              <Separator />
 
-          <FormSection title="Payout wallet" description="Used for commission withdrawals">
-            <Field id="wallet_address" label="Wallet Address" icon={Wallet}>
-              <Input
-                id="wallet_address"
-                name="wallet_address"
-                defaultValue={profile.wallet_address || ""}
-                className={`${inputClass} font-mono text-sm`}
-                placeholder="0x..."
-              />
-            </Field>
-          </FormSection>
+              <FormSection title="Payout wallet" description="Used for commission withdrawals">
+                <Field id="wallet_address" label="Wallet Address" icon={Wallet}>
+                  <Input
+                    id="wallet_address"
+                    name="wallet_address"
+                    defaultValue={profile.wallet_address || ""}
+                    className={`${inputClass} font-mono text-sm`}
+                    placeholder="0x..."
+                  />
+                </Field>
+              </FormSection>
+            </>
+          ) : null}
 
           <Button type="submit" disabled={loading} className="h-10 w-full rounded-xl font-semibold sm:w-auto sm:px-8">
             {loading ? "Saving..." : "Save Profile"}
@@ -283,7 +288,9 @@ export function ProfileForm({
           <ul className="flex flex-col gap-2.5">
             <SecurityTip>Email sign-in is tied to your registered address and cannot be changed here.</SecurityTip>
             <SecurityTip>Keep your Telegram username updated so your account manager can reach you.</SecurityTip>
-            <SecurityTip>Wallet address is used for commission payouts — double-check before saving.</SecurityTip>
+            {!isClientPortal ? (
+              <SecurityTip>Wallet address is used for commission payouts — double-check before saving.</SecurityTip>
+            ) : null}
           </ul>
           {kycRequired ? (
             <Button asChild className="mt-4 h-9 w-full rounded-xl font-semibold">

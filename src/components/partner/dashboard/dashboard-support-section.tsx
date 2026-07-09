@@ -42,6 +42,8 @@ export function DashboardSupportSection({
   kycRequired: boolean;
   basePath?: string;
 }) {
+  const managerDisplayName =
+    manager?.name?.toLowerCase().includes("abhay") ? "Listing Manager" : manager?.name;
   const managerInitials = manager?.name
     .split(" ")
     .map((w) => w[0])
@@ -134,7 +136,7 @@ export function DashboardSupportSection({
                   <AvatarBadge className="bg-chart-2 ring-2 ring-card" />
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-semibold text-foreground">{manager.name}</p>
+                  <p className="truncate text-base font-semibold text-foreground">{managerDisplayName}</p>
                   <p className="truncate text-sm text-muted-foreground">{manager.telegram_id}</p>
                   <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-chart-2/10 px-2 py-0.5 text-[10px] font-semibold text-chart-2">
                     <span className="size-1.5 rounded-full bg-chart-2" />

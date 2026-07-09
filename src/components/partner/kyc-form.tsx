@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Building2,
   CheckCircle2,
-  FileText,
   Globe,
   IdCard,
   Phone,
@@ -13,15 +12,26 @@ import {
   User,
 } from "lucide-react";
 import { submitKyc } from "@/lib/actions";
+import { KycFileUpload } from "@/components/partner/kyc-file-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { KycStatus } from "@/types/database";
 
 const inputClass = "h-10 rounded-xl border-input bg-background pl-10 shadow-sm";
+const selectClass = "h-10 rounded-xl border-input bg-background pl-10 shadow-sm";
+const SUPPORTED_ID_DOCUMENTS = [
+  "Passport",
+  "Aadhaar Card",
+  "Voter ID",
+  "Driving License",
+  "National ID",
+  "Other",
+] as const;
 
 function Field({
   id,
@@ -102,12 +112,17 @@ function StatusBanner({
 export function KycForm({
   defaultValues,
   kycStatus,
+  underReview = false,
 }: {
   defaultValues: Record<string, string>;
   kycStatus: KycStatus;
+  underReview?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [identityDocType, setIdentityDocType] = useState(
+    defaultValues.identity_document_type || "Passport"
+  );
 
   if (kycStatus === "approved") {
     return (
@@ -119,9 +134,19 @@ export function KycForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
     const form = new FormData(e.currentTarget);
     const data = Object.fromEntries(form.entries()) as Record<string, string>;
+
+    if (!data.passport_url?.trim()) {
+      toast.error("Please upload your identity document");
+      return;
+    }
+    if (!data.selfie_url?.trim()) {
+      toast.error("Please upload your selfie verification photo");
+      return;
+    }
+
+    setLoading(true);
     const result = await submitKyc(data);
     setLoading(false);
     if (result.error) {
@@ -134,7 +159,7 @@ export function KycForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      {kycStatus === "pending" ? (
+      {underReview ? (
         <StatusBanner tone="warning" title="Under review">
           Your submission is being reviewed. You cannot edit details until the review is complete.
         </StatusBanner>
@@ -155,7 +180,7 @@ export function KycForm({
               defaultValue={defaultValues.full_name}
               className={inputClass}
               required
-              disabled={kycStatus === "pending"}
+              disabled={underReview}
             />
           </Field>
           <Field id="company_name" label="Company Name" icon={Building2}>
@@ -164,7 +189,7 @@ export function KycForm({
               name="company_name"
               defaultValue={defaultValues.company_name}
               className={inputClass}
-              disabled={kycStatus === "pending"}
+              disabled={underReview}
             />
           </Field>
         </div>
@@ -181,7 +206,7 @@ export function KycForm({
               defaultValue={defaultValues.mobile}
               className={inputClass}
               required
-              disabled={kycStatus === "pending"}
+              disabled={underReview}
             />
           </Field>
           <Field id="telegram_username" label="Telegram Username" icon={Send} required>
@@ -192,7 +217,7 @@ export function KycForm({
               placeholder="@username"
               className={inputClass}
               required
-              disabled={kycStatus === "pending"}
+              disabled={underReview}
             />
           </Field>
           <Field id="country" label="Country" icon={Globe} required>
@@ -202,7 +227,7 @@ export function KycForm({
               defaultValue={defaultValues.country}
               className={inputClass}
               required
-              disabled={kycStatus === "pending"}
+              disabled={underReview}
             />
           </Field>
         </div>
@@ -212,49 +237,58 @@ export function KycForm({
 
       <FormSection
         title="Identity documents"
-        description="Upload files to storage and paste the public URLs below"
+        description="Upload Passport, Aadhaar Card, Voter ID, Driving License, National ID, or other supported government ID"
       >
         <div className="grid gap-4 md:grid-cols-2">
-          <Field id="passport_url" label="Passport / ID Document" icon={IdCard}>
-            <Input
-              id="passport_url"
-              name="passport_url"
-              defaultValue={defaultValues.passport_url}
-              placeholder="https://..."
-              className={inputClass}
-              disabled={kycStatus === "pending"}
-            />
+          <Field id="identity_document_type" label="ID Document Type" icon={IdCard} required>
+            <Select
+              value={identityDocType}
+              onValueChange={(value) => setIdentityDocType(value)}
+              disabled={underReview}
+            >
+              <SelectTrigger className={selectClass}>
+                <SelectValue placeholder="Select document type" />
+              </SelectTrigger>
+              <SelectContent>
+                {SUPPORTED_ID_DOCUMENTS.map((doc) => (
+                  <SelectItem key={doc} value={doc}>
+                    {doc}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <input type="hidden" name="identity_document_type" value={identityDocType} />
           </Field>
-          <Field id="selfie_url" label="Selfie Verification" icon={User}>
-            <Input
-              id="selfie_url"
-              name="selfie_url"
-              defaultValue={defaultValues.selfie_url}
-              placeholder="https://..."
-              className={inputClass}
-              disabled={kycStatus === "pending"}
-            />
-          </Field>
-          <Field id="company_registration_url" label="Company Registration" icon={Building2}>
-            <Input
-              id="company_registration_url"
-              name="company_registration_url"
-              defaultValue={defaultValues.company_registration_url}
-              placeholder="Optional"
-              className={inputClass}
-              disabled={kycStatus === "pending"}
-            />
-          </Field>
-          <Field id="tax_document_url" label="Tax Document" icon={FileText}>
-            <Input
-              id="tax_document_url"
-              name="tax_document_url"
-              defaultValue={defaultValues.tax_document_url}
-              placeholder="https://..."
-              className={inputClass}
-              disabled={kycStatus === "pending"}
-            />
-          </Field>
+          <KycFileUpload
+            name="passport_url"
+            field="identity"
+            label="ID Document"
+            defaultPath={defaultValues.passport_url}
+            disabled={underReview}
+            required
+          />
+          <KycFileUpload
+            name="selfie_url"
+            field="selfie"
+            label="Selfie with ID"
+            defaultPath={defaultValues.selfie_url}
+            disabled={underReview}
+            required
+          />
+          <KycFileUpload
+            name="company_registration_url"
+            field="company"
+            label="Company Registration"
+            defaultPath={defaultValues.company_registration_url}
+            disabled={underReview}
+          />
+          <KycFileUpload
+            name="tax_document_url"
+            field="tax"
+            label="Tax Document"
+            defaultPath={defaultValues.tax_document_url}
+            disabled={underReview}
+          />
         </div>
       </FormSection>
 
@@ -264,10 +298,10 @@ export function KycForm({
         </p>
         <Button
           type="submit"
-          disabled={loading || kycStatus === "pending"}
+          disabled={loading || underReview}
           className="h-10 shrink-0 rounded-xl px-6 font-semibold sm:min-w-[160px]"
         >
-          {kycStatus === "pending" ? "Under Review" : loading ? "Submitting..." : "Submit KYC"}
+          {underReview ? "Under Review" : loading ? "Submitting..." : "Submit KYC"}
         </Button>
       </div>
     </form>

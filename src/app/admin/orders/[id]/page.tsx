@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OrderTimeline } from "@/components/shared/order-timeline";
+import { OrderRequirementsDisplay } from "@/components/shared/order-requirements-display";
 import { QuotationBuilder } from "@/components/admin/quotation-builder";
 import { OrderStatusUpdater, PaymentVerifier } from "@/components/admin/admin-actions";
 import { OrderDeleter, OrderServiceReassign } from "@/components/admin/order-admin-actions";
@@ -152,7 +153,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <AdminPanel>
           <AdminPanelHeader title="Requirements" />
           <AdminPanelBody>
-            <p className="text-sm leading-relaxed text-slate-600">{order.requirements}</p>
+            <OrderRequirementsDisplay requirements={order.requirements} />
           </AdminPanelBody>
         </AdminPanel>
       )}

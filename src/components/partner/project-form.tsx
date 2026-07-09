@@ -396,7 +396,7 @@ export function ProjectForm({
           className={inputClass}
         />
       </Field>
-      <Field id="contract_address" label="Contract" icon={FileCode}>
+      <Field id="contract_address" label="Contract Address" icon={FileCode}>
         <Input
           id="contract_address"
           name="contract_address"
@@ -489,7 +489,7 @@ export function ProjectForm({
         </div>
 
         <div className={cn(fullPage && "xl:max-w-xl")}>
-          <FormSectionCard title="Team" icon={Users} iconColor="purple">
+          <FormSectionCard title="Other Information" icon={Users} iconColor="purple">
             <Textarea
               id="team_info"
               name="team_info"
@@ -519,7 +519,7 @@ export function ProjectForm({
         <div className="mt-3">{extraLinkFields}</div>
       </FormSectionCard>
 
-      <FormSectionCard title="Team" icon={Users} iconColor="purple" description="Optional background for reviewers">
+      <FormSectionCard title="Other Information" icon={Users} iconColor="purple" description="Optional background for reviewers">
         <Textarea
           id="team_info"
           name="team_info"
