@@ -35,6 +35,13 @@ type KycSubmissionWithUrls = KycSubmission & {
   selfie_view_url: string | null;
   company_view_url: string | null;
   tax_view_url: string | null;
+  profiles?: {
+    full_name: string | null;
+    email: string;
+    company_name: string | null;
+    telegram_username: string | null;
+    country: string | null;
+  } | null;
 };
 
 export default async function AdminKycPage() {

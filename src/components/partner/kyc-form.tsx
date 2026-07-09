@@ -243,7 +243,7 @@ export function KycForm({
           <Field id="identity_document_type" label="ID Document Type" icon={IdCard} required>
             <Select
               value={identityDocType}
-              onValueChange={(value) => setIdentityDocType(value)}
+              onValueChange={(value) => setIdentityDocType(value ?? "Passport")}
               disabled={underReview}
             >
               <SelectTrigger className={selectClass}>
