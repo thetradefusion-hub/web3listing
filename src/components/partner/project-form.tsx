@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AtSign,
@@ -229,8 +229,16 @@ export function ProjectForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [network, setNetwork] = useState(project?.blockchain_network || "");
-  const [legalConsent, setLegalConsent] = useState(false);
+  const [legalConsent, setLegalConsent] = useState(Boolean(project?.legal_consent_accepted));
   const [moreLinksOpen, setMoreLinksOpen] = useState(false);
+  const isEditing = Boolean(project && project.status !== "draft");
+  const networkOptions = useMemo(() => {
+    const options: string[] = [...BLOCKCHAIN_NETWORKS];
+    if (project?.blockchain_network && !options.includes(project.blockchain_network)) {
+      options.unshift(project.blockchain_network);
+    }
+    return options;
+  }, [project?.blockchain_network]);
 
   async function handleSubmit(status: string) {
     const formEl = formRef.current;
@@ -264,9 +272,75 @@ export function ProjectForm({
       toast.error(result.error);
       return;
     }
-    toast.success(status === "draft" ? "Draft saved" : "Project submitted");
+
+    if (status === "draft") {
+      toast.success("Draft saved");
+    } else if (status === "submitted") {
+      toast.success(project?.status === "rejected" ? "Project resubmitted" : "Project submitted");
+    } else {
+      toast.success("Project updated");
+    }
+
     router.push(`${basePath}/projects`);
     router.refresh();
+  }
+
+  function renderActionButtons() {
+    if (isEditing) {
+      return (
+        <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted-foreground">
+            Save your changes or resubmit if your project was rejected.
+          </p>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={loading}
+              className="h-10 rounded-xl px-5"
+              onClick={() => handleSubmit(project!.status)}
+            >
+              {loading ? "Saving..." : "Save changes"}
+            </Button>
+            {project?.status === "rejected" ? (
+              <Button
+                type="button"
+                disabled={loading || !legalConsent}
+                className="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 font-semibold text-white shadow-md hover:opacity-90"
+                onClick={() => handleSubmit("submitted")}
+              >
+                {loading ? "Saving..." : "Resubmit for review"}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-muted-foreground">Save a draft anytime, or submit when ready.</p>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={loading}
+            className="h-10 rounded-xl px-5"
+            onClick={() => handleSubmit("draft")}
+          >
+            Save draft
+          </Button>
+          <Button
+            type="button"
+            disabled={loading || !legalConsent}
+            className="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 font-semibold text-white shadow-md hover:opacity-90"
+            onClick={() => handleSubmit("submitted")}
+          >
+            {loading ? "Saving..." : "Submit project"}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const tokenFields = (
@@ -299,7 +373,7 @@ export function ProjectForm({
             <SelectValue placeholder="Select network" />
           </SelectTrigger>
           <SelectContent>
-            {BLOCKCHAIN_NETWORKS.map((n) => (
+            {networkOptions.map((n) => (
               <SelectItem key={n} value={n}>
                 {n}
               </SelectItem>
@@ -429,28 +503,7 @@ export function ProjectForm({
 
         {consentSection}
 
-        <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted-foreground">Save a draft anytime, or submit when ready.</p>
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={loading}
-              className="h-10 rounded-xl px-5"
-              onClick={() => handleSubmit("draft")}
-            >
-              Save draft
-            </Button>
-            <Button
-              type="button"
-              disabled={loading || !legalConsent}
-              className="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 font-semibold text-white shadow-md hover:opacity-90"
-              onClick={() => handleSubmit("submitted")}
-            >
-              {loading ? "Saving..." : "Submit project"}
-            </Button>
-          </div>
-        </div>
+        {renderActionButtons()}
       </form>
     );
   }
@@ -479,25 +532,7 @@ export function ProjectForm({
 
       {consentSection}
 
-      <div className="flex justify-end gap-2 border-t border-border pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          disabled={loading}
-          className="h-10 rounded-xl px-5"
-          onClick={() => handleSubmit("draft")}
-        >
-          Save draft
-        </Button>
-        <Button
-          type="button"
-          disabled={loading || !legalConsent}
-          className="h-10 rounded-xl px-6 font-semibold"
-          onClick={() => handleSubmit("submitted")}
-        >
-          {loading ? "Saving..." : "Submit"}
-        </Button>
-      </div>
+      {renderActionButtons()}
     </form>
   );
 }

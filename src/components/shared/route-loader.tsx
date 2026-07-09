@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Progress, ProgressIndicator, ProgressTrack } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { AppPageLoader } from "@/components/shared/app-page-loader";
 
 /** Wait before showing loader — fast pages never flash a spinner. */
 export const ROUTE_LOADER_SHOW_DELAY_MS = 180;
@@ -20,29 +19,11 @@ export function RouteLoader() {
   const routeKey = `${pathname}?${searchParams.toString()}`;
 
   const [visible, setVisible] = useState(false);
-  const [value, setValue] = useState(0);
 
   const navigatingRef = useRef(false);
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shownAtRef = useRef<number | null>(null);
-  const progressTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  function clearProgressTimers() {
-    for (const timer of progressTimersRef.current) clearTimeout(timer);
-    progressTimersRef.current = [];
-  }
-
-  function scheduleProgress() {
-    clearProgressTimers();
-    setValue(12);
-    progressTimersRef.current = [
-      setTimeout(() => setValue(38), 120),
-      setTimeout(() => setValue(62), 320),
-      setTimeout(() => setValue(84), 680),
-      setTimeout(() => setValue(92), 1100),
-    ];
-  }
 
   function startNavigation() {
     navigatingRef.current = true;
@@ -56,7 +37,6 @@ export function RouteLoader() {
       if (!navigatingRef.current) return;
       shownAtRef.current = Date.now();
       setVisible(true);
-      scheduleProgress();
     }, SHOW_DELAY_MS);
   }
 
@@ -70,13 +50,8 @@ export function RouteLoader() {
     }
 
     const complete = () => {
-      clearProgressTimers();
-      setValue(100);
-      hideTimerRef.current = setTimeout(() => {
-        setVisible(false);
-        setValue(0);
-        shownAtRef.current = null;
-      }, 220);
+      setVisible(false);
+      shownAtRef.current = null;
     };
 
     if (shownAtRef.current) {
@@ -134,31 +109,11 @@ export function RouteLoader() {
     () => () => {
       if (showTimerRef.current) clearTimeout(showTimerRef.current);
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      clearProgressTimers();
     },
     []
   );
 
   if (!visible) return null;
 
-  return (
-    <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-[100]"
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={value}
-      aria-label="Page loading"
-    >
-      <Progress value={value} className="gap-0">
-        <ProgressTrack className="h-0.5 rounded-none bg-transparent">
-          <ProgressIndicator
-            className={cn(
-              "rounded-none bg-gradient-to-r from-primary via-chart-2 to-primary transition-[width] duration-300 ease-out"
-            )}
-          />
-        </ProgressTrack>
-      </Progress>
-    </div>
-  );
+  return <AppPageLoader variant="overlay" label="Loading page" />;
 }

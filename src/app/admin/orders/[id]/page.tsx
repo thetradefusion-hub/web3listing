@@ -102,9 +102,21 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           <AdminPanelBody className="space-y-3">
             <OrderStatusBadge status={payment.status === "confirmed" ? "payment_confirmed" : payment.status === "awaiting_verification" ? "under_review" : "submitted"} />
             {payment.proof_url && (
-              <a href={payment.proof_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-violet-600 hover:underline">
-                View Payment Proof
-              </a>
+              /^https?:\/\//i.test(payment.proof_url) ? (
+                <a href={payment.proof_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-violet-600 hover:underline">
+                  View Payment Proof
+                </a>
+              ) : (
+                <div className="space-y-1">
+                  {payment.payment_instructions ? (
+                    <p className="text-xs text-slate-500">{payment.payment_instructions}</p>
+                  ) : null}
+                  <p className="text-sm text-slate-600">
+                    <span className="font-medium">Transaction hash:</span>{" "}
+                    <code className="break-all text-xs">{payment.proof_url}</code>
+                  </p>
+                </div>
+              )
             )}
             {payment.status === "awaiting_verification" && <PaymentVerifier paymentId={payment.id} />}
           </AdminPanelBody>

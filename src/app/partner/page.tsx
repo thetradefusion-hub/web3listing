@@ -5,6 +5,7 @@ import {
   Wallet,
   Banknote,
   Headphones,
+  ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
@@ -20,6 +21,7 @@ const quickActions: { label: string; href: string; icon: typeof Plus; color: Qui
   { label: "Orders", href: "/partner/orders", icon: Package, color: "orange" },
   { label: "Wallet", href: "/partner/wallet", icon: Wallet, color: "teal" },
   { label: "Withdraw", href: "/partner/wallet", icon: Banknote, color: "purple" },
+  { label: "KYC", href: "/partner/kyc", icon: ShieldCheck, color: "green" },
   { label: "Support", href: "/partner/support", icon: Headphones, color: "pink" },
 ];
 

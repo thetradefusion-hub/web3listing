@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getPortalPathForRole } from "@/lib/portal-config";
+import { getPortalPathForRole, pathRequiresKyc } from "@/lib/portal-config";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -95,10 +95,7 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    const orderRoutes = ["/partner/services", "/partner/orders/new"];
-    const needsKyc = orderRoutes.some((r) => path.startsWith(r));
-
-    if (needsKyc) {
+    if (pathRequiresKyc(path, "partner")) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("kyc_status, role")
@@ -120,6 +117,21 @@ export async function updateSession(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = role === "agent" ? "/partner" : getPortalPathForRole(role as Parameters<typeof getPortalPathForRole>[0]);
       return NextResponse.redirect(url);
+    }
+
+    if (pathRequiresKyc(path, "user")) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("kyc_status, role")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.role === "user" && profile.kyc_status !== "approved") {
+        const url = request.nextUrl.clone();
+        url.pathname = "/user/kyc";
+        url.searchParams.set("required", "true");
+        return NextResponse.redirect(url);
+      }
     }
   }
 

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { PartnerStatCard } from "@/components/partner/dashboard/dashboard-premium";
 import { PartnerBadge, PartnerPageShell, projectStatusVariant } from "@/components/partner/ui";
+import { ProjectActions } from "@/components/partner/projects/project-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -44,15 +45,18 @@ function ProjectCard({
   const initials = (project.token_symbol || project.project_name).slice(0, 2).toUpperCase();
 
   return (
-    <Link href={`${basePath}/projects/${project.id}`} className="group block h-full">
-      <Card
-        size="sm"
-        className="relative h-full overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 py-0 transition-all duration-300 hover:border-primary/25 hover:shadow-md"
-      >
-        <div className={cn("absolute inset-y-0 left-0 w-1 bg-gradient-to-b", accent)} aria-hidden />
+    <Card
+      size="sm"
+      className="relative h-full overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 py-0 transition-all duration-300 hover:border-primary/25 hover:shadow-md"
+    >
+      <div className={cn("absolute inset-y-0 left-0 w-1 bg-gradient-to-b", accent)} aria-hidden />
 
-        <CardContent className="flex h-full flex-col gap-3 p-4 pl-5">
-          <div className="flex items-start justify-between gap-3">
+      <CardContent className="flex h-full flex-col gap-3 p-4 pl-5">
+        <div className="flex items-start justify-between gap-3">
+          <Link
+            href={`${basePath}/projects/${project.id}`}
+            className="group/title flex min-w-0 flex-1 items-start gap-3"
+          >
             <div
               className={cn(
                 "relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl shadow-md ring-2 ring-border/50",
@@ -66,49 +70,59 @@ function ProjectCard({
                 <span className="text-xs font-bold">{initials}</span>
               )}
             </div>
-            <PartnerBadge variant={projectStatusVariant(project.status)}>
-              {statusLabel(project.status)}
-            </PartnerBadge>
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <h3 className="truncate text-base font-bold text-foreground group-hover:text-primary">
-              {project.project_name}
-            </h3>
-            <p className="mt-1 truncate text-sm text-muted-foreground">
-              {project.token_name}{" "}
-              <span className="font-semibold text-foreground">({project.token_symbol})</span>
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-              <Layers className="size-3 shrink-0" strokeWidth={2} />
-              {project.blockchain_network}
-            </span>
-            {orderCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
-                <ShoppingBag className="size-3 shrink-0" strokeWidth={2} />
-                {orderCount} {orderCount === 1 ? "order" : "orders"}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
-            <span>{format(new Date(project.created_at), "MMM d, yyyy")}</span>
-            <div className="flex items-center gap-2">
-              {project.website_url ? (
-                <Globe className="size-3.5 shrink-0 text-muted-foreground" aria-label="Has website" />
-              ) : null}
-              <span className="inline-flex items-center gap-1 font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                Open
-                <ArrowRight className="size-3.5" strokeWidth={2.5} />
-              </span>
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-base font-bold text-foreground group-hover/title:text-primary">
+                {project.project_name}
+              </h3>
+              <p className="mt-1 truncate text-sm text-muted-foreground">
+                {project.token_name}{" "}
+                <span className="font-semibold text-foreground">({project.token_symbol})</span>
+              </p>
             </div>
+          </Link>
+          <PartnerBadge variant={projectStatusVariant(project.status)}>
+            {statusLabel(project.status)}
+          </PartnerBadge>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+            <Layers className="size-3 shrink-0" strokeWidth={2} />
+            {project.blockchain_network}
+          </span>
+          {orderCount > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+              <ShoppingBag className="size-3 shrink-0" strokeWidth={2} />
+              {orderCount} {orderCount === 1 ? "order" : "orders"}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
+          <span>{format(new Date(project.created_at), "MMM d, yyyy")}</span>
+          <div className="flex items-center gap-2">
+            {project.website_url ? (
+              <Globe className="size-3.5 shrink-0 text-muted-foreground" aria-label="Has website" />
+            ) : null}
+            <Link
+              href={`${basePath}/projects/${project.id}`}
+              className="inline-flex items-center gap-1 font-medium text-primary transition hover:underline"
+            >
+              View
+              <ArrowRight className="size-3.5" strokeWidth={2.5} />
+            </Link>
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+
+        <ProjectActions
+          project={project}
+          orderCount={orderCount}
+          basePath={basePath}
+          variant="card"
+          className="border-t border-border pt-3"
+        />
+      </CardContent>
+    </Card>
   );
 }
 

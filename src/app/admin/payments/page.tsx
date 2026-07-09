@@ -89,14 +89,26 @@ export default async function AdminPaymentsPage({
                         {partner?.full_name || partner?.email || "—"} · {formatCurrency(payment.amount)}
                       </p>
                       {payment.proof_url && (
-                        <a
-                          href={payment.proof_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-2 inline-block text-xs font-medium text-violet-600 hover:underline"
-                        >
-                          View payment proof
-                        </a>
+                        <div className="mt-2">
+                          {/^https?:\/\//i.test(payment.proof_url) ? (
+                            <a
+                              href={payment.proof_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block text-xs font-medium text-violet-600 hover:underline"
+                            >
+                              View payment proof
+                            </a>
+                          ) : (
+                            <p className="text-xs text-slate-500">
+                              <span className="font-medium text-slate-700">Tx hash:</span>{" "}
+                              <code className="break-all">{payment.proof_url}</code>
+                            </p>
+                          )}
+                          {payment.payment_instructions ? (
+                            <p className="mt-1 text-xs text-slate-500">{payment.payment_instructions}</p>
+                          ) : null}
+                        </div>
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-3">

@@ -8,7 +8,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { SERVICE_PILLARS } from "@/lib/home-content";
-import { HomeSectionHeader } from "@/components/public/home/section-header";
 import type { LucideIcon } from "lucide-react";
 
 const PILLAR_ICONS: Record<string, LucideIcon> = {
@@ -21,34 +20,37 @@ const PILLAR_ICONS: Record<string, LucideIcon> = {
 
 export function ServicePillars() {
   return (
-    <section className="landing-section">
+    <section className="landing-section border-b border-border">
       <div className="landing-container">
-        <HomeSectionHeader
-          label="Our services"
-          title="What we do"
-          description="From exchange listing to market making, PR, data platforms, and advisory — access professional Web3 services through one marketplace."
-          className="mb-10 sm:mb-14"
-        />
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="lh-label lh-accent">Our services</p>
+          <h2 className="lh-display mt-3 text-foreground sm:mt-4">
+            What we <span className="lh-brand-gradient">do</span>
+          </h2>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
+            From exchange listing to market making, PR, data platforms, and advisory — professional
+            Web3 services through one marketplace.
+          </p>
+        </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICE_PILLARS.map((pillar) => {
             const Icon = PILLAR_ICONS[pillar.title] || Building2;
             return (
               <Link
                 key={pillar.title}
                 href={pillar.href}
-                className="group flex flex-col rounded-2xl border border-border bg-card/50 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5 sm:p-6"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card/60 p-6 transition-all duration-300 hover:border-primary/35 hover:bg-card hover:shadow-xl hover:shadow-primary/5 sm:p-7"
               >
-                <div className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20 transition group-hover:bg-primary/15">
+                <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-chart-2 opacity-0 transition group-hover:opacity-100" />
+                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20 transition group-hover:bg-primary/15">
                   <Icon className="size-5" strokeWidth={2} />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-primary dark:group-hover:text-chart-2 sm:text-xl">
-                  {pillar.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:mt-3">{pillar.desc}</p>
-                <span className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-primary transition group-hover:gap-2 dark:text-chart-2">
-                  Explore
-                  <ArrowUpRight className="size-3.5 sm:size-4" />
+                <h3 className="text-xl font-bold tracking-tight text-foreground">{pillar.title}</h3>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">{pillar.desc}</p>
+                <span className="mt-7 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary transition group-hover:gap-2.5 dark:text-chart-2">
+                  Get in touch
+                  <ArrowUpRight className="size-3.5" />
                 </span>
               </Link>
             );

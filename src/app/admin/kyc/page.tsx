@@ -23,7 +23,7 @@ export default async function AdminKycPage() {
     <AdminPageShell>
       <AdminPageHeader
         title="KYC Review"
-        description="Review and approve partner identity submissions"
+        description="Review and approve identity submissions from users and partners"
       />
 
       {submissions && submissions.length > 0 ? (
@@ -74,7 +74,7 @@ export default async function AdminKycPage() {
           })}
         </div>
       ) : (
-        <AdminEmptyState title="No KYC submissions" description="Partner KYC requests will appear here." />
+        <AdminEmptyState title="No KYC submissions" description="User and partner KYC requests will appear here." />
       )}
     </AdminPageShell>
   );

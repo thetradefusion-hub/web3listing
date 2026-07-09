@@ -22,7 +22,7 @@ export default async function KycPage({
     <PartnerKycView
       profile={profile!}
       kyc={kyc}
-      required={params.required === "true"}
+      required={params.required === "true" || profile!.kyc_status !== "approved"}
       managerTelegramLink={managerResult.data?.telegram_link}
     />
   );

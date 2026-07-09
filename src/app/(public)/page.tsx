@@ -7,7 +7,6 @@ import { ServicePillars } from "@/components/public/home/service-pillars";
 import { PricingPackages } from "@/components/public/home/pricing-packages";
 import { PartnerStrip } from "@/components/public/home/partner-strip";
 import { ConsultationCta } from "@/components/public/home/consultation-cta";
-import { ServiceShowcase } from "@/components/public/home/service-showcase";
 import { HomeFaqSection } from "@/components/public/home/faq-section";
 import { HomeDisclaimer } from "@/components/public/home/disclaimer";
 import { HowItWorksSection } from "@/components/public/home/how-it-works-section";
@@ -31,18 +30,23 @@ export default async function HomePage() {
       <WhySection />
       <StatsBanner />
       <ServicePillars />
-      <ConsultationCta />
+      <ConsultationCta
+        title="Get a free consultation"
+        subtitle="Tell us about your project and we’ll recommend the right listing and growth path."
+        primaryLabel="Book a call with us"
+        secondaryLabel="Become our partner"
+        secondaryHref="/contact"
+      />
       <PricingPackages />
       <PartnerStrip />
-      <ServiceShowcase />
       <HowItWorksSection />
       <PopularServicesSection services={popularServices} />
       <WhyChooseSection />
       <HomeFaqSection />
       <ConsultationCta
-        title="Ready to grow your project?"
+        title="Ready to list & grow?"
         subtitle="Launch faster, build trust, and scale your Web3 ecosystem with professional support."
-        primaryLabel="Book a free consultation"
+        primaryLabel="Get free consultation"
         secondaryLabel="Create your account"
         secondaryHref="/signup"
       />

@@ -4,12 +4,13 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { formatUsdtNetworkLabel, type UsdtNetwork } from "@/lib/usdt-payment";
 import { sendEmail, credentialsEmail, kycStatusEmail, orderUpdateEmail, quoteReadyEmail, withdrawalStatusEmail } from "@/lib/email";
 import { calculateQuotation, calculateOrderCommission, isCommissionEligibleStatus } from "@/lib/commission";
 import { MIN_WITHDRAWAL, OWNER_ROLES, LEGAL_AGREEMENT_VERSION } from "@/lib/constants";
 import { authCallbackUrl, getServerSiteUrl } from "@/lib/site-url";
 import { requireAuth, isAdminRole } from "@/lib/auth";
-import { getPortalForRole, getPortalPathForRole, PORTALS } from "@/lib/portal-config";
+import { getPortalForRole, getPortalPathForRole, getKycBlockError, PORTALS } from "@/lib/portal-config";
 import type { OrderStatus, PaymentMethod, Profile, UserRole, WithdrawalStatus } from "@/types/database";
 
 function ownerBasePath(role: Profile["role"]) {
@@ -235,6 +236,7 @@ export async function submitKyc(data: Record<string, string>) {
     mobile: data.mobile,
     telegram_username: data.telegram_username,
     country: data.country,
+    kyc_status: "pending",
   }).eq("id", profile.id);
 
   const { error } = await supabase.from("kyc_submissions").upsert({
@@ -247,8 +249,19 @@ export async function submitKyc(data: Record<string, string>) {
   }, { onConflict: "user_id" });
 
   if (error) return { error: error.message };
+
+  await notifyAdmins(
+    "New KYC Submission",
+    `${profile.full_name || profile.email} submitted identity documents for review.`,
+    "/admin/kyc",
+    "kyc"
+  );
+
   revalidatePath("/partner/kyc");
   revalidatePath("/user/kyc");
+  revalidatePath("/admin/kyc");
+  revalidatePath("/partner/profile");
+  revalidatePath("/user/profile");
   return { success: true };
 }
 
@@ -272,6 +285,10 @@ export async function reviewKyc(userId: string, status: "approved" | "rejected",
   }
 
   revalidatePath("/admin/kyc");
+  revalidatePath("/partner/kyc");
+  revalidatePath("/user/kyc");
+  revalidatePath("/partner/profile");
+  revalidatePath("/user/profile");
   return { success: true };
 }
 
@@ -462,6 +479,39 @@ export async function updateProject(id: string, data: Record<string, string>) {
   }
 
   revalidatePath(`${base}/projects`);
+  revalidatePath(`${base}/projects/${id}`);
+  revalidatePath("/admin/projects");
+  revalidatePath(`/admin/projects/${id}`);
+  return { success: true };
+}
+
+export async function deleteProject(projectId: string) {
+  const profile = await requireAuth(OWNER_ROLES);
+  const supabase = await createClient();
+  const base = ownerBasePath(profile.role);
+
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, project_name")
+    .eq("id", projectId)
+    .eq("agent_id", profile.id)
+    .single();
+
+  if (!project) return { error: "Project not found" };
+
+  const { count: orderCount } = await supabase
+    .from("orders")
+    .select("*", { count: "exact", head: true })
+    .eq("project_id", projectId);
+
+  if (orderCount && orderCount > 0) {
+    return { error: "Cannot delete a project that has orders. Remove or reassign orders first." };
+  }
+
+  const { error } = await supabase.from("projects").delete().eq("id", projectId).eq("agent_id", profile.id);
+  if (error) return { error: error.message };
+
+  revalidatePath(`${base}/projects`);
   revalidatePath("/admin/projects");
   return { success: true };
 }
@@ -511,9 +561,8 @@ export async function createOrder(data: {
   third_party_ack?: boolean;
 }) {
   const profile = await requireAuth(OWNER_ROLES);
-  if (profile.role === "agent" && profile.kyc_status !== "approved") {
-    return { error: "KYC approval required before placing orders" };
-  }
+  const kycError = getKycBlockError(profile);
+  if (kycError) return { error: kycError };
 
   const supabase = await createClient();
   const { data: service } = await supabase.from("services").select("*").eq("id", data.service_id).single();
@@ -552,7 +601,7 @@ export async function createOrder(data: {
       amount: service.price,
       method: "usdt",
       status: "pending",
-      payment_instructions: "Please send USDT (TRC20) to our wallet. Contact support for payment details.",
+      payment_instructions: "Pay via USDT (BEP20, ERC20, or TRC20). Select your network on the order page.",
     });
     if (paymentError) return { error: paymentError.message };
   }
@@ -606,7 +655,7 @@ export async function createQuotation(data: {
     amount: calc.client_price,
     method: "usdt",
     status: "pending",
-    payment_instructions: "Please send USDT (TRC20). Contact your account manager for payment details.",
+    payment_instructions: "Pay via USDT (BEP20, ERC20, or TRC20). Select your network on the order page.",
   });
 
   const { data: partner } = await supabase.from("profiles").select("email, role").eq("id", order.agent_id).single();
@@ -642,24 +691,32 @@ export async function acceptQuotation(quotationId: string) {
   return { success: true };
 }
 
-export async function uploadPaymentProof(paymentId: string, proofUrl: string) {
+export async function uploadPaymentProof(
+  paymentId: string,
+  data: { txHash: string; network: UsdtNetwork }
+) {
   const profile = await requireAuth();
   const supabase = await createClient();
   const base = ownerBasePath(profile.role);
+
+  const txHash = data.txHash.trim();
+  if (!txHash) return { error: "Transaction hash is required" };
+  if (txHash.length < 8) return { error: "Transaction hash looks invalid" };
 
   const { data: payment } = await supabase.from("payments").select("*, orders(*)").eq("id", paymentId).single();
   if (!payment) return { error: "Payment not found" };
 
   const { error } = await supabase.from("payments").update({
-    proof_url: proofUrl,
+    proof_url: txHash,
+    payment_instructions: formatUsdtNetworkLabel(data.network),
     status: "awaiting_verification",
   }).eq("id", paymentId);
 
   if (error) return { error: error.message };
 
   await notifyAdmins(
-    "Payment Proof Uploaded",
-    "An partner submitted payment proof for verification.",
+    "Payment Hash Submitted",
+    `A ${profile.role === "user" ? "client" : "partner"} submitted a USDT payment hash for verification.`,
     `/admin/payments`
   );
 
@@ -669,6 +726,8 @@ export async function uploadPaymentProof(paymentId: string, proofUrl: string) {
   if (payment.order_id) {
     revalidatePath(`${base}/orders/${payment.order_id}`);
     revalidatePath(`/admin/orders/${payment.order_id}`);
+    revalidatePath(`/partner/orders/${payment.order_id}`);
+    revalidatePath(`/user/orders/${payment.order_id}`);
   }
   return { success: true };
 }
@@ -1052,6 +1111,9 @@ export async function requestWithdrawal(data: {
   bank_info?: string;
 }) {
   const profile = await requireAuth(["agent"]);
+  const kycError = getKycBlockError(profile);
+  if (kycError) return { error: kycError };
+
   const supabase = createAdminClient();
 
   const amount = Number(data.amount);
@@ -1530,6 +1592,9 @@ export async function submitCustomRequirement(data: {
   telegram?: string;
 }) {
   const profile = await requireAuth(["user"]);
+  const kycError = getKycBlockError(profile);
+  if (kycError) return { error: kycError };
+
   const supabase = await createClient();
 
   const { data: row, error } = await supabase

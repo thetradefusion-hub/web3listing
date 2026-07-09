@@ -45,8 +45,16 @@ export function isClientRole(role: UserRole) {
 }
 
 export const BLOCKCHAIN_NETWORKS = [
-  "Ethereum", "BSC", "Polygon", "Arbitrum", "Base", "Solana", "Avalanche", "Tron", "Other",
-];
+  "Ethereum (ERC20)",
+  "BSC (BEP20)",
+  "Polygon (POL)",
+  "Arbitrum (ARB)",
+  "Base",
+  "Solana (SPL)",
+  "Avalanche (C-Chain)",
+  "TRON (TRC20)",
+  "Other",
+] as const;
 
 export const TELEGRAM_SUPPORT =
   process.env.NEXT_PUBLIC_TELEGRAM_SUPPORT_GROUP_URL ||

@@ -19,6 +19,7 @@ import { TelegramAnchor } from "@/components/shared/telegram-anchor";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProjectForm } from "@/components/partner/project-form";
 import { CopyTextButton } from "@/components/partner/projects/copy-text-button";
+import { ProjectActions } from "@/components/partner/projects/project-actions";
 import { ProjectRecommendationsGrid } from "@/components/partner/projects/project-recommendations-grid";
 import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
 import { PartnerBadge, projectStatusVariant } from "@/components/partner/ui";
@@ -108,16 +109,19 @@ export function ProjectDetailView({
           <span aria-hidden>›</span>
           <span className="font-medium text-foreground">Edit Project</span>
         </nav>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" className="size-9 rounded-xl" asChild>
-            <Link href={`${basePath}/projects`}>
-              <ArrowLeft className="size-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Complete your project</h1>
-            <p className="text-sm text-muted-foreground">Fill in details before ordering services</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="icon" className="size-9 rounded-xl" asChild>
+              <Link href={`${basePath}/projects`}>
+                <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Complete your project</h1>
+              <p className="text-sm text-muted-foreground">Fill in details before ordering services</p>
+            </div>
           </div>
+          <ProjectActions project={project} orderCount={orders.length} basePath={basePath} />
         </div>
         <DashboardPanel title="Project details" icon={Layers} iconColor="blue">
           <ProjectForm project={project} basePath={basePath} />
@@ -151,12 +155,15 @@ export function ProjectDetailView({
           <span aria-hidden>›</span>
           <span className="truncate font-medium text-foreground">{project.project_name}</span>
         </nav>
-        <Button variant="outline" size="sm" className="h-9 rounded-xl font-semibold" asChild>
-          <Link href="/partner/projects">
-            <ArrowLeft data-icon="inline-start" />
-            Back
-          </Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <ProjectActions project={project} orderCount={orders.length} basePath={basePath} />
+          <Button variant="outline" size="sm" className="h-9 rounded-xl font-semibold" asChild>
+            <Link href={`${basePath}/projects`}>
+              <ArrowLeft data-icon="inline-start" />
+              Back
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Project hero */}

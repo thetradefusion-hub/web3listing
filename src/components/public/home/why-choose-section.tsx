@@ -10,7 +10,12 @@ export function WhyChooseSection() {
       <div className="landing-container">
         <HomeSectionHeader
           label="Why us"
-          title="Why choose TokenWeb3Listing?"
+          title={
+            <>
+              Why choose{" "}
+              <span className="lh-brand-gradient">Web3Listing?</span>
+            </>
+          }
           className="mb-10 sm:mb-14"
         />
 
@@ -45,7 +50,7 @@ export function WhyChooseSection() {
               className="mt-6 h-11 w-full rounded-xl bg-gradient-to-r from-primary to-chart-2 text-sm font-semibold text-white hover:opacity-90 sm:mt-8 sm:w-auto sm:rounded-full sm:px-8"
               asChild
             >
-              <Link href="/login">
+              <Link href="/contact">
                 Become a partner <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

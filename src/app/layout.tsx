@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   description:
     "One platform for Web3 listings, marketing, liquidity, PR, community, and growth services.",
   icons: {
-    icon: [{ url: "/web3Listing  symbol.png", type: "image/png" }],
-    shortcut: "/web3Listing  symbol.png",
-    apple: "/web3Listing  symbol.png",
+    icon: [{ url: "/web3_exact_colors.svg", type: "image/svg+xml" }],
+    shortcut: "/web3_exact_colors.svg",
+    apple: "/web3_exact_colors.svg",
   },
 };
 
