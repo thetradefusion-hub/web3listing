@@ -9,7 +9,7 @@ import { getServicePriceLabel } from "@/lib/pricing";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
-  CATEGORY_ICONS,
+  getCategoryIcon,
   getServiceAccent,
   getServiceInitials,
   getServiceLogoColor,
@@ -26,8 +26,7 @@ type ServiceRow = Service & {
 function ServiceLogo({ service }: { service: ServiceRow }) {
   const logoUrl = getServiceLogoUrl(service);
   const logoColor = getServiceLogoColor(service.name);
-  const catSlug = service.service_categories?.slug || "listing-services";
-  const CatIcon = CATEGORY_ICONS[catSlug];
+  const CatIcon = getCategoryIcon(service.service_categories?.slug);
 
   return (
     <div

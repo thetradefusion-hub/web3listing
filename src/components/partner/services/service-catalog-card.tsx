@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
-  CATEGORY_ICONS,
+  getCategoryIcon,
+  getCategoryIconStyle,
   getServiceAccent,
   getServiceCardMeta,
   getServiceInitials,
@@ -65,7 +66,7 @@ export function ServiceCatalogCard({
   const cat = Array.isArray(service.service_categories)
     ? service.service_categories[0]
     : service.service_categories;
-  const CatIcon = CATEGORY_ICONS[cat?.slug || ""] || CATEGORY_ICONS["listing-services"];
+  const CatIcon = getCategoryIcon(cat?.slug);
 
   return (
     <article className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-muted/30 shadow-sm transition-all duration-300 hover:border-primary/25 hover:shadow-md hover:-translate-y-px">
@@ -105,8 +106,10 @@ export function ServiceCatalogCard({
             </div>
 
             {cat?.name ? (
-              <span className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                <CatIcon className="size-3 shrink-0" strokeWidth={2} />
+              <span className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full border border-border/80 bg-card px-2 py-0.5 text-[10px] font-semibold text-foreground">
+                <span className={cn("flex size-4 items-center justify-center rounded-md", getCategoryIconStyle(cat.slug))}>
+                  <CatIcon className="size-2.5 shrink-0" strokeWidth={2.5} />
+                </span>
                 {cat.name}
               </span>
             ) : null}

@@ -47,7 +47,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
-  CATEGORY_ICONS,
+  getCategoryIcon,
   getServiceAccent,
   getServiceCardMeta,
   getServiceInitials,
@@ -184,11 +184,11 @@ export function ServiceDetailView({
   const meta = getServiceCardMeta(service);
   const logoColor = getServiceLogoColor(service.name);
   const accent = getServiceAccent(service.name);
-  const CatIcon = CATEGORY_ICONS[categorySlug] || Layers;
+  const CatIcon = getCategoryIcon(categorySlug);
   const whatsIncluded = parseJsonArray<string>(service.whats_included);
   const platforms = parseJsonArray<string>(service.supported_platforms);
   const processSteps = parseJsonArray<{ title: string; description?: string }>(service.process_steps);
-  const faqs = service.faqs || [];
+  const faqs = parseJsonArray<{ question: string; answer: string }>(service.faqs);
   const requiredDocs = service.required_documents || [];
 
   const overviewText = service.overview || service.description;
@@ -493,8 +493,8 @@ export function ServiceDetailView({
               <TabsContent value="faq" className="p-4 sm:p-5">
                 {faqs.length > 0 ? (
                   <div className="flex flex-col gap-3">
-                    {faqs.map((faq) => (
-                      <Card key={faq.question} size="sm" className="gap-0 border-border py-0 ring-0">
+                    {faqs.map((faq, index) => (
+                      <Card key={`${index}-${faq.question}`} size="sm" className="gap-0 border-border py-0 ring-0">
                         <CardHeader className="gap-1 p-3.5 pb-2">
                           <CardTitle className="text-sm font-semibold text-foreground">{faq.question}</CardTitle>
                         </CardHeader>

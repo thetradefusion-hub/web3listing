@@ -97,6 +97,7 @@ function ServiceList({
   emptyHref,
   basePath,
   showCommission,
+  totalAll,
 }: {
   paged: (Service & {
     service_categories?: { name: string; slug: string } | { name: string; slug: string }[] | null;
@@ -105,22 +106,29 @@ function ServiceList({
   emptyHref: string;
   basePath?: string;
   showCommission?: boolean;
+  totalAll: number;
 }) {
   if (paged.length === 0) {
     return (
-      <Empty className="rounded-2xl border-dashed py-10">
+      <Empty className="rounded-2xl border border-dashed border-border bg-card/50 py-10">
         <EmptyHeader>
           <EmptyMedia variant="icon" className="size-11 bg-primary/10 text-primary">
             <PackageSearch />
           </EmptyMedia>
-          <EmptyTitle>No services found</EmptyTitle>
-          <EmptyDescription>Try a different category or adjust your filters.</EmptyDescription>
+          <EmptyTitle>{totalAll === 0 ? "No services yet" : "No services found"}</EmptyTitle>
+          <EmptyDescription>
+            {totalAll === 0
+              ? "Services will appear here once they are added to the catalog."
+              : "Try a different category or adjust your filters."}
+          </EmptyDescription>
         </EmptyHeader>
-        <EmptyContent>
-          <Button asChild variant="outline" size="sm" className="rounded-xl">
-            <Link href={emptyHref}>Clear filters</Link>
-          </Button>
-        </EmptyContent>
+        {totalAll > 0 ? (
+          <EmptyContent>
+            <Button asChild variant="outline" size="sm" className="rounded-xl">
+              <Link href={emptyHref}>Clear filters</Link>
+            </Button>
+          </EmptyContent>
+        ) : null}
       </Empty>
     );
   }
@@ -203,12 +211,14 @@ export function ServiceCatalogView({
             <span aria-hidden>›</span>
             <span className="font-medium text-foreground">{showCommission ? "Marketplace" : "Services"}</span>
           </nav>
-          <h1 className="mt-1.5 text-xl font-bold text-foreground sm:text-2xl">
-            {showCommission ? "Service Marketplace" : "Services"}
-          </h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Browse listings, security, marketing, and growth services for your token projects.
-          </p>
+          {showCommission ? (
+            <>
+              <h1 className="mt-1.5 text-xl font-bold text-foreground sm:text-2xl">Service Marketplace</h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                Browse listings, security, marketing, and growth services for your token projects.
+              </p>
+            </>
+          ) : null}
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -262,17 +272,11 @@ export function ServiceCatalogView({
 
       {/* Desktop */}
       <div className="hidden gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start xl:grid-cols-[minmax(0,1fr)_280px] xl:gap-5">
-        <Suspense fallback={<SearchSkeleton />}>
-          <ServiceCatalogSearchBar className="min-w-0 lg:col-start-1 lg:row-start-1" />
-        </Suspense>
+        <div className="flex min-w-0 flex-col gap-3 xl:gap-4">
+          <Suspense fallback={<SearchSkeleton />}>
+            <ServiceCatalogSearchBar />
+          </Suspense>
 
-        <Suspense fallback={<FiltersSkeleton />}>
-          <div className="min-w-0 self-start lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-4">
-            <ServiceCatalogFilters {...filterProps} hideSearch sidebarLayout />
-          </div>
-        </Suspense>
-
-        <div className="flex min-w-0 flex-col gap-3 lg:col-start-1 lg:row-start-2 xl:gap-4">
           <ServiceCategoryTabs categories={categories} projectQuery={projectQuery} />
 
           <ServiceCatalogResultsBar total={total} page={page} pageSize={pageSize} />
@@ -283,6 +287,7 @@ export function ServiceCatalogView({
             emptyHref={emptyHref}
             basePath={basePath}
             showCommission={showCommission}
+            totalAll={totalAll}
           />
 
           <ServiceCatalogPagination
@@ -293,6 +298,12 @@ export function ServiceCatalogView({
             baseQuery={baseQuery}
           />
         </div>
+
+        <Suspense fallback={<FiltersSkeleton />}>
+          <div className="min-w-0 self-start lg:sticky lg:top-4">
+            <ServiceCatalogFilters {...filterProps} hideSearch sidebarLayout />
+          </div>
+        </Suspense>
       </div>
 
       {/* Mobile / tablet */}
@@ -311,6 +322,7 @@ export function ServiceCatalogView({
           emptyHref={emptyHref}
           basePath={basePath}
           showCommission={showCommission}
+          totalAll={totalAll}
         />
 
         <ServiceCatalogPagination

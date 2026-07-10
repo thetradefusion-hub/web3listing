@@ -19,11 +19,10 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { signIn } from "@/lib/actions";
-import { BrandLogo } from "@/components/shared/brand-logo";
+import { BrandLogo, SidebarBrandLogo } from "@/components/shared/brand-logo";
 import { NAVIGATION_START_EVENT } from "@/components/shared/route-loader";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BRAND_ICON_PATH } from "@/lib/constants";
@@ -54,7 +53,7 @@ const PARTNER_FEATURES = [
 ] as const;
 
 const inputClass =
-  "h-11 rounded-xl border-input bg-background pl-10 shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25";
+  "h-11 w-full rounded-xl border-input bg-background pl-10 shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25";
 
 function FeatureItem({
   icon: Icon,
@@ -83,6 +82,11 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const redirectParam = searchParams.get("redirect");
+  const signupHref = redirectParam
+    ? `/signup?redirect=${encodeURIComponent(redirectParam)}`
+    : "/signup";
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -95,14 +99,13 @@ export default function LoginForm() {
       return;
     }
 
-    const redirectParam = searchParams.get("redirect");
     const destination = redirectParam || result.redirectTo || "/";
     window.dispatchEvent(new Event(NAVIGATION_START_EVENT));
     window.location.href = destination;
   }
 
   return (
-    <div className="auth-shell relative min-h-screen bg-background text-foreground">
+    <div className="auth-shell relative min-h-[100dvh] bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 landing-grid opacity-30 dark:opacity-20" />
       <div className="login-glow pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-primary/20 blur-[100px] sm:h-96 sm:w-96" />
       <div className="login-glow pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-chart-2/15 blur-[100px] sm:h-96 sm:w-96" />
@@ -122,8 +125,8 @@ export default function LoginForm() {
         />
       </header>
 
-      <div className="relative flex min-h-screen flex-col lg:flex-row">
-        {/* Brand panel — desktop (always dark, symbol theme) */}
+      <div className="relative flex min-h-[100dvh] flex-col lg:flex-row">
+        {/* Left brand panel — desktop */}
         <aside className="auth-brand-panel relative hidden overflow-hidden border-r lg:flex lg:w-[44%] lg:flex-col xl:w-[48%]">
           <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary via-chart-4 to-chart-2" aria-hidden />
 
@@ -141,15 +144,13 @@ export default function LoginForm() {
 
           <div className="relative flex flex-1 flex-col justify-between p-10 xl:p-14">
             <div>
-              <BrandLogo href="/" size="lg" priority />
+              <Link href="/" className="inline-flex transition-opacity hover:opacity-90">
+                <SidebarBrandLogo priority className="h-10 max-w-[210px]" />
+              </Link>
               <h1 className="mt-8 text-3xl font-bold leading-tight tracking-tight text-foreground xl:text-4xl">
                 Grow your{" "}
                 <span className="lh-brand-gradient">Web3 projects</span> with confidence
               </h1>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                Sign in to manage projects, order listing services, and track commissions from a single
-                partner dashboard.
-              </p>
             </div>
 
             <ul className="mt-10 flex flex-col gap-3">
@@ -171,19 +172,16 @@ export default function LoginForm() {
           </div>
         </aside>
 
-        {/* Form panel */}
+        {/* Right form panel */}
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-24 sm:px-6 lg:py-16">
           <div className="w-full max-w-[420px]">
             <div className="mb-6 flex justify-center lg:hidden">
               <BrandLogo href="/" size="lg" priority />
             </div>
 
-            <Card
-              size="sm"
-              className="auth-form-card relative overflow-hidden border bg-card/90 py-0 backdrop-blur-xl"
-            >
+            <div className="auth-form-card relative overflow-hidden rounded-2xl border bg-card/90 py-0 backdrop-blur-xl">
               <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary via-chart-4 to-chart-2" aria-hidden />
-              <CardContent className="p-6 sm:p-8">
+              <div className="p-6 sm:p-8">
                 <div className="mb-7 text-center lg:text-left">
                   <p className="lh-accent text-[11px] font-semibold uppercase tracking-wide">Welcome back</p>
                   <h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Sign in</h2>
@@ -267,13 +265,13 @@ export default function LoginForm() {
                 <div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-3.5 text-center">
                   <p className="text-sm text-muted-foreground">
                     Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-semibold text-primary hover:text-chart-2 hover:underline">
+                    <Link href={signupHref} className="font-semibold text-primary hover:text-chart-2 hover:underline">
                       Create account
                     </Link>
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
               By signing in, you agree to our{" "}

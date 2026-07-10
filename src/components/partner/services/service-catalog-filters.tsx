@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { CATEGORY_ICONS } from "@/lib/service-catalog";
+import { getCategoryIcon, getCategoryIconStyle } from "@/lib/service-catalog";
 import type { ServiceCategory } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { usePortalBasePath } from "@/components/shared/portal-view-context";
@@ -166,7 +166,7 @@ export function ServiceCatalogFilters({
         <ScrollArea className="h-[160px] rounded-xl border border-border bg-muted/20 pr-2">
           <div className="flex flex-col gap-1 p-1.5">
             {categories.map((cat) => {
-              const Icon = CATEGORY_ICONS[cat.slug];
+              const Icon = getCategoryIcon(cat.slug, cat.icon);
               const active = current.category === cat.slug;
               const count = categoryCounts[cat.id] || 0;
               return (
@@ -181,12 +181,14 @@ export function ServiceCatalogFilters({
                       : "text-foreground hover:bg-card hover:shadow-sm"
                   )}
                 >
-                  {Icon && (
-                    <Icon
-                      className={cn("size-3.5 shrink-0", active ? "text-primary-foreground" : "text-muted-foreground")}
-                      strokeWidth={2}
-                    />
-                  )}
+                  <span
+                    className={cn(
+                      "flex size-6 shrink-0 items-center justify-center rounded-md",
+                      active ? "bg-primary-foreground/20 text-primary-foreground" : getCategoryIconStyle(cat.slug)
+                    )}
+                  >
+                    <Icon className="size-3.5" strokeWidth={2.25} />
+                  </span>
                   <span className="min-w-0 flex-1 truncate text-xs font-medium">{cat.name}</span>
                   <span
                     className={cn(

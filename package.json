@@ -16,6 +16,7 @@
     "db:seed-binance": "node scripts/run-sql.mjs supabase/migrations/007_seed_binance_ecosystem.sql",
     "db:order-delivery": "node scripts/run-sql.mjs supabase/migrations/008_order_delivery.sql",
     "db:seed-delivery-demo": "node scripts/run-sql.mjs supabase/migrations/009_seed_demo_delivery.sql",
+    "db:seed-categories": "node scripts/run-sql.mjs supabase/migrations/029_seed_core_categories.sql",
     "db:generate-catalog": "node scripts/generate-services-catalog.js",
     "create-admin": "node scripts/create-admin.mjs"
   },

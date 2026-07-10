@@ -6,7 +6,7 @@ import { CheckCircle2, Rocket } from "lucide-react";
 import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
 import { Button } from "@/components/ui/button";
 import {
-  CATEGORY_ICONS,
+  getCategoryIcon,
   getServiceAccent,
   getServiceCardMeta,
   getServiceLogoColor,
@@ -83,7 +83,7 @@ export function ProjectRecommendationsGrid({
           const cat = Array.isArray(service.service_categories)
             ? service.service_categories[0]
             : service.service_categories;
-          const Icon = CATEGORY_ICONS[cat?.slug || ""] || CATEGORY_ICONS["listing-services"];
+          const Icon = getCategoryIcon(cat?.slug);
           const badge = getServiceImpactBadge(service, cat?.slug);
           const benefits = getServiceBenefits(service);
           const logoColor = getServiceLogoColor(service.name);

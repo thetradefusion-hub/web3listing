@@ -3,28 +3,32 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CATEGORY_ICONS, getCategoryShortLabel } from "@/lib/service-catalog";
+import {
+  getCategoryIcon,
+  getCategoryIconStyle,
+  getCategoryShortLabel,
+} from "@/lib/service-catalog";
 import type { ServiceCategory } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { usePortalBasePath } from "@/components/shared/portal-view-context";
 
 function CategoryIconBox({
   active,
+  slug,
   children,
 }: {
   active: boolean;
+  slug?: string;
   children: ReactNode;
 }) {
   return (
     <div
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200 sm:size-9",
-        active
-          ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-          : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+        getCategoryIconStyle(slug, active)
       )}
     >
       {children}
@@ -36,12 +40,14 @@ function CategoryTab({
   active,
   label,
   shortLabel,
+  slug,
   icon: Icon,
   onClick,
 }: {
   active: boolean;
   label: string;
   shortLabel: string;
+  slug?: string;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   onClick: () => void;
 }) {
@@ -59,7 +65,7 @@ function CategoryTab({
           : "border-border bg-card hover:border-primary/20 hover:bg-muted/40"
       )}
     >
-      <CategoryIconBox active={active}>
+      <CategoryIconBox active={active} slug={slug}>
         <Icon className="size-4 sm:size-[18px]" strokeWidth={2} />
       </CategoryIconBox>
       <span
@@ -128,7 +134,7 @@ export function ServiceCategoryTabs({
     scrollRef.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
   }
 
-  const AllIcon = CATEGORY_ICONS["listing-services"];
+  const AllIcon = LayoutGrid;
 
   return (
     <Card className="gap-0 rounded-2xl bg-gradient-to-br from-card via-card to-muted/20 py-0 shadow-sm ring-0">
@@ -172,18 +178,20 @@ export function ServiceCategoryTabs({
             active={!activeCategory}
             label="All categories"
             shortLabel="All"
+            slug="all"
             icon={AllIcon}
             onClick={() => router.push(buildHref())}
           />
 
           {categories.map((cat) => {
-            const Icon = CATEGORY_ICONS[cat.slug] || AllIcon;
+            const Icon = getCategoryIcon(cat.slug, cat.icon);
             return (
               <CategoryTab
                 key={cat.id}
                 active={activeCategory === cat.slug}
                 label={cat.name}
                 shortLabel={getCategoryShortLabel(cat.slug, cat.name)}
+                slug={cat.slug}
                 icon={Icon}
                 onClick={() => router.push(buildHref(cat.slug))}
               />

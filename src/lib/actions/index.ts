@@ -1536,7 +1536,7 @@ export async function upsertService(
     networks: data.networks?.trim() || null,
     refund_policy: data.refund_policy?.trim() || null,
     required_documents: data.required_documents ?? null,
-    faqs: data.faqs ?? null,
+    faqs: Array.isArray(data.faqs) ? data.faqs : [],
     terms_conditions: data.terms_conditions?.trim() || null,
     third_party_fee_note: data.third_party_fee_note?.trim() || null,
   };
@@ -1550,9 +1550,13 @@ export async function upsertService(
 
   revalidatePath("/admin/services");
   revalidatePath("/admin/services/new");
+  if (id) revalidatePath(`/admin/services/${id}/edit`);
   revalidatePath("/services");
   revalidatePath("/partner/services");
   revalidatePath("/user/services");
+  revalidatePath(`/partner/services/${slug}`);
+  revalidatePath(`/user/services/${slug}`);
+  revalidatePath(`/services/${slug}`);
   return { success: true };
 }
 

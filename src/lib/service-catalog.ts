@@ -2,27 +2,67 @@ import type { Service, ServiceCategory } from "@/types/database";
 import { getServiceCommissionPreview, getServicePriceLabel, PRICING_CTA } from "@/lib/pricing";
 import { formatCurrency } from "@/lib/commission";
 import {
-  Building2,
+  Blocks,
+  BookMarked,
   Bot,
   Briefcase,
+  Building2,
+  ChartCandlestick,
   Code,
+  Landmark,
+  LayoutGrid,
+  ListChecks,
   Lock,
+  Megaphone,
   MessageCircle,
   Newspaper,
+  Rocket,
   Search,
   Shield,
-  TrendingUp,
+  ShieldCheck,
   Users,
   Wallet,
   Zap,
   type LucideIcon,
 } from "lucide-react";
 
+/** Lucide icons keyed by kebab-case name (matches DB `service_categories.icon`). */
+export const LUCIDE_ICONS_BY_NAME: Record<string, LucideIcon> = {
+  blocks: Blocks,
+  "shield-check": ShieldCheck,
+  megaphone: Megaphone,
+  landmark: Landmark,
+  "chart-candlestick": ChartCandlestick,
+  "list-checks": ListChecks,
+  rocket: Rocket,
+  "layout-grid": LayoutGrid,
+  "book-marked": BookMarked,
+  "building-2": Building2,
+  code: Code,
+  search: Search,
+  wallet: Wallet,
+  shield: Shield,
+  lock: Lock,
+  newspaper: Newspaper,
+  users: Users,
+  "message-circle": MessageCircle,
+  zap: Zap,
+  bot: Bot,
+  briefcase: Briefcase,
+};
+
+/** Distinct Lucide icons per category slug. */
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  "listing-services": Building2,
+  development: Blocks,
+  security: ShieldCheck,
+  marketing: Megaphone,
+  "exchange-listing": Landmark,
+  "market-making": ChartCandlestick,
+  "listing-services": ListChecks,
+  growth: Rocket,
+  // Legacy slugs
   "explorer-services": Search,
   "wallet-listing": Wallet,
-  "market-making": TrendingUp,
   "token-security": Shield,
   "liquidity-lock": Lock,
   "pr-distribution": Newspaper,
@@ -32,13 +72,19 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "ai-services": Bot,
   "development-services": Code,
   "premium-advisory": Briefcase,
+  "cex-exchange-listing-services": Landmark,
 };
 
 export const CATEGORY_SHORT_LABELS: Record<string, string> = {
+  development: "Dev",
+  security: "Security",
+  marketing: "Marketing",
+  "exchange-listing": "Exchange",
+  "market-making": "Making",
   "listing-services": "Listing",
+  growth: "Growth",
   "explorer-services": "Explorer",
   "wallet-listing": "Wallet",
-  "market-making": "Markets",
   "token-security": "Security",
   "liquidity-lock": "Liquidity",
   "pr-distribution": "PR",
@@ -50,8 +96,63 @@ export const CATEGORY_SHORT_LABELS: Record<string, string> = {
   "premium-advisory": "Advisory",
 };
 
+/** Per-category colorful icon chip styles (bg + text + ring). */
+export const CATEGORY_ICON_STYLES: Record<string, string> = {
+  all: "bg-primary/10 text-primary ring-primary/25",
+  development: "bg-sky-500/15 text-sky-600 ring-sky-500/30 dark:text-sky-400",
+  security: "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30 dark:text-emerald-400",
+  marketing: "bg-fuchsia-500/15 text-fuchsia-600 ring-fuchsia-500/30 dark:text-fuchsia-400",
+  "exchange-listing": "bg-amber-500/15 text-amber-600 ring-amber-500/30 dark:text-amber-400",
+  "market-making": "bg-violet-500/15 text-violet-600 ring-violet-500/30 dark:text-violet-400",
+  "listing-services": "bg-blue-500/15 text-blue-600 ring-blue-500/30 dark:text-blue-400",
+  growth: "bg-lime-500/15 text-lime-700 ring-lime-500/30 dark:text-lime-400",
+};
+
+export const CATEGORY_ICON_ACTIVE_STYLES: Record<string, string> = {
+  all: "bg-primary text-primary-foreground shadow-md shadow-primary/30",
+  development: "bg-sky-500 text-white shadow-md shadow-sky-500/35",
+  security: "bg-emerald-500 text-white shadow-md shadow-emerald-500/35",
+  marketing: "bg-fuchsia-500 text-white shadow-md shadow-fuchsia-500/35",
+  "exchange-listing": "bg-amber-500 text-white shadow-md shadow-amber-500/35",
+  "market-making": "bg-violet-500 text-white shadow-md shadow-violet-500/35",
+  "listing-services": "bg-blue-500 text-white shadow-md shadow-blue-500/35",
+  growth: "bg-lime-500 text-black shadow-md shadow-lime-500/35",
+};
+
+export const DEFAULT_CATEGORY_SLUG = "listing-services";
+
+function normalizeIconKey(value?: string | null) {
+  return (value || "").trim().toLowerCase().replace(/_/g, "-");
+}
+
+export function getCategoryIcon(slug?: string | null, iconName?: string | null): LucideIcon {
+  const normalizedSlug = normalizeIconKey(slug);
+  if (normalizedSlug && CATEGORY_ICONS[normalizedSlug]) {
+    return CATEGORY_ICONS[normalizedSlug];
+  }
+
+  const normalizedIcon = normalizeIconKey(iconName);
+  if (normalizedIcon && LUCIDE_ICONS_BY_NAME[normalizedIcon]) {
+    return LUCIDE_ICONS_BY_NAME[normalizedIcon];
+  }
+
+  return LayoutGrid;
+}
+
+export function getCategoryIconStyle(slug?: string | null, active = false): string {
+  const key = normalizeIconKey(slug);
+  if (key) {
+    if (active && CATEGORY_ICON_ACTIVE_STYLES[key]) return CATEGORY_ICON_ACTIVE_STYLES[key];
+    if (CATEGORY_ICON_STYLES[key]) return `${CATEGORY_ICON_STYLES[key]} ring-1`;
+  }
+  return active
+    ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
+    : "bg-muted text-muted-foreground ring-1 ring-border";
+}
+
 export function getCategoryShortLabel(slug: string, name: string) {
-  return CATEGORY_SHORT_LABELS[slug] || name.replace(/\s+services?$/i, "").trim() || name;
+  const key = normalizeIconKey(slug);
+  return CATEGORY_SHORT_LABELS[key] || name.replace(/\s+services?$/i, "").trim() || name;
 }
 
 export const BADGE_STYLES = {
@@ -149,6 +250,14 @@ export function pickFeaturedServices<T extends Service>(services: T[], limit = 8
 
 export function parseJsonArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      if (Array.isArray(parsed)) return parsed as T[];
+    } catch {
+      /* ignore invalid JSON */
+    }
+  }
   return [];
 }
 

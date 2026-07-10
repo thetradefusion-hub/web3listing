@@ -25,7 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/commission";
 import { PRICING_PACKAGE } from "@/lib/pricing";
 import {
-  CATEGORY_ICONS,
+  getCategoryIcon,
   getServiceCardMeta,
   getServiceInitials,
   getServiceLogoColor,
@@ -134,7 +134,7 @@ function CompactServiceContext({
   serviceHref: string;
 }) {
   const logoColor = getServiceLogoColor(service.name);
-  const CatIcon = CATEGORY_ICONS[categorySlug] || Layers;
+  const CatIcon = getCategoryIcon(categorySlug);
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/15 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">

@@ -15,11 +15,49 @@ export function linesToProcessSteps(value: string) {
 }
 
 export function linesToFaqs(value: string) {
-  return linesToArray(value)
-    .map((line) => {
+  const lines = linesToArray(value);
+  const faqs: { question: string; answer: string }[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.includes("|")) {
       const [question, ...rest] = line.split("|");
-      return { question: question.trim(), answer: rest.join("|").trim() };
-    })
+      const answer = rest.join("|").trim();
+      if (question.trim() && answer) {
+        faqs.push({ question: question.trim(), answer });
+      }
+      continue;
+    }
+
+    // Support "Question?" on one line and answer on the next
+    const next = lines[i + 1];
+    if (line.endsWith("?") && next && !next.endsWith("?") && !next.includes("|")) {
+      faqs.push({ question: line, answer: next });
+      i += 1;
+      continue;
+    }
+
+    // Support "Question? Answer on same line"
+    const qMark = line.indexOf("?");
+    if (qMark > 0 && qMark < line.length - 1) {
+      const question = line.slice(0, qMark + 1).trim();
+      const answer = line.slice(qMark + 1).trim();
+      if (question && answer) faqs.push({ question, answer });
+    }
+  }
+
+  return faqs;
+}
+
+export function normalizeFaqs(
+  value: { question?: string; answer?: string }[] | null | undefined
+) {
+  if (!value?.length) return [];
+  return value
+    .map((f) => ({
+      question: (f.question || "").trim(),
+      answer: (f.answer || "").trim(),
+    }))
     .filter((f) => f.question && f.answer);
 }
 
