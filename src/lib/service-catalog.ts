@@ -119,6 +119,27 @@ export const CATEGORY_ICON_ACTIVE_STYLES: Record<string, string> = {
   growth: "bg-lime-500 text-black shadow-md shadow-lime-500/35",
 };
 
+/** Solid fill colors for progress bars / connectors per category. */
+export const CATEGORY_BAR_STYLES: Record<string, string> = {
+  development: "bg-sky-500",
+  security: "bg-emerald-500",
+  marketing: "bg-fuchsia-500",
+  "exchange-listing": "bg-amber-500",
+  "market-making": "bg-violet-500",
+  "listing-services": "bg-blue-500",
+  growth: "bg-lime-500",
+};
+
+export const CATEGORY_RING_STROKES: Record<string, string> = {
+  development: "#0ea5e9",
+  security: "#10b981",
+  marketing: "#d946ef",
+  "exchange-listing": "#f59e0b",
+  "market-making": "#8b5cf6",
+  "listing-services": "#3b82f6",
+  growth: "#84cc16",
+};
+
 export const DEFAULT_CATEGORY_SLUG = "listing-services";
 
 function normalizeIconKey(value?: string | null) {
@@ -148,6 +169,16 @@ export function getCategoryIconStyle(slug?: string | null, active = false): stri
   return active
     ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
     : "bg-muted text-muted-foreground ring-1 ring-border";
+}
+
+export function getCategoryBarStyle(slug?: string | null): string {
+  const key = normalizeIconKey(slug);
+  return (key && CATEGORY_BAR_STYLES[key]) || "bg-primary";
+}
+
+export function getCategoryRingStroke(slug?: string | null): string {
+  const key = normalizeIconKey(slug);
+  return (key && CATEGORY_RING_STROKES[key]) || "var(--primary)";
 }
 
 export function getCategoryShortLabel(slug: string, name: string) {

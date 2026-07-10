@@ -18,7 +18,7 @@ export default async function UserProjectDetailPage({ params }: { params: Promis
 
   if (!project) notFound();
 
-  const [{ data: orders }, { data: services }, { data: manager }] = await Promise.all([
+  const [{ data: orders }, { data: services }, { data: categories }, { data: manager }] = await Promise.all([
     supabase
       .from("orders")
       .select("*, services(*, service_categories(name, slug))")
@@ -26,10 +26,14 @@ export default async function UserProjectDetailPage({ params }: { params: Promis
       .order("created_at", { ascending: false }),
     supabase
       .from("services")
-      .select("*, service_categories(name, slug)")
+      .select("*, service_categories(name, slug, icon)")
       .eq("is_active", true)
-      .order("sort_order")
-      .limit(48),
+      .order("sort_order"),
+    supabase
+      .from("service_categories")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order"),
     profile?.account_manager_id
       ? supabase.from("account_managers").select("telegram_link").eq("id", profile.account_manager_id).single()
       : supabase.from("account_managers").select("telegram_link").eq("is_active", true).limit(1).single(),
@@ -51,6 +55,7 @@ export default async function UserProjectDetailPage({ params }: { params: Promis
             service_categories: rel(s.service_categories),
           })) || []
         }
+        categories={categories || []}
         managerTelegramLink={manager?.telegram_link}
         basePath="/user"
       />

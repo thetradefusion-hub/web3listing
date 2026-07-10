@@ -2,8 +2,6 @@ import Link from "next/link";
 import {
   ArrowLeft,
   BarChart3,
-  Check,
-  Circle,
   ExternalLink,
   Layers,
   Map,
@@ -20,16 +18,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProjectForm } from "@/components/partner/project-form";
 import { CopyTextButton } from "@/components/partner/projects/copy-text-button";
 import { ProjectActions } from "@/components/partner/projects/project-actions";
-import { ProjectRecommendationsGrid } from "@/components/partner/projects/project-recommendations-grid";
+import { ProjectGrowthOverview } from "@/components/partner/projects/project-growth-overview";
 import { DashboardPanel } from "@/components/partner/dashboard/dashboard-premium";
 import { PartnerBadge, projectStatusVariant } from "@/components/partner/ui";
-import {
-  WHY_RECOMMENDATIONS,
-  buildRoadmap,
-  computeGrowthPhases,
-} from "@/lib/project-recommendations";
+import { WHY_RECOMMENDATIONS, buildRoadmap } from "@/lib/project-recommendations";
 import { getServiceAccent, getServiceCardMeta, getServiceLogoColor } from "@/lib/service-catalog";
-import type { Order, Project, Service } from "@/types/database";
+import type { Order, Project, Service, ServiceCategory } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 const WHY_ICONS = [TrendingUp, Shield, Users, BarChart3];
@@ -42,35 +36,6 @@ function statusLabel(status: Project["status"]) {
     rejected: "Rejected",
   };
   return labels[status] || status;
-}
-
-function GrowthRing({ score }: { score: number }) {
-  const radius = 36;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
-
-  return (
-    <div className="relative flex size-28 shrink-0 items-center justify-center">
-      <svg className="-rotate-90" width="112" height="112" viewBox="0 0 112 112" aria-hidden>
-        <circle cx="56" cy="56" r={radius} fill="none" stroke="var(--border)" strokeWidth="8" />
-        <circle
-          cx="56"
-          cy="56"
-          r={radius}
-          fill="none"
-          stroke="var(--primary)"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-        />
-      </svg>
-      <div className="absolute text-center">
-        <p className="text-2xl font-bold tabular-nums text-foreground">{score}%</p>
-        <p className="text-[10px] font-medium text-muted-foreground">Growth Score</p>
-      </div>
-    </div>
-  );
 }
 
 function MetaTile({ label, children }: { label: string; children: React.ReactNode }) {
@@ -86,6 +51,7 @@ export function ProjectDetailView({
   project,
   orders,
   services,
+  categories = [],
   managerTelegramLink,
   basePath = "/partner",
 }: {
@@ -96,6 +62,7 @@ export function ProjectDetailView({
   services: (Service & {
     service_categories?: { slug: string; name: string } | { slug: string; name: string }[] | null;
   })[];
+  categories?: ServiceCategory[];
   managerTelegramLink?: string | null;
   basePath?: string;
 }) {
@@ -130,7 +97,6 @@ export function ProjectDetailView({
     );
   }
 
-  const { phases, score } = computeGrowthPhases(project, orders);
   const orderedServiceIds = new Set(orders.map((o) => o.service_id));
   const roadmap = buildRoadmap(services, orderedServiceIds);
   const accent = getServiceAccent(project.project_name);
@@ -232,85 +198,13 @@ export function ProjectDetailView({
         </CardContent>
       </Card>
 
-      {/* Growth overview */}
-      <DashboardPanel
-        title="Project Growth Overview"
-        description="Track your journey from setup to scaling"
-        icon={TrendingUp}
-        iconColor="green"
-      >
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0 flex-1 overflow-x-auto pb-1">
-            <div className="flex min-w-[640px] items-start justify-between gap-1 lg:min-w-0">
-              {phases.map((phase, index) => (
-                <div key={phase.id} className="flex flex-1 flex-col items-center text-center">
-                  <div className="flex w-full items-center">
-                    {index > 0 && (
-                      <div
-                        className={cn(
-                          "h-0.5 flex-1",
-                          phase.status !== "pending" ? "bg-chart-2" : "bg-border"
-                        )}
-                      />
-                    )}
-                    <span
-                      className={cn(
-                        "flex size-7 shrink-0 items-center justify-center rounded-full border-2",
-                        phase.status === "completed"
-                          ? "border-chart-2 bg-chart-2/10 text-chart-2"
-                          : phase.status === "in_progress"
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-muted/40 text-muted-foreground"
-                      )}
-                    >
-                      {phase.status === "completed" ? (
-                        <Check className="size-3.5" strokeWidth={2.5} />
-                      ) : phase.status === "in_progress" ? (
-                        <Circle className="size-2 fill-current" />
-                      ) : null}
-                    </span>
-                    {index < phases.length - 1 && (
-                      <div
-                        className={cn(
-                          "h-0.5 flex-1",
-                          phases[index + 1]?.status !== "pending" ? "bg-chart-2" : "bg-border"
-                        )}
-                      />
-                    )}
-                  </div>
-                  <p
-                    className={cn(
-                      "mt-2 text-[10px] font-semibold leading-tight sm:text-[11px]",
-                      phase.status === "pending" ? "text-muted-foreground" : "text-foreground"
-                    )}
-                  >
-                    {phase.label}
-                  </p>
-                  <p
-                    className={cn(
-                      "mt-0.5 text-[9px] font-medium capitalize",
-                      phase.status === "completed"
-                        ? "text-chart-2"
-                        : phase.status === "in_progress"
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                    )}
-                  >
-                    {phase.status === "completed"
-                      ? "Done"
-                      : phase.status === "in_progress"
-                        ? "Active"
-                        : "Pending"}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <GrowthRing score={score} />
-        </div>
-      </DashboardPanel>
-
-      <ProjectRecommendationsGrid projectId={project.id} services={services} basePath={basePath} />
+      <ProjectGrowthOverview
+        project={project}
+        orders={orders}
+        services={services}
+        categories={categories}
+        basePath={basePath}
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <DashboardPanel title="Why These Recommendations?" icon={Lightbulb} iconColor="blue">

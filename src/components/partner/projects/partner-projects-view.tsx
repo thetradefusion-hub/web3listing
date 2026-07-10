@@ -17,9 +17,16 @@ import { ProjectActions } from "@/components/partner/projects/project-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { Progress, ProgressIndicator, ProgressTrack } from "@/components/ui/progress";
 import { getServiceAccent, getServiceLogoColor } from "@/lib/service-catalog";
 import { cn } from "@/lib/utils";
 import type { Project } from "@/types/database";
+
+export type ProjectCardProgress = {
+  score: number;
+  stagesCompleted: number;
+  stagesTotal: number;
+};
 
 function statusLabel(status: Project["status"]) {
   const labels: Record<Project["status"], string> = {
@@ -34,15 +41,20 @@ function statusLabel(status: Project["status"]) {
 function ProjectCard({
   project,
   orderCount,
+  progress,
   basePath,
 }: {
   project: Project;
   orderCount: number;
+  progress?: ProjectCardProgress;
   basePath: string;
 }) {
   const accent = getServiceAccent(project.project_name);
   const logoColor = getServiceLogoColor(project.project_name);
   const initials = (project.token_symbol || project.project_name).slice(0, 2).toUpperCase();
+  const score = progress?.score ?? 0;
+  const stagesCompleted = progress?.stagesCompleted ?? 0;
+  const stagesTotal = progress?.stagesTotal ?? 7;
 
   return (
     <Card
@@ -98,19 +110,34 @@ function ProjectCard({
           )}
         </div>
 
+        <div className="rounded-xl border border-border/70 bg-muted/20 px-2.5 py-2">
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Growth progress
+            </span>
+            <span className="text-[11px] font-semibold tabular-nums text-foreground">
+              {score}% · {stagesCompleted}/{stagesTotal} stages
+            </span>
+          </div>
+          <Progress value={score} className="w-full gap-0">
+            <ProgressTrack className="h-1.5 bg-muted">
+              <ProgressIndicator className="rounded-full bg-primary transition-all duration-500" />
+            </ProgressTrack>
+          </Progress>
+        </div>
+
         <div className="flex items-center justify-between gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
           <span>{format(new Date(project.created_at), "MMM d, yyyy")}</span>
           <div className="flex items-center gap-2">
             {project.website_url ? (
               <Globe className="size-3.5 shrink-0 text-muted-foreground" aria-label="Has website" />
             ) : null}
-            <Link
-              href={`${basePath}/projects/${project.id}`}
-              className="inline-flex items-center gap-1 font-medium text-primary transition hover:underline"
-            >
-              View
-              <ArrowRight className="size-3.5" strokeWidth={2.5} />
-            </Link>
+            <Button variant="outline" size="sm" className="h-8 rounded-lg px-2.5 text-xs font-semibold" asChild>
+              <Link href={`${basePath}/projects/${project.id}`}>
+                View
+                <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -129,10 +156,12 @@ function ProjectCard({
 export function PartnerProjectsView({
   projects,
   orderCountByProject,
+  progressByProject = {},
   basePath = "/partner",
 }: {
   projects: Project[];
   orderCountByProject: Record<string, number>;
+  progressByProject?: Record<string, ProjectCardProgress>;
   basePath?: string;
 }) {
   const total = projects.length;
@@ -190,6 +219,7 @@ export function PartnerProjectsView({
               key={project.id}
               project={project}
               orderCount={orderCountByProject[project.id] || 0}
+              progress={progressByProject[project.id]}
               basePath={basePath}
             />
           ))}
