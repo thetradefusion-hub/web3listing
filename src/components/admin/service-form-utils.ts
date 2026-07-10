@@ -240,8 +240,11 @@ export function normalizeFaqs(value: { question?: string; answer?: string }[] | 
   if (!value?.length) return [];
   return value
     .map((f) => ({
-      question: (f.question || "").replace(/^\s+|\s+$/g, ""),
-      answer: (f.answer || "").replace(/^\s+|\s+$/g, ""),
+      question: (f.question || "").replace(/^\s+|\s+$/g, "").replace(/\n{2,}/g, "\n"),
+      answer: (f.answer || "")
+        .replace(/^\s+|\s+$/g, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .replace(/[ \t]+\n/g, "\n"),
     }))
     .filter((f) => f.question && f.answer);
 }

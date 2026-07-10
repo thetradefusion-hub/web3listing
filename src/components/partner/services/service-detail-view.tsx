@@ -493,20 +493,14 @@ export function ServiceDetailView({
 
               <TabsContent value="faq" className="p-4 sm:p-5">
                 {faqs.length > 0 ? (
-                  <div className="flex flex-col gap-3">
+                  <div className="divide-y divide-border">
                     {faqs.map((faq, index) => (
-                      <Card key={`${index}-${faq.question}`} size="sm" className="gap-0 border-border py-0 ring-0">
-                        <CardHeader className="gap-1 p-3.5 pb-2">
-                          <CardTitle className="whitespace-pre-wrap text-sm font-semibold text-foreground">
-                            {faq.question}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-3.5 pt-0">
-                          <CardDescription className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {faq.answer}
-                          </CardDescription>
-                        </CardContent>
-                      </Card>
+                      <div key={`${index}-${faq.question}`} className="py-3 first:pt-0 last:pb-0">
+                        <p className="text-sm font-semibold text-foreground">{faq.question}</p>
+                        <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                          {faq.answer.replace(/\n{3,}/g, "\n\n").trim()}
+                        </p>
+                      </div>
                     ))}
                   </div>
                 ) : (
