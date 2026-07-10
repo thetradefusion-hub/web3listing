@@ -44,6 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { expandFaqs } from "@/components/admin/service-form-utils";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
@@ -188,9 +189,7 @@ export function ServiceDetailView({
   const whatsIncluded = parseJsonArray<string>(service.whats_included);
   const platforms = parseJsonArray<string>(service.supported_platforms);
   const processSteps = parseJsonArray<{ title: string; description?: string }>(service.process_steps);
-  const faqs = parseJsonArray<{ question: string; answer: string }>(service.faqs).filter(
-    (f) => f?.question?.trim() && f?.answer?.trim()
-  );
+  const faqs = expandFaqs(parseJsonArray<{ question: string; answer: string }>(service.faqs));
   const requiredDocs = service.required_documents || [];
 
   const overviewText = service.overview || service.description;
@@ -498,10 +497,14 @@ export function ServiceDetailView({
                     {faqs.map((faq, index) => (
                       <Card key={`${index}-${faq.question}`} size="sm" className="gap-0 border-border py-0 ring-0">
                         <CardHeader className="gap-1 p-3.5 pb-2">
-                          <CardTitle className="text-sm font-semibold text-foreground">{faq.question}</CardTitle>
+                          <CardTitle className="whitespace-pre-wrap text-sm font-semibold text-foreground">
+                            {faq.question}
+                          </CardTitle>
                         </CardHeader>
                         <CardContent className="p-3.5 pt-0">
-                          <CardDescription className="text-sm leading-relaxed">{faq.answer}</CardDescription>
+                          <CardDescription className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {faq.answer}
+                          </CardDescription>
                         </CardContent>
                       </Card>
                     ))}

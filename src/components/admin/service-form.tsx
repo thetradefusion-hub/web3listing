@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import {
   arrayToLines,
+  expandFaqs,
   faqsToLines,
   linesToArray,
   linesToFaqs,
@@ -117,11 +118,11 @@ export function ServiceForm({
     setLoading(true);
     const form = new FormData(e.currentTarget);
     const faqsRaw = ((form.get("faqs") as string) || "").trim();
-    const faqs = normalizeFaqs(linesToFaqs(faqsRaw));
+    const faqs = expandFaqs(normalizeFaqs(linesToFaqs(faqsRaw)));
 
     if (faqsRaw && faqs.length === 0) {
       setLoading(false);
-      toast.error("FAQs format galat hai. Use Q: question / A: answer (blank line between each FAQ)");
+      toast.error("FAQs format galat hai. Use numbered list: 1. Question? then answer on next line(s)");
       return;
     }
 
@@ -293,13 +294,11 @@ export function ServiceForm({
             rows={10}
             className={`${textareaClass} font-mono text-sm`}
             defaultValue={faqsToLines(service?.faqs)}
-            placeholder={`Q: How long does this service take?\nA: Usually 3-5 business days.\n\nQ: Is approval guaranteed?\nA: No — final approval depends on the platform.`}
+            placeholder={`1. Is the audit guaranteed?\nNo. Final findings are determined by the audit team.\n\n2. How long does the process take?\nTypically 2 days to 2 weeks, depending on contract complexity.\n\n3. Do you provide post-audit support?\nYes. We assist with report clarification and follow-up.`}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Saari FAQs ek saath paste karein. Format:{" "}
-            <span className="font-medium text-foreground">Q:</span> question, next line{" "}
-            <span className="font-medium text-foreground">A:</span> answer. Har FAQ ke beech blank line.
-            (Ya blank-line pairs / <span className="font-medium text-foreground">Question | answer</span> bhi chalega.)
+            Numbered list paste karein — har question alag FAQ banega. Answer mein line breaks / bullets
+            jaisa likho waisa user aur partner pe dikhega.
           </p>
         </Field>
       </FormSection>

@@ -16,10 +16,90 @@ export function linesToProcessSteps(value: string) {
 
 type FaqItem = { question: string; answer: string };
 
+const NUMBERED_LINE = /^\s*(\d+)[\.\)]\s*(.*)$/;
+
 function pushFaq(faqs: FaqItem[], question: string, answer: string) {
-  const q = question.trim();
-  const a = answer.trim();
+  const q = question.replace(/^\s+|\s+$/g, "").replace(/[ \t]+\n/g, "\n");
+  const a = answer.replace(/^\s+|\s+$/g, "").replace(/[ \t]+\n/g, "\n");
   if (q && a) faqs.push({ question: q, answer: a });
+}
+
+/** Turn inline "team.2.Will...developers.3.How" into real line breaks before numbered questions. */
+export function normalizeNumberedFaqText(text: string): string {
+  return text
+    .replace(/\r\n/g, "\n")
+    // "audit team.2.Will" or "team. 2.Will" → newline before the number
+    .replace(/([.!?])\s*(?=\d+[\.\)]\s*[A-Za-z])/g, "$1\n")
+    // "support?2.Next" without space
+    .replace(/([.?!:])(?=\d+[\.\)]\s*[A-Za-z])/g, "$1\n")
+    // After a full answer sentence ending then "2.Question" with only spaces
+    .replace(/([a-z0-9)])\s+(?=\d+[\.\)]\s*[A-Z])/g, "$1\n");
+}
+
+function splitQuestionAnswer(firstLine: string, restText: string): FaqItem | null {
+  const rest = restText.replace(/^\n+/, "").replace(/\n+$/, "");
+  if (rest.trim()) {
+    // If "Question? Answer..." is still on the first line, split it
+    const qMark = firstLine.indexOf("?");
+    if (qMark > 0 && qMark < firstLine.length - 1) {
+      const question = firstLine.slice(0, qMark + 1).trim();
+      const sameLineAnswer = firstLine.slice(qMark + 1).trim();
+      const answer = [sameLineAnswer, rest].filter(Boolean).join("\n").trim();
+      if (question && answer) return { question, answer };
+    }
+    return { question: firstLine.trim(), answer: rest };
+  }
+
+  // Same-line: "Question? Answer continues here"
+  const qMark = firstLine.indexOf("?");
+  if (qMark > 0 && qMark < firstLine.length - 1) {
+    const question = firstLine.slice(0, qMark + 1).trim();
+    const answer = firstLine.slice(qMark + 1).trim();
+    if (question && answer) return { question, answer };
+  }
+
+  return null;
+}
+
+/**
+ * Numbered list FAQs (most common admin paste):
+ *
+ * 1. Is approval guaranteed?
+ * No. Final approval depends on the auditor.
+ * 2. How long does it take?
+ * Typically 2 days to 2 weeks.
+ */
+function parseNumberedFaqs(text: string): FaqItem[] | null {
+  const normalized = normalizeNumberedFaqText(text);
+  const lines = normalized.split("\n");
+  const starts: number[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    if (NUMBERED_LINE.test(lines[i]) && lines[i].replace(NUMBERED_LINE, "$2").trim()) {
+      starts.push(i);
+    }
+  }
+
+  if (starts.length === 0) return null;
+
+  const faqs: FaqItem[] = [];
+  for (let s = 0; s < starts.length; s++) {
+    const start = starts[s];
+    const end = s + 1 < starts.length ? starts[s + 1] : lines.length;
+    const match = lines[start].match(NUMBERED_LINE);
+    if (!match) continue;
+
+    const firstLine = match[2].trim();
+    const restText = lines.slice(start + 1, end).join("\n");
+    const item = splitQuestionAnswer(firstLine, restText);
+    if (item) pushFaq(faqs, item.question, item.answer);
+  }
+
+  return faqs.length > 0 ? faqs : null;
+}
+
+function hasNumberedFaqMarkers(text: string): boolean {
+  return /(?:^|[\n.!?])\s*\d+[\.\)]\s*[A-Za-z]/.test(text) || /^\s*\d+[\.\)]\s*[A-Za-z]/.test(text);
 }
 
 /** Parse Q:/A: labeled blocks from bulk FAQ text. */
@@ -37,24 +117,29 @@ function parseLabeledFaqs(text: string): FaqItem[] | null {
   return faqs;
 }
 
-/** Blank-line separated: first line = question, remaining lines = answer. */
+/** Blank-line / --- separated FAQ blocks. First line = question, rest = answer. */
 function parseBlankSeparatedFaqs(text: string): FaqItem[] {
   const faqs: FaqItem[] = [];
   const blocks = text
-    .split(/\n\s*\n/)
+    .split(/\n\s*---\s*\n|\n\s*\n/)
     .map((b) => b.trim())
     .filter(Boolean);
 
   for (const block of blocks) {
-    const lines = block
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    if (lines.length >= 2) {
-      pushFaq(faqs, lines[0], lines.slice(1).join("\n"));
-    } else if (lines.length === 1 && lines[0].includes("|")) {
-      const [question, ...rest] = lines[0].split("|");
-      pushFaq(faqs, question, rest.join("|"));
+    const rawLines = block.split("\n");
+    const firstIdx = rawLines.findIndex((l) => l.trim());
+    if (firstIdx < 0) continue;
+    const question = rawLines[firstIdx].trim();
+    const answer = rawLines
+      .slice(firstIdx + 1)
+      .join("\n")
+      .replace(/^\n+/, "")
+      .replace(/\n+$/, "");
+    if (question && answer.trim()) {
+      pushFaq(faqs, question, answer);
+    } else if (question.includes("|")) {
+      const [q, ...rest] = question.split("|");
+      pushFaq(faqs, q, rest.join("|"));
     }
   }
 
@@ -73,28 +158,32 @@ function parsePipeFaqs(text: string): FaqItem[] {
 }
 
 /**
- * Parse bulk FAQ text. Preferred formats (any of these work):
+ * Parse bulk FAQ text. Supported formats:
  *
- * Q: How long does it take?
- * A: Usually 3-5 business days.
+ * 1. Question one?
+ * Answer one
+ * 2. Question two?
+ * Answer two
  *
- * Q: Is approval guaranteed?
- * A: No — final approval depends on the platform.
+ * Q: Question
+ * A: Answer
  *
- * Or blank-line pairs:
- * How long does it take?
- * Usually 3-5 business days.
+ * Question
+ * Answer
+ * (blank line between FAQs)
  *
- * Or one per line: Question | answer
+ * Question | answer
  */
 export function linesToFaqs(value: string): FaqItem[] {
   const text = value.replace(/\r\n/g, "\n").trim();
   if (!text) return [];
 
+  const numbered = parseNumberedFaqs(text);
+  if (numbered && numbered.length > 0) return numbered;
+
   const labeled = parseLabeledFaqs(text);
   if (labeled && labeled.length > 0) return labeled;
 
-  // Prefer pipe lines when present so multi-line "Q | A" isn't misread as blank blocks
   if (text.includes("|")) {
     const pipe = parsePipeFaqs(text);
     if (pipe.length > 0) return pipe;
@@ -103,7 +192,6 @@ export function linesToFaqs(value: string): FaqItem[] {
   const blankSeparated = parseBlankSeparatedFaqs(text);
   if (blankSeparated.length > 0) return blankSeparated;
 
-  // Last resort: consecutive lines where odd = question, even = answer
   const lines = linesToArray(text);
   const faqs: FaqItem[] = [];
   for (let i = 0; i + 1 < lines.length; i += 2) {
@@ -112,12 +200,48 @@ export function linesToFaqs(value: string): FaqItem[] {
   return faqs;
 }
 
+/** Fix already-saved FAQs that were mashed into one item from a numbered list paste. */
+export function expandFaqs(
+  value: { question?: string; answer?: string }[] | null | undefined
+): FaqItem[] {
+  const faqs = normalizeFaqs(value);
+  if (faqs.length === 0) return [];
+
+  // Prefer repairing mashed single blobs (common after bulk paste)
+  if (faqs.length === 1) {
+    const combined = `${faqs[0].question}\n${faqs[0].answer}`;
+    if (hasNumberedFaqMarkers(combined)) {
+      const repaired = parseNumberedFaqs(
+        /^\s*\d+[\.\)]/.test(faqs[0].question.trim()) ? combined : `1. ${combined}`
+      );
+      if (repaired && repaired.length > 1) return repaired;
+    }
+
+    const reparsed = linesToFaqs(combined);
+    if (reparsed.length > 1) return reparsed;
+  }
+
+  // Also repair if any answer still contains inline numbered questions
+  const needsRepair = faqs.some(
+    (f) => hasNumberedFaqMarkers(f.answer) && /\d+[\.\)]\s*[A-Za-z]/.test(f.answer)
+  );
+  if (needsRepair) {
+    const combined = faqs.map((f) => `${f.question}\n${f.answer}`).join("\n");
+    const repaired = parseNumberedFaqs(
+      /^\s*\d+[\.\)]/.test(combined) ? combined : `1. ${combined}`
+    );
+    if (repaired && repaired.length > faqs.length) return repaired;
+  }
+
+  return faqs;
+}
+
 export function normalizeFaqs(value: { question?: string; answer?: string }[] | null | undefined) {
   if (!value?.length) return [];
   return value
     .map((f) => ({
-      question: (f.question || "").trim(),
-      answer: (f.answer || "").trim(),
+      question: (f.question || "").replace(/^\s+|\s+$/g, ""),
+      answer: (f.answer || "").replace(/^\s+|\s+$/g, ""),
     }))
     .filter((f) => f.question && f.answer);
 }
@@ -133,7 +257,9 @@ export function processStepsToLines(value: unknown) {
 }
 
 export function faqsToLines(value: unknown) {
-  const faqs = parseJsonArray<{ question: string; answer: string }>(value);
+  const faqs = expandFaqs(parseJsonArray<{ question: string; answer: string }>(value));
   if (!faqs.length) return "";
-  return faqs.map((f) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n");
+  return faqs
+    .map((f, i) => `${i + 1}. ${f.question}\n${f.answer}`)
+    .join("\n\n");
 }
