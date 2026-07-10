@@ -188,7 +188,9 @@ export function ServiceDetailView({
   const whatsIncluded = parseJsonArray<string>(service.whats_included);
   const platforms = parseJsonArray<string>(service.supported_platforms);
   const processSteps = parseJsonArray<{ title: string; description?: string }>(service.process_steps);
-  const faqs = parseJsonArray<{ question: string; answer: string }>(service.faqs);
+  const faqs = parseJsonArray<{ question: string; answer: string }>(service.faqs).filter(
+    (f) => f?.question?.trim() && f?.answer?.trim()
+  );
   const requiredDocs = service.required_documents || [];
 
   const overviewText = service.overview || service.description;

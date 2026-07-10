@@ -20,21 +20,20 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import {
   arrayToLines,
+  faqsToLines,
   linesToArray,
+  linesToFaqs,
   linesToProcessSteps,
   normalizeFaqs,
   processStepsToLines,
 } from "@/components/admin/service-form-utils";
-import { parseJsonArray } from "@/lib/service-catalog";
 import type { CommissionType, PricingModel, Service, ServiceCategory } from "@/types/database";
 
 const inputClass = "h-11 rounded-xl";
 const textareaClass = "rounded-xl";
-
-type FaqDraft = { question: string; answer: string };
 
 function FormSection({
   title,
@@ -101,9 +100,6 @@ export function ServiceForm({
   const [isActive, setIsActive] = useState(service?.is_active ?? true);
   const [requiresAck, setRequiresAck] = useState(service?.requires_third_party_ack ?? false);
   const [badge, setBadge] = useState<"hot" | "popular" | "new" | "none">(service?.badge || "none");
-  const [faqs, setFaqs] = useState<FaqDraft[]>(() =>
-    normalizeFaqs(parseJsonArray<{ question: string; answer: string }>(service?.faqs))
-  );
 
   useEffect(() => {
     if (service) {
@@ -113,26 +109,21 @@ export function ServiceForm({
       setIsActive(service.is_active);
       setRequiresAck(service.requires_third_party_ack);
       setBadge(service.badge || "none");
-      setFaqs(normalizeFaqs(parseJsonArray<{ question: string; answer: string }>(service.faqs)));
     }
   }, [service]);
-
-  function updateFaq(index: number, field: keyof FaqDraft, value: string) {
-    setFaqs((prev) => prev.map((faq, i) => (i === index ? { ...faq, [field]: value } : faq)));
-  }
-
-  function addFaq() {
-    setFaqs((prev) => [...prev, { question: "", answer: "" }]);
-  }
-
-  function removeFaq(index: number) {
-    setFaqs((prev) => prev.filter((_, i) => i !== index));
-  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     const form = new FormData(e.currentTarget);
+    const faqsRaw = ((form.get("faqs") as string) || "").trim();
+    const faqs = normalizeFaqs(linesToFaqs(faqsRaw));
+
+    if (faqsRaw && faqs.length === 0) {
+      setLoading(false);
+      toast.error("FAQs format galat hai. Use Q: question / A: answer (blank line between each FAQ)");
+      return;
+    }
 
     const result = await upsertService(
       {
@@ -155,7 +146,7 @@ export function ServiceForm({
         supported_platforms: linesToArray((form.get("supported_platforms") as string) || ""),
         process_steps: linesToProcessSteps((form.get("process_steps") as string) || ""),
         required_documents: linesToArray((form.get("required_documents") as string) || ""),
-        faqs: normalizeFaqs(faqs),
+        faqs,
         pricing_model: pricingModel,
         price: pricingModel === "fixed" ? Number(form.get("price")) || null : null,
         service_fee: Number(form.get("service_fee")) || null,
@@ -295,70 +286,22 @@ export function ServiceForm({
             placeholder="One platform per line"
           />
         </Field>
-        <div className="sm:col-span-2 xl:col-span-3">
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <Label>FAQs</Label>
-            <Button type="button" variant="outline" size="sm" className="h-8 rounded-lg" onClick={addFaq}>
-              <Plus data-icon="inline-start" />
-              Add FAQ
-            </Button>
-          </div>
-          {faqs.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-6 text-center text-sm text-muted-foreground">
-              No FAQs yet. Click &quot;Add FAQ&quot; to add question and answer pairs for partners and users.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {faqs.map((faq, index) => (
-                <div key={index} className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
-                  <div className="mb-3 flex items-center justify-between gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      FAQ {index + 1}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 rounded-lg text-destructive hover:text-destructive"
-                      onClick={() => removeFaq(index)}
-                      aria-label={`Remove FAQ ${index + 1}`}
-                    >
-                      <Trash2 data-icon="inline-start" />
-                      Remove
-                    </Button>
-                  </div>
-                  <div className="grid gap-3">
-                    <div>
-                      <Label htmlFor={`faq-question-${index}`} className="mb-1.5 block text-xs">
-                        Question
-                      </Label>
-                      <Input
-                        id={`faq-question-${index}`}
-                        className={inputClass}
-                        value={faq.question}
-                        onChange={(e) => updateFaq(index, "question", e.target.value)}
-                        placeholder="e.g. How long does this service take?"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`faq-answer-${index}`} className="mb-1.5 block text-xs">
-                        Answer
-                      </Label>
-                      <Textarea
-                        id={`faq-answer-${index}`}
-                        rows={2}
-                        className={textareaClass}
-                        value={faq.answer}
-                        onChange={(e) => updateFaq(index, "answer", e.target.value)}
-                        placeholder="Clear answer shown on the service details FAQ tab"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <Field label="FAQs (bulk text)" htmlFor="faqs" className="sm:col-span-2 xl:col-span-3">
+          <Textarea
+            id="faqs"
+            name="faqs"
+            rows={10}
+            className={`${textareaClass} font-mono text-sm`}
+            defaultValue={faqsToLines(service?.faqs)}
+            placeholder={`Q: How long does this service take?\nA: Usually 3-5 business days.\n\nQ: Is approval guaranteed?\nA: No — final approval depends on the platform.`}
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Saari FAQs ek saath paste karein. Format:{" "}
+            <span className="font-medium text-foreground">Q:</span> question, next line{" "}
+            <span className="font-medium text-foreground">A:</span> answer. Har FAQ ke beech blank line.
+            (Ya blank-line pairs / <span className="font-medium text-foreground">Question | answer</span> bhi chalega.)
+          </p>
+        </Field>
       </FormSection>
 
       <FormSection title="Links & metadata" description="Demo, proof of work, and listing details">
