@@ -1,4 +1,4 @@
--- TokenWeb3Listing Initial Schema
+-- Web3Listing Initial Schema
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

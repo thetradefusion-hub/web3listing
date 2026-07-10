@@ -23,21 +23,21 @@ export type LegalDocument = {
 export const TERMS_AND_CONDITIONS: LegalDocument = {
   slug: "terms",
   title: "Terms & Conditions",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
       number: 1,
       title: "Acceptance of Terms",
       paragraphs: [
-        "By accessing TokenWeb3Listing.com, creating an account, submitting information, purchasing services, or using our platform, you agree to comply with these Terms & Conditions.",
+        "By accessing Web3Listing.com, creating an account, submitting information, purchasing services, or using our platform, you agree to comply with these Terms & Conditions.",
         "If you do not agree, you must discontinue use of the platform.",
       ],
     },
     {
       number: 2,
       title: "Services",
-      paragraphs: ["TokenWeb3Listing.com provides:"],
+      paragraphs: ["Web3Listing.com provides:"],
       bullets: [
         "Exchange Listing Consulting",
         "CoinMarketCap & CoinGecko Support",
@@ -116,14 +116,14 @@ export const TERMS_AND_CONDITIONS: LegalDocument = {
       title: "Intellectual Property",
       paragraphs: [
         "Clients retain ownership of their projects and submitted materials.",
-        "TokenWeb3Listing.com retains ownership of its website, branding, systems, reports, documentation, and proprietary processes.",
+        "Web3Listing.com retains ownership of its website, branding, systems, reports, documentation, and proprietary processes.",
       ],
     },
     {
       number: 8,
       title: "Limitation of Liability",
       paragraphs: [
-        "The maximum liability of TokenWeb3Listing.com shall not exceed the amount paid for the specific service purchased.",
+        "The maximum liability of Web3Listing.com shall not exceed the amount paid for the specific service purchased.",
         "We shall not be liable for:",
       ],
       bullets: [
@@ -156,14 +156,14 @@ export const TERMS_AND_CONDITIONS: LegalDocument = {
 export const PRIVACY_POLICY: LegalDocument = {
   slug: "privacy",
   title: "Privacy Policy",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
       number: 1,
       title: "Introduction",
       paragraphs: [
-        "TokenWeb3Listing.com respects your privacy and is committed to protecting your personal and business information.",
+        "Web3Listing.com respects your privacy and is committed to protecting your personal and business information.",
         "This Privacy Policy explains how we collect, use, store, and protect your information when you use our platform.",
       ],
     },
@@ -271,7 +271,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       number: 8,
       title: "Policy Updates",
       paragraphs: [
-        "TokenWeb3Listing.com may update this policy without prior notice.",
+        "Web3Listing.com may update this policy without prior notice.",
         "Continued use of the platform constitutes acceptance of updated policies.",
       ],
     },
@@ -281,13 +281,13 @@ export const PRIVACY_POLICY: LegalDocument = {
 export const AML_KYC_POLICY: LegalDocument = {
   slug: "aml-kyc",
   title: "AML & KYC Policy",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
       number: 1,
       title: "Purpose",
-      paragraphs: ["TokenWeb3Listing.com is committed to preventing:"],
+      paragraphs: ["Web3Listing.com is committed to preventing:"],
       bullets: [
         "Money Laundering",
         "Terrorist Financing",
@@ -376,7 +376,7 @@ export const AML_KYC_POLICY: LegalDocument = {
       number: 7,
       title: "Right to Refuse Service",
       paragraphs: [
-        "TokenWeb3Listing.com reserves the right to refuse any client, project, transaction, or relationship without explanation if compliance concerns exist.",
+        "Web3Listing.com reserves the right to refuse any client, project, transaction, or relationship without explanation if compliance concerns exist.",
       ],
     },
   ],
@@ -385,7 +385,7 @@ export const AML_KYC_POLICY: LegalDocument = {
 export const REFUND_POLICY: LegalDocument = {
   slug: "refund",
   title: "Refund Policy",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
@@ -396,7 +396,7 @@ export const REFUND_POLICY: LegalDocument = {
         "Payment is duplicated.",
         "Service cannot be delivered.",
         "Service has not started within the agreed timeline.",
-        "Order is cancelled by TokenWeb3Listing.com.",
+        "Order is cancelled by Web3Listing.com.",
       ],
     },
     {
@@ -442,7 +442,7 @@ export const REFUND_POLICY: LegalDocument = {
 export const SLA_POLICY: LegalDocument = {
   slug: "sla",
   title: "Service Level Agreement (SLA)",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
@@ -522,7 +522,7 @@ export const SLA_POLICY: LegalDocument = {
     {
       number: 7,
       title: "Force Majeure",
-      paragraphs: ["TokenWeb3Listing.com shall not be responsible for delays caused by:"],
+      paragraphs: ["Web3Listing.com shall not be responsible for delays caused by:"],
       bullets: [
         "Exchange Delays",
         "Wallet Provider Delays",
@@ -537,7 +537,7 @@ export const SLA_POLICY: LegalDocument = {
       number: 8,
       title: "Service Credits",
       paragraphs: [
-        "Service credits may be considered only when delays are directly caused by TokenWeb3Listing.com and not by external providers or client actions.",
+        "Service credits may be considered only when delays are directly caused by Web3Listing.com and not by external providers or client actions.",
       ],
     },
   ],
@@ -546,16 +546,16 @@ export const SLA_POLICY: LegalDocument = {
 export const DISCLAIMER_POLICY: LegalDocument = {
   slug: "disclaimer",
   title: "Legal Disclaimer",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
       number: 1,
       title: "General Disclaimer",
       paragraphs: [
-        "TokenWeb3Listing.com is an independent Web3 consulting, marketing, listing support, and service marketplace platform.",
+        "Web3Listing.com is an independent Web3 consulting, marketing, listing support, and service marketplace platform.",
         "We provide consulting, coordination, onboarding assistance, project management, and execution support for blockchain, cryptocurrency, Web3, AI, DeFi, NFT, GameFi, and related technology projects.",
-        "TokenWeb3Listing.com does not own, operate, control, or represent any cryptocurrency exchange, blockchain explorer, wallet provider, media publication, audit company, influencer network, market maker, launchpad, or third-party service provider unless explicitly stated through a separate written partnership agreement.",
+        "Web3Listing.com does not own, operate, control, or represent any cryptocurrency exchange, blockchain explorer, wallet provider, media publication, audit company, influencer network, market maker, launchpad, or third-party service provider unless explicitly stated through a separate written partnership agreement.",
       ],
     },
     {
@@ -563,7 +563,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
       title: "No Official Affiliation",
       paragraphs: [
         "References to exchanges, wallets, media platforms, audit firms, blockchain explorers, launchpads, or third-party service providers are provided solely for informational and service coordination purposes.",
-        "TokenWeb3Listing.com is not affiliated with, endorsed by, sponsored by, or officially partnered with any third-party company unless specifically disclosed.",
+        "Web3Listing.com is not affiliated with, endorsed by, sponsored by, or officially partnered with any third-party company unless specifically disclosed.",
         "All company names, trademarks, service marks, logos, and intellectual property belong to their respective owners.",
       ],
     },
@@ -571,7 +571,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
       number: 3,
       title: "Exchange Listing Disclaimer",
       paragraphs: [
-        "TokenWeb3Listing.com provides exchange listing consulting, preparation assistance, documentation review, communication support, and project onboarding services.",
+        "Web3Listing.com provides exchange listing consulting, preparation assistance, documentation review, communication support, and project onboarding services.",
         "We do not own or control any exchange listing process.",
         "Final approval, rejection, pricing, timelines, requirements, and listing decisions remain solely under the control of the respective exchange.",
         "We do not guarantee exchange listing approval under any circumstances.",
@@ -581,7 +581,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
       number: 4,
       title: "CoinMarketCap & CoinGecko Disclaimer",
       paragraphs: [
-        "TokenWeb3Listing.com assists clients with application preparation, documentation review, project readiness verification, and submission support.",
+        "Web3Listing.com assists clients with application preparation, documentation review, project readiness verification, and submission support.",
         "CoinMarketCap and CoinGecko independently evaluate applications.",
         "We do not control their review process and cannot guarantee listing approval.",
       ],
@@ -606,7 +606,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
       number: 7,
       title: "Smart Contract Audit Disclaimer",
       paragraphs: [
-        "TokenWeb3Listing.com does not perform security audits unless specifically stated.",
+        "Web3Listing.com does not perform security audits unless specifically stated.",
         "Audit services are coordinated through independent third-party security firms.",
         "Audit reports, findings, recommendations, and certifications are issued exclusively by the selected audit provider.",
         "We do not guarantee the security, performance, or vulnerability-free operation of any smart contract.",
@@ -634,7 +634,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
       title: "Market Making Disclaimer",
       paragraphs: [
         "Market making, liquidity management, trading support, and automated trading services involve significant risks.",
-        "TokenWeb3Listing.com does not provide investment advice, financial advice, portfolio management services, securities services, brokerage services, or regulated financial services.",
+        "Web3Listing.com does not provide investment advice, financial advice, portfolio management services, securities services, brokerage services, or regulated financial services.",
         "Past performance does not guarantee future results.",
         "Clients remain fully responsible for all trading activities and regulatory compliance.",
       ],
@@ -643,7 +643,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
       number: 11,
       title: "No Investment Advice",
       paragraphs: [
-        "Information provided by TokenWeb3Listing.com is for business and operational purposes only.",
+        "Information provided by Web3Listing.com is for business and operational purposes only.",
         "Nothing contained on this website shall be considered:",
       ],
       bullets: [
@@ -660,7 +660,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
     {
       number: 12,
       title: "No Guarantee of Results",
-      paragraphs: ["TokenWeb3Listing.com does not guarantee:"],
+      paragraphs: ["Web3Listing.com does not guarantee:"],
       bullets: [
         "Exchange Listings",
         "CoinMarketCap Approval",
@@ -692,14 +692,14 @@ export const DISCLAIMER_POLICY: LegalDocument = {
         "Consumer Protection Laws",
       ],
       closing:
-        "TokenWeb3Listing.com reserves the right to reject, suspend, or terminate services for any project suspected of fraud, scams, illegal activity, sanctions violations, money laundering, market manipulation, or regulatory violations.",
+        "Web3Listing.com reserves the right to reject, suspend, or terminate services for any project suspected of fraud, scams, illegal activity, sanctions violations, money laundering, market manipulation, or regulatory violations.",
     },
     {
       number: 14,
       title: "Limitation of Liability",
       paragraphs: [
-        "Under no circumstances shall TokenWeb3Listing.com, its owners, employees, contractors, affiliates, partners, or service providers be liable for any direct, indirect, incidental, consequential, special, regulatory, financial, trading, or business losses arising from the use of our services.",
-        "The maximum liability of TokenWeb3Listing.com shall be limited to the amount paid by the client for the specific service in question.",
+        "Under no circumstances shall Web3Listing.com, its owners, employees, contractors, affiliates, partners, or service providers be liable for any direct, indirect, incidental, consequential, special, regulatory, financial, trading, or business losses arising from the use of our services.",
+        "The maximum liability of Web3Listing.com shall be limited to the amount paid by the client for the specific service in question.",
       ],
     },
     {
@@ -715,7 +715,7 @@ export const DISCLAIMER_POLICY: LegalDocument = {
 export const PARTNER_POLICY: LegalDocument = {
   slug: "partner-policy",
   title: "Partner & Affiliate Policy",
-  site: "TokenWeb3Listing.com",
+  site: "Web3Listing.com",
   lastUpdated: "June 2026",
   sections: [
     {
@@ -772,7 +772,7 @@ export const PARTNER_POLICY: LegalDocument = {
       number: 5,
       title: "Independent Status",
       paragraphs: [
-        "Agents operate as independent contractors and are not employees, representatives, or legal partners of TokenWeb3Listing.com.",
+        "Agents operate as independent contractors and are not employees, representatives, or legal partners of Web3Listing.com.",
         "Agents are responsible for their own taxes, regulatory obligations, and local compliance requirements.",
       ],
     },

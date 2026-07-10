@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -72,6 +72,17 @@ export function CustomRequirementForm({ projects }: { projects: Pick<Project, "i
   const [serviceType, setServiceType] = useState<string>("");
   const [budgetRange, setBudgetRange] = useState<string>("");
 
+  const projectItems = useMemo(
+    () => [
+      { label: "No project", value: "none" },
+      ...projects.map((p) => ({
+        label: `${p.project_name} (${p.token_symbol})`,
+        value: p.id,
+      })),
+    ],
+    [projects]
+  );
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
@@ -140,15 +151,18 @@ export function CustomRequirementForm({ projects }: { projects: Pick<Project, "i
         {projects.length > 0 ? (
           <div className="space-y-2">
             <Label className="text-xs font-semibold text-muted-foreground">Related project (optional)</Label>
-            <Select value={projectId} onValueChange={(v) => setProjectId(v ?? "none")}>
+            <Select
+              items={projectItems}
+              value={projectId}
+              onValueChange={(v) => setProjectId(v ?? "none")}
+            >
               <SelectTrigger className={cn(fieldClass, "w-full")}>
                 <SelectValue placeholder="Select a project" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">No project</SelectItem>
-                {projects.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.project_name} ({p.token_symbol})
+                {projectItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
                   </SelectItem>
                 ))}
               </SelectContent>

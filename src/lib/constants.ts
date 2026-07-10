@@ -1,7 +1,7 @@
 import type { UserRole } from "@/types/database";
 import { buildTelegramLink, DEFAULT_MANAGER_TELEGRAM_USERNAME } from "@/lib/telegram";
 
-export const SITE_NAME = "TokenWeb3Listing";
+export const SITE_NAME = "Web3Listing";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const BRAND_LOGO_LIGHT_PATH = "/web3Listing png 1.png";
 export const BRAND_LOGO_DARK_PATH = "/web3Listing png green text.png";

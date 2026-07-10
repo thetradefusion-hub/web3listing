@@ -3,7 +3,7 @@ UPDATE legal_pages
 SET
   title = 'Partner & Affiliate Policy',
   content = 'PARTNER & AFFILIATE POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Commission Structure
@@ -34,7 +34,7 @@ Violation may result in
 • Permanent Ban
 
 5. Independent Status
-Agents operate as independent contractors and are not employees, representatives, or legal partners of TokenWeb3Listing.com.
+Agents operate as independent contractors and are not employees, representatives, or legal partners of Web3Listing.com.
 Agents are responsible for their own taxes, regulatory obligations, and local compliance requirements.
 
 6. Marketing Rules

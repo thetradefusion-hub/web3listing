@@ -22,8 +22,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { KycStatus } from "@/types/database";
 
-const inputClass = "h-10 rounded-xl border-input bg-background pl-10 shadow-sm";
-const selectClass = "h-10 rounded-xl border-input bg-background pl-10 shadow-sm";
+const inputClass = "h-10 w-full min-w-0 rounded-xl border-input bg-background pl-10 shadow-sm";
+const selectClass = "h-10 w-full min-w-0 rounded-xl border-input bg-background pl-10 shadow-sm";
 const SUPPORTED_ID_DOCUMENTS = [
   "Passport",
   "Aadhaar Card",
@@ -52,7 +52,7 @@ function Field({
         {label}
         {required ? " *" : ""}
       </Label>
-      <div className="relative">
+      <div className="relative min-w-0">
         <Icon
           className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
           strokeWidth={2}
@@ -172,7 +172,7 @@ export function KycForm({
       ) : null}
 
       <FormSection title="Personal details" description="Legal name and company information">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field id="full_name" label="Full Name" icon={User} required>
             <Input
               id="full_name"
@@ -198,7 +198,7 @@ export function KycForm({
       <Separator />
 
       <FormSection title="Contact information" description="How we reach you for verification">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field id="mobile" label="Mobile" icon={Phone} required>
             <Input
               id="mobile"
@@ -239,14 +239,14 @@ export function KycForm({
         title="Identity documents"
         description="Upload Passport, Aadhaar Card, Voter ID, Driving License, National ID, or other supported government ID"
       >
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field id="identity_document_type" label="ID Document Type" icon={IdCard} required>
             <Select
               value={identityDocType}
               onValueChange={(value) => setIdentityDocType(value ?? "Passport")}
               disabled={underReview}
             >
-              <SelectTrigger className={selectClass}>
+              <SelectTrigger className={cn(selectClass, "w-full")}>
                 <SelectValue placeholder="Select document type" />
               </SelectTrigger>
               <SelectContent>
@@ -292,14 +292,14 @@ export function KycForm({
         </div>
       </FormSection>
 
-      <div className="flex flex-col gap-3 border-t border-border pt-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">
+      <div className="flex flex-col-reverse gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-2">
+        <p className="text-center text-xs text-muted-foreground sm:text-left">
           By submitting, you confirm all information is accurate and documents belong to you.
         </p>
         <Button
           type="submit"
           disabled={loading || underReview}
-          className="h-10 shrink-0 rounded-xl px-6 font-semibold sm:min-w-[160px]"
+          className="h-11 w-full shrink-0 rounded-xl px-6 font-semibold sm:h-10 sm:w-auto sm:min-w-[160px]"
         >
           {underReview ? "Under Review" : loading ? "Submitting..." : "Submit KYC"}
         </Button>

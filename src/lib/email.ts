@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const FROM_EMAIL = "TokenWeb3Listing <noreply@tokenweb3listing.com>";
+const FROM_EMAIL = "Web3Listing <noreply@web3listing.com>";
 
 export async function sendEmail({
   to,
@@ -29,9 +29,9 @@ export async function sendEmail({
 
 export function credentialsEmail(email: string, password: string) {
   return {
-    subject: "Your TokenWeb3Listing Partner Account",
+    subject: "Your Web3Listing Partner Account",
     html: `
-      <h2>Welcome to TokenWeb3Listing Partner Portal</h2>
+      <h2>Welcome to Web3Listing Partner Portal</h2>
       <p>Your account has been created. Use these credentials to login:</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Password:</strong> ${password}</p>
@@ -43,7 +43,7 @@ export function credentialsEmail(email: string, password: string) {
 
 export function kycStatusEmail(status: string, notes?: string) {
   return {
-    subject: `KYC ${status.charAt(0).toUpperCase() + status.slice(1)} — TokenWeb3Listing`,
+    subject: `KYC ${status.charAt(0).toUpperCase() + status.slice(1)} — Web3Listing`,
     html: `
       <h2>KYC Status Update</h2>
       <p>Your KYC verification has been <strong>${status}</strong>.</p>

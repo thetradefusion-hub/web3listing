@@ -7,15 +7,15 @@ INSERT INTO account_managers (name, telegram_id, telegram_link, support_hours) V
 -- Legal Pages
 INSERT INTO legal_pages (slug, title, content) VALUES
 ('terms', 'Terms & Conditions', $terms$TERMS & CONDITIONS
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Acceptance of Terms
-By accessing TokenWeb3Listing.com, creating an account, submitting information, purchasing services, or using our platform, you agree to comply with these Terms & Conditions.
+By accessing Web3Listing.com, creating an account, submitting information, purchasing services, or using our platform, you agree to comply with these Terms & Conditions.
 If you do not agree, you must discontinue use of the platform.
 
 2. Services
-TokenWeb3Listing.com provides:
+Web3Listing.com provides:
 • Exchange Listing Consulting
 • CoinMarketCap & CoinGecko Support
 • Market Making Services
@@ -73,10 +73,10 @@ Crypto payments are considered completed after blockchain confirmation.
 
 7. Intellectual Property
 Clients retain ownership of their projects and submitted materials.
-TokenWeb3Listing.com retains ownership of its website, branding, systems, reports, documentation, and proprietary processes.
+Web3Listing.com retains ownership of its website, branding, systems, reports, documentation, and proprietary processes.
 
 8. Limitation of Liability
-The maximum liability of TokenWeb3Listing.com shall not exceed the amount paid for the specific service purchased.
+The maximum liability of Web3Listing.com shall not exceed the amount paid for the specific service purchased.
 We shall not be liable for:
 • Financial Losses
 • Trading Losses
@@ -98,11 +98,11 @@ We reserve the right to suspend or terminate any account for:
 Any disputes shall be governed by the laws applicable to the jurisdiction in which the company is registered.
 Arbitration and mediation may be required before court proceedings.$terms$),
 ('privacy', 'Privacy Policy', $privacy$PRIVACY POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Introduction
-TokenWeb3Listing.com respects your privacy and is committed to protecting your personal and business information.
+Web3Listing.com respects your privacy and is committed to protecting your personal and business information.
 This Privacy Policy explains how we collect, use, store, and protect your information when you use our platform.
 
 2. Information We Collect
@@ -174,10 +174,10 @@ Users may request:
 • Data Deletion (where legally permitted)
 
 8. Policy Updates
-TokenWeb3Listing.com may update this policy without prior notice.
+Web3Listing.com may update this policy without prior notice.
 Continued use of the platform constitutes acceptance of updated policies.$privacy$),
 ('refund', 'Refund Policy', $refund$REFUND POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Eligible Refund Cases
@@ -185,7 +185,7 @@ Refunds may be approved when:
 • Payment is duplicated.
 • Service cannot be delivered.
 • Service has not started within the agreed timeline.
-• Order is cancelled by TokenWeb3Listing.com.
+• Order is cancelled by Web3Listing.com.
 
 2. Non-Refundable Cases
 Refunds will NOT be provided when:
@@ -210,11 +210,11 @@ The original payment method may be used whenever possible.
 5. Crypto Payments
 Due to blockchain volatility and transaction costs, crypto refunds may be processed in equivalent value rather than original token amounts.$refund$),
 ('aml-kyc', 'AML & KYC Policy', $amlkyc$AML & KYC POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Purpose
-TokenWeb3Listing.com is committed to preventing:
+Web3Listing.com is committed to preventing:
 • Money Laundering
 • Terrorist Financing
 • Fraud
@@ -270,9 +270,9 @@ We may cooperate with:
 Where legally required.
 
 7. Right to Refuse Service
-TokenWeb3Listing.com reserves the right to refuse any client, project, transaction, or relationship without explanation if compliance concerns exist.$amlkyc$),
+Web3Listing.com reserves the right to refuse any client, project, transaction, or relationship without explanation if compliance concerns exist.$amlkyc$),
 ('sla', 'Service Level Agreement (SLA)', $sla$SERVICE LEVEL AGREEMENT (SLA)
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Objective
@@ -316,7 +316,7 @@ Clients must:
 Failure to do so may extend delivery timelines.
 
 7. Force Majeure
-TokenWeb3Listing.com shall not be responsible for delays caused by:
+Web3Listing.com shall not be responsible for delays caused by:
 • Exchange Delays
 • Wallet Provider Delays
 • Media Publication Delays
@@ -326,9 +326,9 @@ TokenWeb3Listing.com shall not be responsible for delays caused by:
 • Third-Party Failures
 
 8. Service Credits
-Service credits may be considered only when delays are directly caused by TokenWeb3Listing.com and not by external providers or client actions.$sla$),
+Service credits may be considered only when delays are directly caused by Web3Listing.com and not by external providers or client actions.$sla$),
 ('partner-policy', 'Partner & Affiliate Policy', $partnerpolicy$PARTNER & AFFILIATE POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Commission Structure
@@ -359,7 +359,7 @@ Violation may result in
 • Permanent Ban
 
 5. Independent Status
-Agents operate as independent contractors and are not employees, representatives, or legal partners of TokenWeb3Listing.com.
+Agents operate as independent contractors and are not employees, representatives, or legal partners of Web3Listing.com.
 Agents are responsible for their own taxes, regulatory obligations, and local compliance requirements.
 
 6. Marketing Rules
@@ -370,27 +370,27 @@ Agents must not claim:
 • Official Partnerships
 unless explicitly authorized in writing.$partnerpolicy$),
 ('disclaimer', 'Legal Disclaimer', $disclaimer$LEGAL DISCLAIMER
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. General Disclaimer
-TokenWeb3Listing.com is an independent Web3 consulting, marketing, listing support, and service marketplace platform.
+Web3Listing.com is an independent Web3 consulting, marketing, listing support, and service marketplace platform.
 We provide consulting, coordination, onboarding assistance, project management, and execution support for blockchain, cryptocurrency, Web3, AI, DeFi, NFT, GameFi, and related technology projects.
-TokenWeb3Listing.com does not own, operate, control, or represent any cryptocurrency exchange, blockchain explorer, wallet provider, media publication, audit company, influencer network, market maker, launchpad, or third-party service provider unless explicitly stated through a separate written partnership agreement.
+Web3Listing.com does not own, operate, control, or represent any cryptocurrency exchange, blockchain explorer, wallet provider, media publication, audit company, influencer network, market maker, launchpad, or third-party service provider unless explicitly stated through a separate written partnership agreement.
 
 2. No Official Affiliation
 References to exchanges, wallets, media platforms, audit firms, blockchain explorers, launchpads, or third-party service providers are provided solely for informational and service coordination purposes.
-TokenWeb3Listing.com is not affiliated with, endorsed by, sponsored by, or officially partnered with any third-party company unless specifically disclosed.
+Web3Listing.com is not affiliated with, endorsed by, sponsored by, or officially partnered with any third-party company unless specifically disclosed.
 All company names, trademarks, service marks, logos, and intellectual property belong to their respective owners.
 
 3. Exchange Listing Disclaimer
-TokenWeb3Listing.com provides exchange listing consulting, preparation assistance, documentation review, communication support, and project onboarding services.
+Web3Listing.com provides exchange listing consulting, preparation assistance, documentation review, communication support, and project onboarding services.
 We do not own or control any exchange listing process.
 Final approval, rejection, pricing, timelines, requirements, and listing decisions remain solely under the control of the respective exchange.
 We do not guarantee exchange listing approval under any circumstances.
 
 4. CoinMarketCap & CoinGecko Disclaimer
-TokenWeb3Listing.com assists clients with application preparation, documentation review, project readiness verification, and submission support.
+Web3Listing.com assists clients with application preparation, documentation review, project readiness verification, and submission support.
 CoinMarketCap and CoinGecko independently evaluate applications.
 We do not control their review process and cannot guarantee listing approval.
 
@@ -403,7 +403,7 @@ Explorer update services are limited to assisting with the submission and coordi
 Approval of token logos, social links, project information, and contract verification remains subject to the policies of the respective blockchain explorer.
 
 7. Smart Contract Audit Disclaimer
-TokenWeb3Listing.com does not perform security audits unless specifically stated.
+Web3Listing.com does not perform security audits unless specifically stated.
 Audit services are coordinated through independent third-party security firms.
 Audit reports, findings, recommendations, and certifications are issued exclusively by the selected audit provider.
 We do not guarantee the security, performance, or vulnerability-free operation of any smart contract.
@@ -419,12 +419,12 @@ We do not guarantee views, engagement, token performance, community growth, inve
 
 10. Market Making Disclaimer
 Market making, liquidity management, trading support, and automated trading services involve significant risks.
-TokenWeb3Listing.com does not provide investment advice, financial advice, portfolio management services, securities services, brokerage services, or regulated financial services.
+Web3Listing.com does not provide investment advice, financial advice, portfolio management services, securities services, brokerage services, or regulated financial services.
 Past performance does not guarantee future results.
 Clients remain fully responsible for all trading activities and regulatory compliance.
 
 11. No Investment Advice
-Information provided by TokenWeb3Listing.com is for business and operational purposes only.
+Information provided by Web3Listing.com is for business and operational purposes only.
 Nothing contained on this website shall be considered:
 • Investment Advice
 • Financial Advice
@@ -435,7 +435,7 @@ Nothing contained on this website shall be considered:
 Users should seek independent professional advice before making any financial, legal, tax, or investment decisions.
 
 12. No Guarantee of Results
-TokenWeb3Listing.com does not guarantee:
+Web3Listing.com does not guarantee:
 • Exchange Listings
 • CoinMarketCap Approval
 • CoinGecko Approval
@@ -460,11 +460,11 @@ Clients are solely responsible for ensuring that their projects comply with:
 • Securities Regulations
 • Tax Obligations
 • Consumer Protection Laws
-TokenWeb3Listing.com reserves the right to reject, suspend, or terminate services for any project suspected of fraud, scams, illegal activity, sanctions violations, money laundering, market manipulation, or regulatory violations.
+Web3Listing.com reserves the right to reject, suspend, or terminate services for any project suspected of fraud, scams, illegal activity, sanctions violations, money laundering, market manipulation, or regulatory violations.
 
 14. Limitation of Liability
-Under no circumstances shall TokenWeb3Listing.com, its owners, employees, contractors, affiliates, partners, or service providers be liable for any direct, indirect, incidental, consequential, special, regulatory, financial, trading, or business losses arising from the use of our services.
-The maximum liability of TokenWeb3Listing.com shall be limited to the amount paid by the client for the specific service in question.
+Under no circumstances shall Web3Listing.com, its owners, employees, contractors, affiliates, partners, or service providers be liable for any direct, indirect, incidental, consequential, special, regulatory, financial, trading, or business losses arising from the use of our services.
+The maximum liability of Web3Listing.com shall be limited to the amount paid by the client for the specific service in question.
 
 15. Acceptance of Terms
 By accessing our website, submitting information, purchasing services, or engaging with our platform, you acknowledge that you have read, understood, and agreed to this disclaimer and all related policies, terms, and conditions.$disclaimer$);
@@ -473,4 +473,4 @@ By accessing our website, submitting information, purchasing services, or engagi
 INSERT INTO blog_posts (title, slug, excerpt, content, is_published, published_at) VALUES
 ('How to Prepare for CoinMarketCap Listing', 'coinmarketcap-listing-guide', 'Essential steps to prepare your token project for CoinMarketCap application.', 'CoinMarketCap listing requires proper documentation, verified contract, active community, and accurate project data. This guide covers the complete preparation process including website requirements, social media verification, and application best practices.', true, NOW()),
 ('BSCScan Token Update Guide', 'bscscan-update-guide', 'Step-by-step guide for updating your token information on BSCScan.', 'Learn how to update your token logo, social links, and contract verification on BSCScan. Our team can handle the entire process within 24-48 hours.', true, NOW()),
-('Web3 Partner Program: Earn Commissions', 'partner-program-guide', 'Join our partner program and earn 10-30% commission on every referral.', 'The TokenWeb3Listing Partner Program allows marketing agencies, influencers, and consultants to earn recurring commissions by referring Web3 projects to our platform.', true, NOW());
+('Web3 Partner Program: Earn Commissions', 'partner-program-guide', 'Join our partner program and earn 10-30% commission on every referral.', 'The Web3Listing Partner Program allows marketing agencies, influencers, and consultants to earn recurring commissions by referring Web3 projects to our platform.', true, NOW());

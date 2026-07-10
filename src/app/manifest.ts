@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "TokenWeb3Listing",
+    name: "Web3Listing",
     short_name: "Web3Listing",
     description:
       "Web3 listings, marketing, liquidity, PR, community, and growth services for token projects.",

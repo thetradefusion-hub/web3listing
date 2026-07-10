@@ -71,7 +71,7 @@ SET
       "answer": "No. Final approval depends on third-party platform policies. We maximize your chances with professional preparation and follow-up."
     }
   ]'::jsonb,
-  terms_conditions = 'By ordering Binance Ecosystem Support, you acknowledge that third-party platforms (PancakeSwap, BSCScan, trackers, etc.) make independent approval decisions. TokenWeb3Listing provides preparation, submission, and follow-up services on a best-effort basis. Payment is 100% advance and non-refundable once work begins. You are responsible for accurate project information and legal compliance in your jurisdiction.'
+  terms_conditions = 'By ordering Binance Ecosystem Support, you acknowledge that third-party platforms (PancakeSwap, BSCScan, trackers, etc.) make independent approval decisions. Web3Listing provides preparation, submission, and follow-up services on a best-effort basis. Payment is 100% advance and non-refundable once work begins. You are responsible for accurate project information and legal compliance in your jurisdiction.'
 WHERE slug = 'binance-ecosystem-support';
 
 -- Demo completed orders for "Recent Successful Listings" section (agent test account)

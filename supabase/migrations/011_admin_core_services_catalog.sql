@@ -90,7 +90,7 @@ FROM (
     'Non-Refundable after work begins',
     ARRAY['Token contract address','Project whitepaper / litepaper','Logo (512x512 PNG)','Team KYC documents','Legal opinion (if required)','Tokenomics breakdown','Website & social links'],
     '[{"question":"Which exchanges can you list on?","answer":"We support applications to major CEX platforms including Binance ecosystem partners, Bitget, MEXC, Gate, KuCoin, and more. Final approval is at each exchange''s discretion."},{"question":"Do you guarantee listing approval?","answer":"No. Exchanges make independent decisions. We maximize approval chances through professional preparation and follow-up."},{"question":"How long does CEX listing take?","answer":"Typically 14–30 days depending on exchange queue, project readiness, and compliance review timelines."}]',
-    'CEX listing outcomes depend on third-party exchange policies. TokenWeb3Listing provides preparation and submission services on a best-effort basis. Payment is 100% advance and non-refundable once work begins.',
+    'CEX listing outcomes depend on third-party exchange policies. Web3Listing provides preparation and submission services on a best-effort basis. Payment is 100% advance and non-refundable once work begins.',
     'Supported 80+ token listings across Tier-1 and Tier-2 centralized exchanges with an average 72% application acceptance rate on prepared submissions.',
     1
   ),

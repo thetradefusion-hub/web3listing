@@ -1,4 +1,4 @@
-const CACHE_NAME = "tokenweb3listing-v1";
+const CACHE_NAME = "web3listing-v1";
 const PRECACHE_URLS = ["/", "/offline"];
 
 self.addEventListener("install", (event) => {

@@ -3,11 +3,11 @@ UPDATE legal_pages
 SET
   title = 'Privacy Policy',
   content = 'PRIVACY POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Introduction
-TokenWeb3Listing.com respects your privacy and is committed to protecting your personal and business information.
+Web3Listing.com respects your privacy and is committed to protecting your personal and business information.
 This Privacy Policy explains how we collect, use, store, and protect your information when you use our platform.
 
 2. Information We Collect
@@ -79,7 +79,7 @@ Users may request:
 • Data Deletion (where legally permitted)
 
 8. Policy Updates
-TokenWeb3Listing.com may update this policy without prior notice.
+Web3Listing.com may update this policy without prior notice.
 Continued use of the platform constitutes acceptance of updated policies.',
   updated_at = NOW()
 WHERE slug = 'privacy';

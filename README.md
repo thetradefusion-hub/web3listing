@@ -1,4 +1,4 @@
-# TokenWeb3Listing.com
+# Web3Listing.com
 
 B2B Partner & Reseller Portal for Web3 listing, marketing, and growth services.
 

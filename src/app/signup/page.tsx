@@ -3,7 +3,7 @@ import SignupForm from "./signup-form";
 
 export const metadata = {
   title: "Sign Up",
-  description: "Create a TokenWeb3Listing account to order listing services",
+  description: "Create a Web3Listing account to order listing services",
 };
 
 export default function SignupPage() {

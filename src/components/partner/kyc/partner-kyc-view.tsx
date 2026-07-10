@@ -92,7 +92,52 @@ function VerificationStepper({
   };
 
   return (
-    <div className="flex min-w-0 items-start justify-between gap-1 overflow-x-auto pb-1 sm:gap-2">
+    <>
+      <ol className="flex flex-col gap-2 sm:hidden">
+        {VERIFICATION_STEPS.map((step, index) => {
+          const state = stepState(index);
+          return (
+            <li
+              key={step.id}
+              className={cn(
+                "flex items-center gap-3 rounded-xl border px-3 py-2.5",
+                state === "active"
+                  ? "border-primary/30 bg-primary/5"
+                  : state === "completed"
+                    ? "border-chart-2/30 bg-chart-2/5"
+                    : "border-border bg-muted/20"
+              )}
+            >
+              <span
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-full border-2",
+                  state === "completed"
+                    ? "border-chart-2 bg-chart-2/10 text-chart-2"
+                    : state === "active"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-muted/40 text-muted-foreground"
+                )}
+              >
+                {state === "completed" ? (
+                  <Check className="size-3.5" strokeWidth={2.5} />
+                ) : (
+                  <span className="text-[10px] font-bold">{index + 1}</span>
+                )}
+              </span>
+              <p
+                className={cn(
+                  "text-sm font-semibold",
+                  state === "pending" ? "text-muted-foreground" : "text-foreground"
+                )}
+              >
+                {step.label}
+              </p>
+            </li>
+          );
+        })}
+      </ol>
+
+      <div className="hidden min-w-0 items-start justify-between gap-1 overflow-x-auto pb-1 sm:flex sm:gap-2">
       {VERIFICATION_STEPS.map((step, index) => {
         const state = stepState(index);
         return (
@@ -142,7 +187,8 @@ function VerificationStepper({
           </div>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -211,19 +257,19 @@ export function PartnerKycView({
       <Card size="sm" className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 py-0">
         <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary via-chart-2 to-chart-4" aria-hidden />
         <CardContent className="flex flex-col gap-4 p-4 pl-5 sm:flex-row sm:items-start sm:justify-between sm:p-5 sm:pl-6">
-          <div className="flex min-w-0 gap-4">
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm ring-2 ring-border/50 sm:size-16">
-              <ShieldCheck className="size-7 sm:size-8" strokeWidth={2} />
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:gap-4">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm ring-2 ring-border/50 sm:size-14 md:size-16">
+              <ShieldCheck className="size-6 sm:size-7 md:size-8" strokeWidth={2} />
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-lg font-bold text-foreground sm:text-xl">Identity Verification</h1>
+                <h1 className="text-base font-bold text-foreground sm:text-lg md:text-xl">Identity Verification</h1>
                 <PartnerBadge variant={kycStatusVariant(status)}>{kycLabel(status, underReview)}</PartnerBadge>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">{kycDescription(status, underReview)}</p>
-              <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{kycDescription(status, underReview)}</p>
+              <p className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
                 <User className="size-3.5 shrink-0" />
-                {displayName}
+                <span className="break-all sm:break-normal">{displayName}</span>
                 {kyc?.created_at ? (
                   <>
                     <span aria-hidden>·</span>
@@ -235,11 +281,11 @@ export function PartnerKycView({
           </div>
 
           {status === "approved" ? (
-            <Button asChild variant="outline" className="h-9 shrink-0 rounded-xl font-semibold">
+            <Button asChild variant="outline" className="h-10 w-full shrink-0 rounded-xl font-semibold sm:h-9 sm:w-auto">
               <Link href={`${basePath}/services`}>Browse Services</Link>
             </Button>
           ) : (
-            <Button asChild variant="outline" className="h-9 shrink-0 rounded-xl font-semibold">
+            <Button asChild variant="outline" className="h-10 w-full shrink-0 rounded-xl font-semibold sm:h-9 sm:w-auto">
               <Link href={`${basePath}/support`}>
                 <Headphones data-icon="inline-start" />
                 Get Help
@@ -249,7 +295,7 @@ export function PartnerKycView({
         </CardContent>
       </Card>
 
-      <section aria-label="Verification overview" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <section aria-label="Verification overview" className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         <PartnerStatCard
           title="Status"
           value={kycLabel(status, underReview)}
@@ -280,10 +326,10 @@ export function PartnerKycView({
         />
       </section>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-5">
-        <div className="flex flex-col gap-4">
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-5">
+        <div className="flex min-w-0 flex-col gap-4">
           <DashboardPanel
-            className="h-auto"
+            className="h-auto min-w-0 overflow-hidden"
             contentClassName="flex-none gap-5"
             title="KYC Application"
             description="Passport, Aadhaar, Voter ID, or other supported ID with selfie verification"
@@ -324,8 +370,8 @@ export function PartnerKycView({
           </DashboardPanel>
         </div>
 
-        <aside className="flex flex-col gap-4">
-          <DashboardPanel className="h-auto" contentClassName="flex-none" title="What you'll need" icon={FileText} iconColor="purple">
+        <aside className="flex min-w-0 flex-col gap-4">
+          <DashboardPanel className="h-auto min-w-0" contentClassName="flex-none" title="What you'll need" icon={FileText} iconColor="purple">
             <ul className="flex flex-col gap-2.5">
               <RequirementItem>Upload a clear photo of Passport, Aadhaar, Voter ID, or other supported ID</RequirementItem>
               <RequirementItem>Upload a selfie holding the same ID document</RequirementItem>
@@ -334,7 +380,7 @@ export function PartnerKycView({
             </ul>
           </DashboardPanel>
 
-          <DashboardPanel className="h-auto" contentClassName="flex-none" title="Tips for faster approval" icon={CheckCircle2} iconColor="green">
+          <DashboardPanel className="h-auto min-w-0" contentClassName="flex-none" title="Tips for faster approval" icon={CheckCircle2} iconColor="green">
             <ul className="flex flex-col gap-2.5">
               <RequirementItem>Upload high-resolution JPG, PNG, WEBP, or PDF files</RequirementItem>
               <RequirementItem>Ensure all text on ID is readable</RequirementItem>
@@ -347,7 +393,9 @@ export function PartnerKycView({
             <CardContent className="flex flex-col gap-3 p-4">
               <p className="text-sm font-semibold text-foreground">Questions about KYC?</p>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                Your account manager can walk you through document requirements and review status.
+                {basePath === "/user"
+                  ? "Our listing manager can walk you through document requirements and review status."
+                  : "Your account manager can walk you through document requirements and review status."}
               </p>
               {managerTelegramLink ? (
                 <Button size="sm" className="h-9 w-full rounded-xl text-xs font-semibold" asChild>

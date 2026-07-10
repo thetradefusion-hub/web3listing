@@ -3,7 +3,7 @@ import LoginForm from "./login-form";
 
 export const metadata = {
   title: "Sign In",
-  description: "Sign in to the TokenWeb3Listing partner dashboard",
+  description: "Sign in to the Web3Listing partner dashboard",
 };
 
 export default function LoginPage() {

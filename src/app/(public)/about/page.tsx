@@ -15,9 +15,9 @@ const services = [
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-4xl font-bold">About TokenWeb3Listing</h1>
+      <h1 className="text-4xl font-bold">About Web3Listing</h1>
       <p className="mt-6 text-lg text-muted-foreground">
-        TokenWeb3Listing.com is a Web3 consulting and execution platform helping blockchain startups,
+        Web3Listing.com is a Web3 consulting and execution platform helping blockchain startups,
         token projects, exchanges, NFT projects, AI projects, GameFi platforms, and Web3 businesses
         access professional growth services through a single dashboard.
       </p>
@@ -39,7 +39,7 @@ export default function AboutPage() {
       <div className="mt-12 rounded-lg border border-border/40 bg-card/50 p-6">
         <h3 className="font-semibold">Important Disclaimer</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          TokenWeb3Listing.com is an independent Web3 consulting and service marketplace.
+          Web3Listing.com is an independent Web3 consulting and service marketplace.
           We are not affiliated with or endorsed by any exchange, wallet, media company, audit provider,
           or third-party platform unless explicitly stated. No guarantees are provided regarding
           listing approvals, media publications, token prices, or investment returns.

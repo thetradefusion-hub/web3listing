@@ -447,4 +447,4 @@ export const HOME_FAQS = [
 ] as const;
 
 export const DISCLAIMER =
-  "TokenWeb3Listing.com is an independent Web3 consulting and service marketplace. We are not affiliated with, endorsed by, or officially partnered with any exchange, wallet provider, media company, audit firm, or third-party platform unless specifically disclosed. All trademarks and brand names belong to their respective owners. Final approvals for listings, publications, audits, wallet integrations, and other third-party services remain under the control of the respective organizations.";
+  "Web3Listing.com is an independent Web3 consulting and service marketplace. We are not affiliated with, endorsed by, or officially partnered with any exchange, wallet provider, media company, audit firm, or third-party platform unless specifically disclosed. All trademarks and brand names belong to their respective owners. Final approvals for listings, publications, audits, wallet integrations, and other third-party services remain under the control of the respective organizations.";

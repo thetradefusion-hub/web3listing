@@ -3,11 +3,11 @@ UPDATE legal_pages
 SET
   title = 'AML & KYC Policy',
   content = 'AML & KYC POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Purpose
-TokenWeb3Listing.com is committed to preventing:
+Web3Listing.com is committed to preventing:
 • Money Laundering
 • Terrorist Financing
 • Fraud
@@ -63,6 +63,6 @@ We may cooperate with:
 Where legally required.
 
 7. Right to Refuse Service
-TokenWeb3Listing.com reserves the right to refuse any client, project, transaction, or relationship without explanation if compliance concerns exist.',
+Web3Listing.com reserves the right to refuse any client, project, transaction, or relationship without explanation if compliance concerns exist.',
   updated_at = NOW()
 WHERE slug = 'aml-kyc';

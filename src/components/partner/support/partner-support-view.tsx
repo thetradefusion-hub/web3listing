@@ -35,8 +35,14 @@ export function PartnerSupportView({
   const inProgress = tickets.filter((t) => t.status === "in_progress").length;
   const closed = tickets.filter((t) => t.status === "closed").length;
   const telegramLink = buildTelegramLink(manager?.telegram_link || TELEGRAM_SUPPORT);
+  const isUserPortal = basePath === "/user";
+  const managerPanelTitle = isUserPortal ? "Listing Manager" : "Account Manager";
+  const managerDisplayName =
+    isUserPortal || manager?.name?.toLowerCase().includes("abhay")
+      ? "Listing Manager"
+      : manager?.name;
 
-  const managerInitials = manager?.name
+  const managerInitials = (managerDisplayName || manager?.name || "LM")
     .split(" ")
     .map((w) => w[0])
     .join("")
@@ -114,7 +120,7 @@ export function PartnerSupportView({
             </CardContent>
           </Card>
 
-          <DashboardPanel title="Account Manager" icon={UserRound} iconColor="green">
+          <DashboardPanel title={managerPanelTitle} icon={UserRound} iconColor="green">
             {manager ? (
               <div className="flex flex-col gap-4">
                 <div className="rounded-xl border border-border bg-gradient-to-br from-card to-muted/30 p-4">
@@ -126,7 +132,7 @@ export function PartnerSupportView({
                       <AvatarBadge className="bg-chart-2 ring-2 ring-card" />
                     </Avatar>
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-foreground">{manager.name}</p>
+                      <p className="truncate font-semibold text-foreground">{managerDisplayName}</p>
                       <p className="truncate text-sm text-muted-foreground">{manager.telegram_id}</p>
                     </div>
                   </div>

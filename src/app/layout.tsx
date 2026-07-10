@@ -17,12 +17,12 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "TokenWeb3Listing — Web3 Listings, Marketing & Growth",
-    template: "%s | TokenWeb3Listing",
+    default: "Web3Listing — Web3 Listings, Marketing & Growth",
+    template: "%s | Web3Listing",
   },
   description:
     "One platform for Web3 listings, marketing, liquidity, PR, community, and growth services.",
-  applicationName: "TokenWeb3Listing",
+  applicationName: "Web3Listing",
   appleWebApp: {
     capable: true,
     title: "Web3Listing",

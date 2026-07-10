@@ -10,6 +10,7 @@ import {
   PieChart,
   Zap,
   Package,
+  Percent,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/commission";
@@ -125,32 +126,47 @@ export function UserDashboardView({
       )}
 
       <section aria-label="Key metrics" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
-        <PartnerStatCard title="Projects" value={stats.projectCount} icon={FolderKanban} color="blue" />
-        <PartnerStatCard title="Orders" value={stats.orderCount} icon={ClipboardList} color="green" />
         <PartnerStatCard
-          title="Active"
+          title="Total Project"
+          value={stats.projectCount}
+          subtitle="All projects"
+          icon={FolderKanban}
+          color="blue"
+        />
+        <PartnerStatCard
+          title="Total Order"
+          value={stats.orderCount}
+          subtitle="All orders"
+          icon={ClipboardList}
+          color="green"
+        />
+        <PartnerStatCard
+          title="Active Order"
           value={stats.activeOrders}
+          subtitle={stats.activeOrderPct}
           icon={Clock}
           color="orange"
-          trend={stats.activeOrderPct}
-          trendDirection="neutral"
         />
         <PartnerStatCard
-          title="Completed"
+          title="Completed Order"
           value={stats.completedOrders}
+          subtitle="Delivered or closed"
           icon={CheckCircle2}
           color="purple"
-          trend={stats.completionRate}
-          trendDirection="up"
         />
-        <PartnerStatCard title="Pending" value={stats.pendingOrders} icon={Package} color="orange" />
         <PartnerStatCard
-          title="Completion"
+          title="Pending Order"
+          value={stats.pendingOrders}
+          subtitle="Awaiting action"
+          icon={Package}
+          color="orange"
+        />
+        <PartnerStatCard
+          title="Completion %"
           value={stats.completionRate || "—"}
-          icon={CheckCircle2}
+          subtitle={stats.orderCount ? `of ${stats.orderCount} orders` : "No orders yet"}
+          icon={Percent}
           color="green"
-          trend={stats.orderCount ? `${stats.orderCount} total` : undefined}
-          trendDirection="neutral"
         />
       </section>
 

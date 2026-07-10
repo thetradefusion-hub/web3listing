@@ -32,6 +32,7 @@ const projectStatusLabels: Record<string, string> = {
 };
 
 const PENDING_STATUSES: OrderStatus[] = ["submitted", "under_review", "waiting_payment"];
+const ACTIVE_STATUSES: OrderStatus[] = ["payment_confirmed", "in_progress", "third_party_review"];
 
 export default async function UserDashboard() {
   const profile = await getCurrentUser();
@@ -56,7 +57,7 @@ export default async function UserDashboard() {
       .from("orders")
       .select("*", { count: "exact", head: true })
       .eq("agent_id", userId)
-      .not("status", "in", "(closed,completed,delivered)"),
+      .in("status", ACTIVE_STATUSES),
     supabase
       .from("orders")
       .select("*", { count: "exact", head: true })
@@ -120,11 +121,13 @@ export default async function UserDashboard() {
     .slice(0, 5);
 
   const activeOrderPct =
-    orderCount && activeOrders ? `${Math.round(((activeOrders || 0) / orderCount) * 100)}%` : undefined;
+    orderCount && activeOrders ? `${Math.round(((activeOrders || 0) / orderCount) * 100)}% active` : undefined;
   const completionRate =
-    orderCount && completedOrders
+    orderCount && completedOrders != null
       ? `${Math.round(((completedOrders || 0) / orderCount) * 100)}%`
-      : undefined;
+      : orderCount
+        ? "0%"
+        : "—";
 
   return (
     <UserDashboardView

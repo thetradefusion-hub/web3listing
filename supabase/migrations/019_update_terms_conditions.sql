@@ -3,15 +3,15 @@ UPDATE legal_pages
 SET
   title = 'Terms & Conditions',
   content = 'TERMS & CONDITIONS
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Acceptance of Terms
-By accessing TokenWeb3Listing.com, creating an account, submitting information, purchasing services, or using our platform, you agree to comply with these Terms & Conditions.
+By accessing Web3Listing.com, creating an account, submitting information, purchasing services, or using our platform, you agree to comply with these Terms & Conditions.
 If you do not agree, you must discontinue use of the platform.
 
 2. Services
-TokenWeb3Listing.com provides:
+Web3Listing.com provides:
 • Exchange Listing Consulting
 • CoinMarketCap & CoinGecko Support
 • Market Making Services
@@ -69,10 +69,10 @@ Crypto payments are considered completed after blockchain confirmation.
 
 7. Intellectual Property
 Clients retain ownership of their projects and submitted materials.
-TokenWeb3Listing.com retains ownership of its website, branding, systems, reports, documentation, and proprietary processes.
+Web3Listing.com retains ownership of its website, branding, systems, reports, documentation, and proprietary processes.
 
 8. Limitation of Liability
-The maximum liability of TokenWeb3Listing.com shall not exceed the amount paid for the specific service purchased.
+The maximum liability of Web3Listing.com shall not exceed the amount paid for the specific service purchased.
 We shall not be liable for:
 • Financial Losses
 • Trading Losses

@@ -3,7 +3,7 @@ UPDATE legal_pages
 SET
   title = 'Refund Policy',
   content = 'REFUND POLICY
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Eligible Refund Cases
@@ -11,7 +11,7 @@ Refunds may be approved when:
 • Payment is duplicated.
 • Service cannot be delivered.
 • Service has not started within the agreed timeline.
-• Order is cancelled by TokenWeb3Listing.com.
+• Order is cancelled by Web3Listing.com.
 
 2. Non-Refundable Cases
 Refunds will NOT be provided when:

@@ -77,7 +77,7 @@ export function KycFileUpload({
   }
 
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
+    <div className={cn("flex min-w-0 flex-col gap-2", className)}>
       <Label className="text-xs font-semibold text-muted-foreground">
         {label}
         {required ? " *" : ""}
@@ -87,7 +87,7 @@ export function KycFileUpload({
 
       <label
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/20 px-4 py-5 text-center transition-colors",
+          "flex w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/20 px-3 py-4 text-center transition-colors sm:px-4 sm:py-5",
           !disabled && "hover:border-primary/40 hover:bg-muted/30",
           disabled && "cursor-not-allowed opacity-60",
           path && "border-chart-2/40 bg-chart-2/5"
@@ -107,7 +107,7 @@ export function KycFileUpload({
         ) : (
           <Upload className="size-5 text-muted-foreground" />
         )}
-        <div className="min-w-0">
+        <div className="min-w-0 max-w-full px-1">
           <p className="text-sm font-medium text-foreground">
             {uploading ? "Uploading..." : path ? "File uploaded" : "Click to upload"}
           </p>
@@ -125,7 +125,7 @@ export function KycFileUpload({
           type="button"
           variant="outline"
           size="sm"
-          className="h-8 w-fit rounded-lg text-xs"
+          className="h-9 w-full rounded-lg text-xs sm:h-8 sm:w-fit"
           onClick={handleView}
         >
           <FileUp data-icon="inline-start" />

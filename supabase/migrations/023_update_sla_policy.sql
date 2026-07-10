@@ -3,7 +3,7 @@ UPDATE legal_pages
 SET
   title = 'Service Level Agreement (SLA)',
   content = 'SERVICE LEVEL AGREEMENT (SLA)
-TokenWeb3Listing.com
+Web3Listing.com
 Last Updated: June 2026
 
 1. Objective
@@ -47,7 +47,7 @@ Clients must:
 Failure to do so may extend delivery timelines.
 
 7. Force Majeure
-TokenWeb3Listing.com shall not be responsible for delays caused by:
+Web3Listing.com shall not be responsible for delays caused by:
 • Exchange Delays
 • Wallet Provider Delays
 • Media Publication Delays
@@ -57,6 +57,6 @@ TokenWeb3Listing.com shall not be responsible for delays caused by:
 • Third-Party Failures
 
 8. Service Credits
-Service credits may be considered only when delays are directly caused by TokenWeb3Listing.com and not by external providers or client actions.',
+Service credits may be considered only when delays are directly caused by Web3Listing.com and not by external providers or client actions.',
   updated_at = NOW()
 WHERE slug = 'sla';
