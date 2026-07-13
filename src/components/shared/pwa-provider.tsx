@@ -12,16 +12,26 @@ function registerServiceWorker() {
 
 export function PwaProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const idle =
-      "requestIdleCallback" in window
-        ? window.requestIdleCallback(registerServiceWorker, { timeout: 4000 })
-        : window.setTimeout(registerServiceWorker, 2000);
+    let idleCallbackId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const schedule =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback.bind(window)
+        : null;
+
+    if (schedule) {
+      idleCallbackId = schedule(registerServiceWorker, { timeout: 4000 });
+    } else {
+      timeoutId = setTimeout(registerServiceWorker, 2000);
+    }
 
     return () => {
-      if ("cancelIdleCallback" in window && typeof idle === "number") {
-        window.cancelIdleCallback(idle);
-      } else {
-        window.clearTimeout(idle as number);
+      if (idleCallbackId != null && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleCallbackId);
+      }
+      if (timeoutId != null) {
+        clearTimeout(timeoutId);
       }
     };
   }, []);
