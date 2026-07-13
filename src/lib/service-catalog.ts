@@ -264,7 +264,15 @@ export function getServiceLogoUrl(service: { name: string; logo_url?: string | n
   return null;
 }
 
-export function pickFeaturedServices<T extends Service>(services: T[], limit = 8): T[] {
+export function pickFeaturedServices<
+  T extends {
+    name: string;
+    badge?: string | null;
+    sort_order?: number | null;
+    logo_url?: string | null;
+    service_categories?: { name?: string; slug?: string } | null;
+  },
+>(services: T[], limit = 8): T[] {
   const rank = (service: T) => {
     let score = service.sort_order ?? 999;
     if (service.badge === "hot") score -= 10_000;

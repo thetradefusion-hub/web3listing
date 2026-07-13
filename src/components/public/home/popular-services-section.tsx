@@ -17,13 +17,10 @@ import {
 } from "@/lib/service-catalog";
 import { cn } from "@/lib/utils";
 import { HomeSectionHeader } from "@/components/public/home/section-header";
-import type { PricingModel, Service } from "@/types/database";
+import type { HomeFeaturedService } from "@/lib/home-featured-services";
+import type { PricingModel } from "@/types/database";
 
-type ServiceRow = Service & {
-  service_categories?: { name: string; slug: string } | null;
-};
-
-function ServiceLogo({ service }: { service: ServiceRow }) {
+function ServiceLogo({ service }: { service: HomeFeaturedService }) {
   const logoUrl = getServiceLogoUrl(service);
   const logoColor = getServiceLogoColor(service.name);
   const CatIcon = getCategoryIcon(service.service_categories?.slug);
@@ -47,7 +44,7 @@ function ServiceLogo({ service }: { service: ServiceRow }) {
   );
 }
 
-export function PopularServicesSection({ services }: { services: ServiceRow[] | null }) {
+export function PopularServicesSection({ services }: { services: HomeFeaturedService[] | null }) {
   const { resolvedTheme } = useTheme();
   const badgeVariant = resolvedTheme === "dark" ? "dark" : "light";
   const items = services ?? [];
@@ -121,7 +118,9 @@ export function PopularServicesSection({ services }: { services: ServiceRow[] | 
                     </div>
 
                     <div className="mt-4 pl-2">
-                      <p className="text-xl font-bold text-primary dark:text-chart-2">{getServicePriceLabel(service)}</p>
+                      <p className="text-xl font-bold text-primary dark:text-chart-2">
+                        {getServicePriceLabel(service)}
+                      </p>
                       {service.estimated_tat ? (
                         <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="size-3 shrink-0" />

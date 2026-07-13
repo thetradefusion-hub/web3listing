@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getPortalPathForRole, pathRequiresKyc } from "@/lib/portal-config";
+import type { PartnerOnboardingStatus } from "@/types/database";
 
 function clearSupabaseAuthCookies(request: NextRequest, response: NextResponse) {
   for (const cookie of request.cookies.getAll()) {
@@ -142,7 +143,9 @@ export async function updateSession(request: NextRequest) {
         "@/lib/partner-onboarding"
       );
       if (profile && !isPartnerOnboardingComplete(profile as Parameters<typeof isPartnerOnboardingComplete>[0])) {
-        url.pathname = getPartnerOnboardingPath(profile.partner_onboarding_status, {
+        url.pathname = getPartnerOnboardingPath(
+          profile.partner_onboarding_status as PartnerOnboardingStatus | null | undefined,
+          {
           agreementsAccepted: Boolean(profile.partner_agreements_accepted_at),
         });
         if (url.pathname !== path) {
@@ -189,7 +192,9 @@ export async function updateSession(request: NextRequest) {
 
       if (!onboardingDone && !onOnboarding) {
         const url = request.nextUrl.clone();
-        url.pathname = getPartnerOnboardingPath(profile.partner_onboarding_status, {
+        url.pathname = getPartnerOnboardingPath(
+          profile.partner_onboarding_status as PartnerOnboardingStatus | null | undefined,
+          {
           agreementsAccepted: Boolean(profile.partner_agreements_accepted_at),
         });
         return NextResponse.redirect(url);
