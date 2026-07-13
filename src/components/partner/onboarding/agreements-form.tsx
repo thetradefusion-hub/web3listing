@@ -21,7 +21,7 @@ export function AgreementsForm() {
     setLoading(true);
     const result = await acceptPartnerAgreements(ids);
     setLoading(false);
-    if (result.error) {
+    if ("error" in result) {
       toast.error(result.error);
       return;
     }

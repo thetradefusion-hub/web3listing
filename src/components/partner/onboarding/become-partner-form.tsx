@@ -79,7 +79,7 @@ export function BecomePartnerForm() {
       services_offered: String(form.get("services_offered") || ""),
     });
 
-    if (result.error) {
+    if ("error" in result) {
       setLoading(false);
       toast.error(result.error);
       return;

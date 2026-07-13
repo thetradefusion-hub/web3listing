@@ -37,7 +37,7 @@ export function BusinessProfileForm({
       preferred_services: String(form.get("preferred_services") || ""),
     });
     setLoading(false);
-    if (result.error) {
+    if ("error" in result) {
       toast.error(result.error);
       return;
     }

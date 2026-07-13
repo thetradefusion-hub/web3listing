@@ -40,7 +40,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
     const code = String(new FormData(e.currentTarget).get("code") || "");
     const result = await verifyPartnerEmailOtp(code);
     setLoading(false);
-    if (result.error) {
+    if ("error" in result) {
       toast.error(result.error);
       return;
     }
@@ -53,13 +53,13 @@ export function VerifyEmailForm({ email }: { email: string }) {
     setResending(true);
     const result = await resendPartnerEmailOtp();
     setResending(false);
-    if (result.error) {
+    if ("error" in result) {
       toast.error(result.error);
       return;
     }
     if (result.stub) {
       setEmailStub(true);
-      if ("devCode" in result && result.devCode) {
+      if (result.devCode) {
         setDevCode(result.devCode);
         toast.success(`Dev mode: use code ${result.devCode}`);
         return;

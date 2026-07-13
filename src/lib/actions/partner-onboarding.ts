@@ -41,7 +41,13 @@ async function getClientMeta() {
   };
 }
 
-async function issueEmailOtp(userId: string, email: string) {
+async function issueEmailOtp(
+  userId: string,
+  email: string
+): Promise<
+  | { error: string }
+  | { success: true; stub: boolean; devCode?: string }
+> {
   const admin = createAdminClient();
   const code = generateOtp();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
@@ -162,16 +168,24 @@ export async function applyToBecomePartner(data: {
   return { success: true, redirectTo: "/partner/onboarding/business-profile" };
 }
 
-export async function resendPartnerEmailOtp() {
+export async function resendPartnerEmailOtp(): Promise<
+  | { error: string }
+  | { success: true; stub: boolean; devCode?: string }
+> {
   const profile = await requireAuth([PARTNER_ROLE]);
   if (profile.partner_onboarding_status !== "applied") {
     return { error: "Email is already verified or application is not pending verification." };
   }
   const result = await issueEmailOtp(profile.id, profile.email);
-  if (result.error) return result;
+  if ("error" in result && result.error) {
+    return { error: result.error };
+  }
+  if (!("success" in result)) {
+    return { error: "Failed to send verification code." };
+  }
   return {
     success: true,
-    stub: result.stub,
+    stub: Boolean(result.stub),
     ...("devCode" in result && result.devCode ? { devCode: result.devCode } : {}),
   };
 }
