@@ -5,7 +5,7 @@ export default async function AdminPartnersPage() {
   const supabase = await createClient();
   const { data: partners } = await supabase
     .from("profiles")
-    .select("id, full_name, email, company_name, country, kyc_status, created_at, telegram_username")
+    .select("id, full_name, email, company_name, country, kyc_status, created_at, telegram_username, partner_onboarding_status")
     .eq("role", "agent")
     .order("created_at", { ascending: false });
 

@@ -67,6 +67,30 @@ export const TICKET_STATUS_LABELS: Record<string, string> = {
 };
 
 export const LEGAL_AGREEMENT_VERSION = "2026-06";
+export const PARTNER_AGREEMENT_VERSION = "2026-07-partner-v1";
+
+export const PARTNER_ONBOARDING_STATUSES = [
+  "none",
+  "applied",
+  "email_verified",
+  "profile_complete",
+  "kyc_pending",
+  "kyc_rejected",
+  "agreements_pending",
+  "active",
+] as const;
+
+export type PartnerOnboardingStatus = (typeof PARTNER_ONBOARDING_STATUSES)[number];
+
+export const PARTNER_AGREEMENT_POLICIES = [
+  { id: "partner_agreement", label: "Partner Agreement", href: "/legal/terms" },
+  { id: "affiliate_policy", label: "Affiliate Policy", href: "/legal/terms" },
+  { id: "commission_policy", label: "Commission Policy", href: "/legal/terms" },
+  { id: "privacy_policy", label: "Privacy Policy", href: "/legal/privacy" },
+  { id: "aml_kyc_policy", label: "AML/KYC Policy", href: "/legal/aml-kyc" },
+  { id: "terms_conditions", label: "Terms & Conditions", href: "/legal/terms" },
+  { id: "nda_optional", label: "NDA (Optional)", href: "/legal/terms", optional: true },
+] as const;
 
 export const PROJECT_LEGAL_POLICIES = [
   { href: "/legal/terms", label: "Terms & Conditions" },

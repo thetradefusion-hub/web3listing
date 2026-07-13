@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { Suspense } from "react";
 import { HomeHero } from "@/components/public/home/hero";
 import { WhySection } from "@/components/public/home/why-section";
 import { ServicePillars } from "@/components/public/home/service-pillars";
@@ -11,18 +10,31 @@ import { HomeDisclaimer } from "@/components/public/home/disclaimer";
 import { HowItWorksSection } from "@/components/public/home/how-it-works-section";
 import { PopularServicesSection } from "@/components/public/home/popular-services-section";
 import { WhyChooseSection } from "@/components/public/home/why-choose-section";
-import { pickFeaturedServices } from "@/lib/service-catalog";
+import { getHomeFeaturedServices } from "@/lib/home-featured-services";
 
-export default async function HomePage() {
-  const supabase = await createClient();
-  const { data: services } = await supabase
-    .from("services")
-    .select("*, service_categories(name, slug)")
-    .eq("is_active", true)
-    .order("sort_order");
+export const revalidate = 300;
 
-  const popularServices = pickFeaturedServices(services ?? [], 8);
+async function PopularServicesBlock() {
+  const popularServices = await getHomeFeaturedServices();
+  return <PopularServicesSection services={popularServices} />;
+}
 
+function PopularServicesFallback() {
+  return (
+    <section className="landing-section">
+      <div className="landing-container">
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-muted" />
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-40 animate-pulse rounded-2xl bg-muted/70" />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
   return (
     <>
       <HomeHero />
@@ -33,12 +45,14 @@ export default async function HomePage() {
         subtitle="Tell us about your project and we’ll recommend the right listing and growth path."
         primaryLabel="Book a call with us"
         secondaryLabel="Become our partner"
-        secondaryHref="/contact"
+        secondaryHref="/become-a-partner"
       />
       <PricingPackages />
       <PartnerStrip />
       <HowItWorksSection />
-      <PopularServicesSection services={popularServices} />
+      <Suspense fallback={<PopularServicesFallback />}>
+        <PopularServicesBlock />
+      </Suspense>
       <WhyChooseSection />
       <HomeFaqSection />
       <ConsultationCta

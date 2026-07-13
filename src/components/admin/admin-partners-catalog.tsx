@@ -40,7 +40,15 @@ import type { KycStatus, Profile } from "@/types/database";
 
 type PartnerRow = Pick<
   Profile,
-  "id" | "full_name" | "email" | "company_name" | "country" | "kyc_status" | "created_at" | "telegram_username"
+  | "id"
+  | "full_name"
+  | "email"
+  | "company_name"
+  | "country"
+  | "kyc_status"
+  | "created_at"
+  | "telegram_username"
+  | "partner_onboarding_status"
 >;
 
 function kycBadgeVariant(status: KycStatus): "default" | "secondary" | "destructive" | "outline" {
@@ -58,17 +66,22 @@ function PartnerIdentity({ partner }: { partner: PartnerRow }) {
     .toUpperCase();
 
   return (
-    <div className="flex min-w-0 items-center gap-3">
+    <Link
+      href={`/admin/partners/${partner.id}`}
+      className="flex min-w-0 items-center gap-3 rounded-xl outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring"
+    >
       <Avatar className="size-10 rounded-xl">
         <AvatarFallback className="rounded-xl bg-primary text-xs font-bold text-primary-foreground">
           {initials}
         </AvatarFallback>
       </Avatar>
       <div className="min-w-0">
-        <p className="truncate font-semibold text-foreground">{partner.full_name || "Unnamed partner"}</p>
+        <p className="truncate font-semibold text-foreground hover:text-primary hover:underline">
+          {partner.full_name || "Unnamed partner"}
+        </p>
         <p className="truncate text-sm text-muted-foreground">{partner.email}</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -150,9 +163,12 @@ export function AdminPartnersCatalog({
   const stats = useMemo(() => {
     const kycApproved = partners.filter((p) => p.kyc_status === "approved").length;
     const kycPending = partners.filter((p) => p.kyc_status === "pending").length;
+    const onboardingPending = partners.filter(
+      (p) => p.partner_onboarding_status && p.partner_onboarding_status !== "active" && p.partner_onboarding_status !== "none"
+    ).length;
     const withOrders = partners.filter((p) => (orderCounts[p.id] || 0) > 0).length;
     const totalOrders = partners.reduce((sum, p) => sum + (orderCounts[p.id] || 0), 0);
-    return { total: partners.length, kycApproved, kycPending, withOrders, totalOrders };
+    return { total: partners.length, kycApproved, kycPending, onboardingPending, withOrders, totalOrders };
   }, [partners, orderCounts]);
 
   const filtered = useMemo(() => {
@@ -189,7 +205,7 @@ export function AdminPartnersCatalog({
       <section aria-label="Partner stats" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <AdminStatCard title="Total Partners" value={stats.total} icon={Handshake} color="blue" />
         <AdminStatCard title="KYC Approved" value={stats.kycApproved} icon={CheckCircle2} color="green" />
-        <AdminStatCard title="KYC Pending" value={stats.kycPending} icon={UserCheck} color="orange" />
+        <AdminStatCard title="Onboarding" value={stats.onboardingPending} icon={UserCheck} color="orange" />
         <AdminStatCard title="Total Orders" value={stats.totalOrders} icon={ClipboardList} color="purple" />
       </section>
 
@@ -213,6 +229,7 @@ export function AdminPartnersCatalog({
                     <TableHead className="hidden px-4 md:table-cell">Company</TableHead>
                     <TableHead className="hidden px-4 lg:table-cell">Telegram</TableHead>
                     <TableHead className="px-4">KYC</TableHead>
+                    <TableHead className="hidden px-4 md:table-cell">Onboarding</TableHead>
                     <TableHead className="hidden px-4 sm:table-cell">Orders</TableHead>
                     <TableHead className="hidden px-4 xl:table-cell">Joined</TableHead>
                     <TableHead className="px-4 text-right">Actions</TableHead>
@@ -220,7 +237,7 @@ export function AdminPartnersCatalog({
                 </TableHeader>
                 <TableBody>
                   {filtered.map((partner) => (
-                    <TableRow key={partner.id}>
+                    <TableRow key={partner.id} className="group">
                       <TableCell className="whitespace-normal px-4 py-3">
                         <PartnerIdentity partner={partner} />
                       </TableCell>
@@ -241,6 +258,11 @@ export function AdminPartnersCatalog({
                           {partner.kyc_status}
                         </Badge>
                       </TableCell>
+                      <TableCell className="hidden px-4 md:table-cell">
+                        <Badge variant="outline" className="capitalize">
+                          {(partner.partner_onboarding_status || "none").replace(/_/g, " ")}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="hidden px-4 sm:table-cell">
                         <Badge variant={(orderCounts[partner.id] || 0) > 0 ? "secondary" : "outline"}>
                           {orderCounts[partner.id] || 0}
@@ -250,11 +272,16 @@ export function AdminPartnersCatalog({
                         {new Date(partner.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="px-4 text-right">
-                        <PartnerActions
-                          partnerId={partner.id}
-                          email={partner.email}
-                          kycStatus={partner.kyc_status}
-                        />
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <Button asChild size="sm" variant="secondary" className="rounded-xl">
+                            <Link href={`/admin/partners/${partner.id}`}>View</Link>
+                          </Button>
+                          <PartnerActions
+                            partnerId={partner.id}
+                            email={partner.email}
+                            kycStatus={partner.kyc_status}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -270,6 +297,9 @@ export function AdminPartnersCatalog({
                       <Badge variant={kycBadgeVariant(partner.kyc_status)} className="capitalize">
                         KYC: {partner.kyc_status}
                       </Badge>
+                      <Badge variant="outline" className="capitalize">
+                        {(partner.partner_onboarding_status || "none").replace(/_/g, " ")}
+                      </Badge>
                       <Badge variant="outline">{orderCounts[partner.id] || 0} orders</Badge>
                     </div>
                     <div className="mt-3 border-t border-border pt-3">
@@ -284,7 +314,10 @@ export function AdminPartnersCatalog({
                         {new Date(partner.created_at).toLocaleDateString()}
                       </MobileDataRow>
                     </div>
-                    <div className="mt-3 border-t border-border pt-3">
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+                      <Button asChild size="sm" variant="secondary" className="rounded-xl">
+                        <Link href={`/admin/partners/${partner.id}`}>View details</Link>
+                      </Button>
                       <PartnerActions
                         partnerId={partner.id}
                         email={partner.email}

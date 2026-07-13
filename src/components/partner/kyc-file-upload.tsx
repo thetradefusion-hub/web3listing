@@ -12,7 +12,7 @@ const ACCEPT = "image/jpeg,image/png,image/webp,application/pdf";
 
 type KycFileUploadProps = {
   name: string;
-  field: "identity" | "selfie" | "company" | "tax";
+  field: "identity" | "selfie" | "company" | "tax" | "address" | "rep_id";
   label: string;
   defaultPath?: string;
   disabled?: boolean;

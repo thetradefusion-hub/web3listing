@@ -93,15 +93,26 @@ export async function signIn(email: string, password: string) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, kyc_status, partner_onboarding_status, partner_agreements_accepted_at")
     .eq("id", user.id)
     .single();
 
   revalidatePath("/", "layout");
 
-  const redirectTo = profile?.role
+  let redirectTo = profile?.role
     ? getPortalPathForRole(profile.role as UserRole)
     : "/";
+
+  if (profile?.role === "agent") {
+    const { getPartnerOnboardingPath, isPartnerOnboardingComplete } = await import(
+      "@/lib/partner-onboarding"
+    );
+    if (!isPartnerOnboardingComplete(profile as Parameters<typeof isPartnerOnboardingComplete>[0])) {
+      redirectTo = getPartnerOnboardingPath(profile.partner_onboarding_status, {
+        agreementsAccepted: Boolean(profile.partner_agreements_accepted_at),
+      });
+    }
+  }
 
   return { success: true, redirectTo };
 }
@@ -165,6 +176,7 @@ export async function createAgentAccount(data: {
 
   if (error) return { error: error.message };
 
+  const now = new Date().toISOString();
   await admin.from("profiles").update({
     full_name: data.full_name,
     company_name: data.company_name,
@@ -172,6 +184,10 @@ export async function createAgentAccount(data: {
     country: data.country,
     role: "agent",
     kyc_status: "approved",
+    partner_onboarding_status: "active",
+    email_verified_at: now,
+    partner_agreements_accepted_at: now,
+    partner_activated_at: now,
   }).eq("id", authUser.user.id);
 
   const emailContent = credentialsEmail(data.email, password);
@@ -206,8 +222,12 @@ export async function approveAgentKyc(userId: string) {
   await admin.from("profiles").update({ kyc_status: "approved" }).eq("id", userId);
   await admin.from("kyc_submissions").update({ status: "approved", reviewed_at: new Date().toISOString() }).eq("user_id", userId);
 
+  const { syncPartnerOnboardingAfterKyc } = await import("@/lib/actions/partner-onboarding");
+  await syncPartnerOnboardingAfterKyc(userId, true);
+
   revalidatePath("/admin/partners");
   revalidatePath("/admin/kyc");
+  revalidatePath("/partner/onboarding");
   return { success: true };
 }
 
@@ -230,7 +250,14 @@ export async function updateProfile(data: Record<string, string>) {
   return { success: true };
 }
 
-const KYC_UPLOAD_FIELDS = new Set(["identity", "selfie", "company", "tax"]);
+const KYC_UPLOAD_FIELDS = new Set([
+  "identity",
+  "selfie",
+  "company",
+  "tax",
+  "address",
+  "rep_id",
+]);
 const KYC_ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -303,6 +330,11 @@ export async function submitKyc(data: Record<string, string>) {
   const identityDocumentUrl = data.passport_url?.trim();
   const selfieUrl = data.selfie_url?.trim();
   const identityDocumentType = data.identity_document_type?.trim();
+  const isPartnerOnboarding =
+    profile.role === "agent" &&
+    profile.partner_onboarding_status &&
+    profile.partner_onboarding_status !== "none" &&
+    profile.partner_onboarding_status !== "active";
 
   if (!identityDocumentType) {
     return { error: "Please select an identity document type" };
@@ -313,15 +345,28 @@ export async function submitKyc(data: Record<string, string>) {
   if (!selfieUrl) {
     return { error: "Please upload your selfie verification photo" };
   }
+  if (isPartnerOnboarding) {
+    if (!data.address_proof_url?.trim()) {
+      return { error: "Please upload address proof" };
+    }
+    if (!data.authorized_rep_id_url?.trim()) {
+      return { error: "Please upload authorized representative ID" };
+    }
+  }
 
-  await supabase.from("profiles").update({
+  const profilePatch: Record<string, string> = {
     full_name: data.full_name,
     company_name: data.company_name,
     mobile: data.mobile,
     telegram_username: data.telegram_username,
     country: data.country,
     kyc_status: "pending",
-  }).eq("id", profile.id);
+  };
+  if (isPartnerOnboarding) {
+    profilePatch.partner_onboarding_status = "kyc_pending";
+  }
+
+  await supabase.from("profiles").update(profilePatch).eq("id", profile.id);
 
   const { error } = await supabase.from("kyc_submissions").upsert({
     user_id: profile.id,
@@ -330,6 +375,8 @@ export async function submitKyc(data: Record<string, string>) {
     company_registration_url: data.company_registration_url,
     selfie_url: selfieUrl,
     tax_document_url: data.tax_document_url,
+    address_proof_url: data.address_proof_url || null,
+    authorized_rep_id_url: data.authorized_rep_id_url || null,
     status: "pending",
   }, { onConflict: "user_id" });
 
@@ -347,6 +394,11 @@ export async function submitKyc(data: Record<string, string>) {
   revalidatePath("/admin/kyc");
   revalidatePath("/partner/profile");
   revalidatePath("/user/profile");
+  revalidatePath("/partner/onboarding");
+
+  if (isPartnerOnboarding) {
+    return { success: true, redirectTo: "/partner/onboarding/agreements" };
+  }
   return { success: true };
 }
 
@@ -363,6 +415,9 @@ export async function reviewKyc(userId: string, status: "approved" | "rejected",
 
   await admin.from("profiles").update({ kyc_status: status }).eq("id", userId);
 
+  const { syncPartnerOnboardingAfterKyc } = await import("@/lib/actions/partner-onboarding");
+  await syncPartnerOnboardingAfterKyc(userId, status === "approved");
+
   const { data: profile } = await admin.from("profiles").select("email").eq("id", userId).single();
   if (profile?.email) {
     const email = kycStatusEmail(status, notes);
@@ -374,6 +429,8 @@ export async function reviewKyc(userId: string, status: "approved" | "rejected",
   revalidatePath("/user/kyc");
   revalidatePath("/partner/profile");
   revalidatePath("/user/profile");
+  revalidatePath("/partner/onboarding");
+  revalidatePath("/admin/partners");
   return { success: true };
 }
 

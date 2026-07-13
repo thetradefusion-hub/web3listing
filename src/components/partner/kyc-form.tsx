@@ -113,10 +113,12 @@ export function KycForm({
   defaultValues,
   kycStatus,
   underReview = false,
+  partnerOnboarding = false,
 }: {
   defaultValues: Record<string, string>;
   kycStatus: KycStatus;
   underReview?: boolean;
+  partnerOnboarding?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -145,6 +147,14 @@ export function KycForm({
       toast.error("Please upload your selfie verification photo");
       return;
     }
+    if (partnerOnboarding && !data.address_proof_url?.trim()) {
+      toast.error("Please upload address proof");
+      return;
+    }
+    if (partnerOnboarding && !data.authorized_rep_id_url?.trim()) {
+      toast.error("Please upload authorized representative ID");
+      return;
+    }
 
     setLoading(true);
     const result = await submitKyc(data);
@@ -154,6 +164,10 @@ export function KycForm({
       return;
     }
     toast.success("KYC submitted for review");
+    if ("redirectTo" in result && result.redirectTo) {
+      window.location.href = result.redirectTo;
+      return;
+    }
     router.refresh();
   }
 
@@ -289,6 +303,26 @@ export function KycForm({
             defaultPath={defaultValues.tax_document_url}
             disabled={underReview}
           />
+          {partnerOnboarding ? (
+            <>
+              <KycFileUpload
+                name="address_proof_url"
+                field="address"
+                label="Address Proof"
+                defaultPath={defaultValues.address_proof_url}
+                disabled={underReview}
+                required
+              />
+              <KycFileUpload
+                name="authorized_rep_id_url"
+                field="rep_id"
+                label="Authorized Rep ID"
+                defaultPath={defaultValues.authorized_rep_id_url}
+                disabled={underReview}
+                required
+              />
+            </>
+          ) : null}
         </div>
       </FormSection>
 

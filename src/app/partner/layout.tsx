@@ -2,8 +2,17 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { PartnerPortalShell } from "@/components/partner/portal-shell";
+import { PartnerOnboardingShell } from "@/components/partner/onboarding/onboarding-shell";
+import {
+  getPartnerOnboardingPath,
+  isPartnerOnboardingComplete,
+} from "@/lib/partner-onboarding";
 
-export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
+export default async function PartnerLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const profile = await getCurrentUser();
   if (!profile) redirect("/login");
   if (profile.role !== "agent") {
@@ -11,9 +20,26 @@ export default async function PartnerLayout({ children }: { children: React.Reac
     redirect("/admin");
   }
 
+  if (!isPartnerOnboardingComplete(profile)) {
+    return (
+      <PartnerOnboardingShell
+        profile={profile}
+        currentPath={getPartnerOnboardingPath(profile.partner_onboarding_status, {
+          agreementsAccepted: Boolean(profile.partner_agreements_accepted_at),
+        })}
+      >
+        {children}
+      </PartnerOnboardingShell>
+    );
+  }
+
   const supabase = await createClient();
   const { data: manager } = profile.account_manager_id
-    ? await supabase.from("account_managers").select("*").eq("id", profile.account_manager_id).single()
+    ? await supabase
+        .from("account_managers")
+        .select("*")
+        .eq("id", profile.account_manager_id)
+        .single()
     : await supabase.from("account_managers").select("*").eq("is_active", true).limit(1).single();
 
   return (

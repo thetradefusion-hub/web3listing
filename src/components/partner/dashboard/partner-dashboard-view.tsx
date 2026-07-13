@@ -30,8 +30,10 @@ import {
 } from "@/components/partner/dashboard/dashboard-premium";
 import { DashboardSupportSection } from "@/components/partner/dashboard/dashboard-support-section";
 import { rel, PartnerPageShell } from "@/components/partner/ui";
-import { EarningsChart } from "@/components/partner/dashboard/earnings-chart";
-import { ProjectStatusChart } from "@/components/partner/dashboard/project-status-chart";
+import {
+  LazyEarningsChart,
+  LazyProjectStatusChart,
+} from "@/components/partner/dashboard/lazy-charts";
 import { Alert, AlertAction, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -277,7 +279,7 @@ export function PartnerDashboardView({
           }
         >
           {totalProjects > 0 ? (
-            <ProjectStatusChart data={projectChartData} total={totalProjects} compact />
+            <LazyProjectStatusChart data={projectChartData} total={totalProjects} compact />
           ) : (
             <p className="py-8 text-center text-sm text-muted-foreground">No projects yet</p>
           )}
@@ -324,7 +326,7 @@ export function PartnerDashboardView({
           <EarningsOverviewCard
             monthEarnings={monthEarnings}
             earningsGrowth={earningsGrowth}
-            chart={<EarningsChart data={earningsChartData} compact />}
+            chart={<LazyEarningsChart data={earningsChartData} compact />}
           />
         </DashboardPanel>
       </div>

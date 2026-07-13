@@ -61,9 +61,33 @@ export interface Profile {
   kyc_status: KycStatus;
   account_manager_id: string | null;
   avatar_url: string | null;
+  partner_onboarding_status?: PartnerOnboardingStatus;
+  partner_website?: string | null;
+  years_of_experience?: string | null;
+  monthly_client_volume?: string | null;
+  services_offered?: string | null;
+  company_description?: string | null;
+  business_type?: string | null;
+  target_market?: string | null;
+  existing_client_base?: string | null;
+  monthly_leads?: string | null;
+  preferred_services?: string | null;
+  email_verified_at?: string | null;
+  partner_agreements_accepted_at?: string | null;
+  partner_activated_at?: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export type PartnerOnboardingStatus =
+  | "none"
+  | "applied"
+  | "email_verified"
+  | "profile_complete"
+  | "kyc_pending"
+  | "kyc_rejected"
+  | "agreements_pending"
+  | "active";
 
 export interface AccountManager {
   id: string;
@@ -83,6 +107,8 @@ export interface KycSubmission {
   company_registration_url: string | null;
   selfie_url: string | null;
   tax_document_url: string | null;
+  address_proof_url?: string | null;
+  authorized_rep_id_url?: string | null;
   status: KycStatus;
   review_notes: string | null;
   reviewed_by: string | null;

@@ -1,8 +1,26 @@
 import { Resend } from "resend";
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+function isConfiguredResendKey(key: string | undefined): key is string {
+  if (!key) return false;
+  const trimmed = key.trim();
+  if (!trimmed) return false;
+  if (/^your[_-]?resend/i.test(trimmed)) return false;
+  if (trimmed.includes("your_resend_api_key")) return false;
+  return true;
+}
 
-const FROM_EMAIL = "Web3Listing <noreply@web3listing.com>";
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = isConfiguredResendKey(resendApiKey) ? new Resend(resendApiKey) : null;
+
+/** Prefer verified domain in prod; Resend test sender works without a custom domain. */
+const FROM_EMAIL =
+  process.env.EMAIL_FROM?.trim() ||
+  process.env.RESEND_FROM_EMAIL?.trim() ||
+  "Web3Listing <onboarding@resend.dev>";
+
+export function isEmailDeliveryConfigured() {
+  return Boolean(resend);
+}
 
 export async function sendEmail({
   to,
@@ -15,15 +33,33 @@ export async function sendEmail({
 }) {
   if (!resend) {
     console.log(`[Email stub] To: ${to}, Subject: ${subject}`);
-    return { success: true, stub: true };
+    console.log(`[Email stub] HTML:\n${html}`);
+    return { success: true as const, stub: true as const };
   }
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to, subject, html });
-    return { success: true };
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
+    });
+
+    if (error) {
+      console.error("Email send failed:", error);
+      return {
+        success: false as const,
+        error: error.message || "Failed to send email",
+      };
+    }
+
+    return { success: true as const, id: data?.id };
   } catch (error) {
     console.error("Email send failed:", error);
-    return { success: false, error };
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to send email",
+    };
   }
 }
 

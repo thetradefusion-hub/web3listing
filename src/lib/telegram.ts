@@ -1,4 +1,4 @@
-export const DEFAULT_MANAGER_TELEGRAM_USERNAME = "blackbox1920";
+export const DEFAULT_MANAGER_TELEGRAM_USERNAME = "Web3ListingOfficial";
 
 export function buildTelegramLink(usernameOrLink?: string | null): string {
   const fallback = `https://t.me/${encodeURIComponent(DEFAULT_MANAGER_TELEGRAM_USERNAME)}`;

@@ -139,7 +139,7 @@ export function HomeHero() {
                 className="h-12 w-full rounded-full border-border/80 bg-background/70 px-8 text-sm font-semibold uppercase tracking-wide backdrop-blur-sm hover:bg-muted/60 sm:w-auto"
                 asChild
               >
-                <Link href="/contact">Become our partner</Link>
+                <Link href="/become-a-partner">Become our partner</Link>
               </Button>
             </div>
 

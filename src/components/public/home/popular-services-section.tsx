@@ -37,7 +37,7 @@ function ServiceLogo({ service }: { service: ServiceRow }) {
     >
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoUrl} alt="" className="size-9 object-contain" />
+        <img src={logoUrl} alt="" className="size-9 object-contain" loading="lazy" decoding="async" />
       ) : CatIcon ? (
         <CatIcon className="size-5" strokeWidth={2} />
       ) : (

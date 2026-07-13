@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND_LOGO_DARK_PATH, BRAND_LOGO_LIGHT_PATH, SITE_NAME } from "@/lib/constants";
@@ -42,20 +40,25 @@ function BrandLogoImages({
 
   return (
     <>
+      {/* Only boost the light-mode logo on the critical path; dark loads lazily. */}
       <Image
         src={BRAND_LOGO_LIGHT_PATH}
         alt={SITE_NAME}
         width={240}
         height={48}
         priority={priority}
+        sizes="(max-width: 640px) 160px, 200px"
         className={cn(imageClass, "dark:hidden")}
       />
       <Image
         src={BRAND_LOGO_DARK_PATH}
-        alt={SITE_NAME}
+        alt=""
+        aria-hidden
         width={240}
         height={48}
-        priority={priority}
+        priority={false}
+        loading="lazy"
+        sizes="(max-width: 640px) 160px, 200px"
         className={cn(imageClass, "hidden dark:block")}
       />
     </>
@@ -84,7 +87,13 @@ export function BrandLogo({
   return <span className="inline-flex shrink-0 items-center">{logo}</span>;
 }
 
-export function SidebarBrandLogo({ className, priority = false }: { className?: string; priority?: boolean }) {
+export function SidebarBrandLogo({
+  className,
+  priority = false,
+}: {
+  className?: string;
+  priority?: boolean;
+}) {
   return (
     <Image
       src={BRAND_LOGO_DARK_PATH}
@@ -92,6 +101,7 @@ export function SidebarBrandLogo({ className, priority = false }: { className?: 
       width={220}
       height={48}
       priority={priority}
+      sizes="210px"
       className={cn("h-9 w-auto max-w-[210px] object-contain object-left", className)}
     />
   );
