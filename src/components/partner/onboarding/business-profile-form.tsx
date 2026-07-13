@@ -39,9 +39,6 @@ export function BusinessProfileForm({
     setLoading(false);
     if (result.error) {
       toast.error(result.error);
-      if (result.redirectTo) {
-        window.location.href = result.redirectTo;
-      }
       return;
     }
     toast.success("Business profile saved");
