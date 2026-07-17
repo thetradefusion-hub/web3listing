@@ -31,6 +31,7 @@ export function PublicFooter() {
             <h4 className="mb-3 text-sm font-semibold text-foreground">Quick Links</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href="/services" className="transition hover:text-primary">Services</Link></li>
+              <li><Link href="/verify" className="transition hover:text-primary">Verify partner</Link></li>
               <li><Link href="/about" className="transition hover:text-primary">About Us</Link></li>
               <li><Link href="/blog" className="transition hover:text-primary">Blog</Link></li>
               <li><Link href="/contact" className="transition hover:text-primary">Contact</Link></li>

@@ -22,11 +22,12 @@ export default async function AgreementsPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold">Partner agreements</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="lh-accent text-[11px] font-semibold uppercase tracking-wide">Step 3 of 4</p>
+      <h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Partner agreements</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
         Accept the required policies to finish your application.
       </p>
-      <div className="mt-6">
+      <div className="mt-7">
         <AgreementsForm />
       </div>
     </div>

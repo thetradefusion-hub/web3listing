@@ -83,6 +83,47 @@ const TAB_LABELS: Record<string, { short: string; full: string }> = {
   terms: { short: "Terms", full: "Terms" },
 };
 
+function ProofOfWorkImage({ url }: { url: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <Button variant="outline" className="rounded-xl font-semibold" asChild>
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          <ExternalLink data-icon="inline-start" />
+          View Proof of Work
+        </a>
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block overflow-hidden rounded-xl border border-border bg-muted/20"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt="Proof of work"
+          className="h-auto w-full object-contain"
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+      </a>
+      <Button variant="outline" className="w-fit rounded-xl font-semibold" asChild>
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          <ExternalLink data-icon="inline-start" />
+          Open full image
+        </a>
+      </Button>
+    </div>
+  );
+}
+
 function MetricPill({
   icon: Icon,
   label,
@@ -454,20 +495,15 @@ export function ServiceDetailView({
               <TabsContent value="proof" className="p-4 sm:p-5">
                 {service.proof_of_work ? (
                   <p className="text-sm leading-relaxed text-muted-foreground">{service.proof_of_work}</p>
-                ) : (
+                ) : !service.proof_of_work_url ? (
                   <Empty className="border-0 bg-transparent py-6">
                     <EmptyHeader>
                       <EmptyTitle className="text-sm">Proof coming soon</EmptyTitle>
                     </EmptyHeader>
                   </Empty>
-                )}
+                ) : null}
                 {service.proof_of_work_url && (
-                  <Button variant="outline" className="mt-4 rounded-xl font-semibold" asChild>
-                    <a href={service.proof_of_work_url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink data-icon="inline-start" />
-                      View Proof of Work
-                    </a>
-                  </Button>
+                  <ProofOfWorkImage url={service.proof_of_work_url} />
                 )}
               </TabsContent>
 

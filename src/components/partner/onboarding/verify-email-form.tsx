@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Mail } from "lucide-react";
+import { ArrowRight, Loader2, Mail } from "lucide-react";
 import {
   getPartnerEmailOtpDevHint,
   resendPartnerEmailOtp,
@@ -72,10 +72,12 @@ export function VerifyEmailForm({ email }: { email: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3">
-        <Mail className="mt-0.5 size-5 shrink-0 text-primary" />
+      <div className="flex items-start gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+          <Mail className="size-5" strokeWidth={2} />
+        </span>
         <div>
-          <p className="text-sm font-semibold">Check your inbox</p>
+          <p className="text-sm font-semibold text-foreground">Check your inbox</p>
           <p className="mt-0.5 text-sm text-muted-foreground">
             We sent a 6-digit code to <span className="font-medium text-foreground">{email}</span>
           </p>
@@ -99,7 +101,9 @@ export function VerifyEmailForm({ email }: { email: string }) {
       ) : null}
 
       <div className="space-y-2">
-        <Label htmlFor="code">Verification code</Label>
+        <Label htmlFor="code" className="text-xs font-semibold text-muted-foreground">
+          Verification code
+        </Label>
         <Input
           id="code"
           name="code"
@@ -107,7 +111,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
           pattern="[0-9]{6}"
           maxLength={6}
           placeholder="000000"
-          className="h-12 rounded-xl text-center text-2xl tracking-[0.4em] font-semibold"
+          className="h-14 rounded-xl text-center text-2xl font-semibold tracking-[0.4em] shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25"
           defaultValue={devCode || undefined}
           key={devCode || "otp-input"}
           required
@@ -121,7 +125,10 @@ export function VerifyEmailForm({ email }: { email: string }) {
             Verifying…
           </>
         ) : (
-          "Verify email"
+          <>
+            Verify email
+            <ArrowRight className="size-4" />
+          </>
         )}
       </Button>
 

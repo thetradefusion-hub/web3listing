@@ -31,6 +31,7 @@ import {
   normalizeFaqs,
   processStepsToLines,
 } from "@/components/admin/service-form-utils";
+import { ImageUrlPreview } from "@/components/admin/image-url-preview";
 import type { CommissionType, PricingModel, Service, ServiceCategory } from "@/types/database";
 
 const inputClass = "h-11 rounded-xl";
@@ -307,12 +308,13 @@ export function ServiceForm({
         <Field label="Demo link" htmlFor="demo_link">
           <Input id="demo_link" name="demo_link" className={inputClass} defaultValue={service?.demo_link || ""} />
         </Field>
-        <Field label="Proof of work URL" htmlFor="proof_of_work_url">
-          <Input
+        <Field label="Proof of work image URL" htmlFor="proof_of_work_url">
+          <ImageUrlPreview
             id="proof_of_work_url"
             name="proof_of_work_url"
             className={inputClass}
             defaultValue={service?.proof_of_work_url || ""}
+            placeholder="https://... (image link, shown full-size on the service page)"
           />
         </Field>
         <Field label="Proof of work text" htmlFor="proof_of_work" className="sm:col-span-2 xl:col-span-3">

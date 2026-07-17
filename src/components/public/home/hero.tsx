@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PARTNER_EXCHANGES } from "@/lib/home-content";
+import { getServiceInitials, getServiceLogoUrl } from "@/lib/service-catalog";
 import { cn } from "@/lib/utils";
 
 const HERO_EXCHANGES = [
@@ -17,20 +19,28 @@ const HERO_EXCHANGES = [
   "DEXTools",
 ] as const;
 
+/** Square brand marks for the orbit (favicon CDN is reliable for exchange domains). */
+const HERO_LOGO_BY_NAME: Record<(typeof HERO_EXCHANGES)[number], string> = {
+  Binance: "https://www.google.com/s2/favicons?domain=binance.com&sz=128",
+  MEXC: "https://www.google.com/s2/favicons?domain=mexc.com&sz=128",
+  "Gate.io": "https://www.google.com/s2/favicons?domain=gate.io&sz=128",
+  KuCoin: "https://www.google.com/s2/favicons?domain=kucoin.com&sz=128",
+  Bitget: "https://www.google.com/s2/favicons?domain=bitget.com&sz=128",
+  OKX: "https://www.google.com/s2/favicons?domain=okx.com&sz=128",
+  Bybit: "https://www.google.com/s2/favicons?domain=bybit.com&sz=128",
+  CoinMarketCap: "https://www.google.com/s2/favicons?domain=coinmarketcap.com&sz=128",
+  CoinGecko: "https://www.google.com/s2/favicons?domain=coingecko.com&sz=128",
+  DEXTools: "https://www.google.com/s2/favicons?domain=dextools.io&sz=128",
+};
+
 function ExchangeOrb({
   name,
   className,
 }: {
-  name: string;
+  name: (typeof HERO_EXCHANGES)[number];
   className?: string;
 }) {
-  const initials = name
-    .replace(/\./g, "")
-    .split(" ")
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const logoUrl = HERO_LOGO_BY_NAME[name] ?? getServiceLogoUrl({ name });
 
   return (
     <div
@@ -39,7 +49,22 @@ function ExchangeOrb({
         className
       )}
     >
-      <span className="text-xs font-bold tracking-tight text-primary sm:text-sm">{initials}</span>
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt=""
+          width={28}
+          height={28}
+          className="size-6 object-contain sm:size-7"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span className="text-xs font-bold tracking-tight text-primary sm:text-sm">
+          {getServiceInitials(name)}
+        </span>
+      )}
       <span className="mt-0.5 max-w-[3.5rem] truncate px-1 text-[8px] font-medium text-muted-foreground sm:text-[9px]">
         {name}
       </span>
@@ -65,9 +90,16 @@ function HeroExchangeNetwork() {
       />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative z-10 flex size-28 flex-col items-center justify-center rounded-full border border-primary/30 bg-gradient-to-br from-primary to-chart-4 text-primary-foreground shadow-2xl shadow-primary/30 sm:size-32">
-          <span className="text-2xl font-black tracking-tight sm:text-3xl">W3</span>
-          <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.16em] opacity-90">
+        <div className="relative z-10 flex size-28 flex-col items-center justify-center gap-1 rounded-full border border-primary/40 bg-zinc-950 text-white shadow-2xl shadow-primary/30 sm:size-32">
+          <Image
+            src="/web3_exact_colors.svg"
+            alt="W3 Listing"
+            width={72}
+            height={48}
+            priority
+            className="h-9 w-auto sm:h-10"
+          />
+          <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/85">
             Listing
           </span>
         </div>
@@ -93,6 +125,32 @@ function HeroExchangeNetwork() {
         );
       })}
     </div>
+  );
+}
+
+function PartnerMarqueeItem({ name }: { name: string }) {
+  const logoUrl = getServiceLogoUrl({ name });
+
+  return (
+    <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border/50 bg-card/50 px-3 py-1.5 backdrop-blur-sm">
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt=""
+          width={20}
+          height={20}
+          className="size-5 object-contain"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span className="flex size-5 items-center justify-center rounded-md bg-primary/10 text-[10px] font-bold text-primary">
+          {getServiceInitials(name)}
+        </span>
+      )}
+      <span className="text-sm font-semibold tracking-tight text-muted-foreground/90">{name}</span>
+    </span>
   );
 }
 
@@ -154,14 +212,9 @@ export function HomeHero() {
         <div className="relative overflow-hidden border-t border-border/60 py-5 sm:py-6">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent sm:w-16" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent sm:w-16" />
-          <div className="flex w-max gap-8 lh-marquee px-4">
+          <div className="flex w-max items-center gap-4 lh-marquee px-4 sm:gap-5">
             {[...PARTNER_EXCHANGES, ...PARTNER_EXCHANGES].map((name, i) => (
-              <span
-                key={`${name}-${i}`}
-                className="shrink-0 text-sm font-semibold tracking-tight text-muted-foreground/75"
-              >
-                {name}
-              </span>
+              <PartnerMarqueeItem key={`${name}-${i}`} name={name} />
             ))}
           </div>
         </div>

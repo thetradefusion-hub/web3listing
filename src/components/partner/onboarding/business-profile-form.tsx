@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { savePartnerBusinessProfile } from "@/lib/actions/partner-onboarding";
 import { NAVIGATION_START_EVENT } from "@/components/shared/route-loader";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+
+const inputClass =
+  "h-11 rounded-xl border-input bg-background shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25";
+const labelClass = "text-xs font-semibold text-muted-foreground";
 
 export function BusinessProfileForm({
   defaults,
@@ -47,70 +51,86 @@ export function BusinessProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="company_description">Company description *</Label>
+        <Label htmlFor="company_description" className={labelClass}>
+          Company description *
+        </Label>
         <Textarea
           id="company_description"
           name="company_description"
-          rows={3}
+          rows={4}
           defaultValue={defaults.company_description || ""}
-          className="rounded-xl"
+          className="rounded-xl border-input bg-background shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25"
+          placeholder="What does your company do in Web3?"
           required
         />
       </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="business_type">Business type *</Label>
+          <Label htmlFor="business_type" className={labelClass}>
+            Business type *
+          </Label>
           <Input
             id="business_type"
             name="business_type"
             defaultValue={defaults.business_type || ""}
             placeholder="Agency, consultancy, exchange…"
-            className="h-11 rounded-xl"
+            className={inputClass}
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="target_market">Target market *</Label>
+          <Label htmlFor="target_market" className={labelClass}>
+            Target market *
+          </Label>
           <Input
             id="target_market"
             name="target_market"
             defaultValue={defaults.target_market || ""}
             placeholder="Regions / segments"
-            className="h-11 rounded-xl"
+            className={inputClass}
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="existing_client_base">Existing client base *</Label>
+          <Label htmlFor="existing_client_base" className={labelClass}>
+            Existing client base *
+          </Label>
           <Input
             id="existing_client_base"
             name="existing_client_base"
             defaultValue={defaults.existing_client_base || ""}
-            className="h-11 rounded-xl"
+            className={inputClass}
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="monthly_leads">Monthly leads *</Label>
+          <Label htmlFor="monthly_leads" className={labelClass}>
+            Monthly leads *
+          </Label>
           <Input
             id="monthly_leads"
             name="monthly_leads"
             defaultValue={defaults.monthly_leads || ""}
-            className="h-11 rounded-xl"
+            className={inputClass}
             required
           />
         </div>
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="preferred_services">Preferred marketplace services *</Label>
+        <Label htmlFor="preferred_services" className={labelClass}>
+          Preferred marketplace services *
+        </Label>
         <Textarea
           id="preferred_services"
           name="preferred_services"
-          rows={2}
+          rows={3}
           defaultValue={defaults.preferred_services || ""}
-          className="rounded-xl"
+          className="rounded-xl border-input bg-background shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25"
+          placeholder="Listings, PR, market making, audits…"
           required
         />
       </div>
@@ -122,7 +142,10 @@ export function BusinessProfileForm({
             Saving…
           </>
         ) : (
-          "Continue to KYC"
+          <>
+            Continue to KYC
+            <ArrowRight className="size-4" />
+          </>
         )}
       </Button>
     </form>

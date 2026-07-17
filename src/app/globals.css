@@ -723,6 +723,89 @@ div[data-base-ui-inert][role="presentation"][inert] {
     radial-gradient(ellipse 45% 40% at 0% 75%, color-mix(in srgb, #8b2cf5 14%, transparent), transparent 50%);
 }
 
+.partner-network-section {
+  background:
+    radial-gradient(ellipse 55% 45% at 0% 50%, color-mix(in srgb, #8b2cf5 18%, transparent), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 100% 50%, color-mix(in srgb, #6366f1 14%, transparent), transparent 55%),
+    #09090b;
+}
+
+.partner-network-glow-left {
+  background: radial-gradient(circle at left center, color-mix(in srgb, #8b2cf5 22%, transparent), transparent 70%);
+}
+
+.partner-network-glow-right {
+  background: radial-gradient(circle at right center, color-mix(in srgb, #6366f1 18%, transparent), transparent 70%);
+}
+
+.partner-network-badge {
+  box-shadow: 0 0 24px color-mix(in srgb, #8b2cf5 18%, transparent);
+}
+
+.partner-network-cta {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #8b2cf5 12%, transparent),
+    0 16px 48px color-mix(in srgb, #8b2cf5 16%, transparent);
+}
+
+.partner-network-cta-icon {
+  box-shadow: 0 0 32px color-mix(in srgb, #8b2cf5 28%, transparent);
+}
+
+.partner-network-cta-btn {
+  border: 0;
+  background-image: linear-gradient(90deg, #8b2cf5 0%, #7c3aed 45%, #a3e635 100%);
+  color: #0a0a0a;
+  box-shadow: 0 10px 28px color-mix(in srgb, #8b2cf5 30%, transparent);
+}
+
+.partner-network-cta-btn:hover {
+  filter: brightness(1.05);
+}
+
+.partner-grid-card:hover {
+  box-shadow: 0 8px 28px color-mix(in srgb, #8b2cf5 14%, transparent);
+}
+
+.services-marketplace {
+  background:
+    radial-gradient(
+      ellipse 70% 45% at 50% -10%,
+      color-mix(in srgb, var(--primary) 10%, transparent),
+      transparent 55%
+    ),
+    var(--background);
+}
+
+.services-hero-badge {
+  box-shadow: 0 0 24px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.services-search {
+  filter: drop-shadow(0 10px 28px color-mix(in srgb, var(--primary) 8%, transparent));
+}
+
+.services-card {
+  animation: services-card-in 0.45s ease both;
+}
+
+@keyframes services-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-card {
+    animation: none;
+  }
+}
+
 .hero-badge-pill {
   display: inline-flex;
   align-items: center;

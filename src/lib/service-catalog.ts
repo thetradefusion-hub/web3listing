@@ -232,25 +232,44 @@ export function getServiceInitials(name: string) {
     .toUpperCase();
 }
 
+/** Favicon helper for brands without a cryptologos asset. */
+export function getBrandFaviconUrl(domain: string) {
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+}
+
+function brandFavicon(domain: string) {
+  return getBrandFaviconUrl(domain);
+}
+
 /** Known exchange / platform logos when `logo_url` is not set in admin. */
 const BRAND_LOGO_PATTERNS: { pattern: RegExp; url: string }[] = [
-  { pattern: /binance/i, url: "https://cryptologos.cc/logos/bnb-bnb-logo.png" },
-  { pattern: /okx|oklx/i, url: "https://cryptologos.cc/logos/okx-okx-logo.png" },
-  { pattern: /mexc/i, url: "https://cryptologos.cc/logos/mexc-mexc-logo.png" },
-  { pattern: /gate/i, url: "https://cryptologos.cc/logos/gate-gt-logo.png" },
-  { pattern: /kucoin/i, url: "https://cryptologos.cc/logos/kucoin-kcs-logo.png" },
-  { pattern: /bitget/i, url: "https://cryptologos.cc/logos/bitget-token-bgb-logo.png" },
-  { pattern: /bitmart/i, url: "https://cryptologos.cc/logos/bitmart-bmx-logo.png" },
-  { pattern: /bingx/i, url: "https://cryptologos.cc/logos/bingx-bingx-logo.png" },
-  { pattern: /coinstore/i, url: "https://cryptologos.cc/logos/coinstore-coin-logo.png" },
-  { pattern: /latoken/i, url: "https://cryptologos.cc/logos/latoken-la-logo.png" },
-  { pattern: /lbank/i, url: "https://cryptologos.cc/logos/lbank-lbk-logo.png" },
-  { pattern: /blofin/i, url: "https://cryptologos.cc/logos/blofin-blo-logo.png" },
-  { pattern: /coingecko/i, url: "https://cryptologos.cc/logos/coingecko-gecko-logo.png" },
-  { pattern: /trust\s*wallet/i, url: "https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png" },
-  { pattern: /metamask/i, url: "https://cryptologos.cc/logos/metamask-mask-logo.png" },
-  { pattern: /dextools/i, url: "https://cryptologos.cc/logos/dextools-dext-logo.png" },
-  { pattern: /certik/i, url: "https://cryptologos.cc/logos/certik-ctk-logo.png" },
+  { pattern: /binance/i, url: brandFavicon("binance.com") },
+  { pattern: /okx|oklx/i, url: brandFavicon("okx.com") },
+  { pattern: /mexc/i, url: brandFavicon("mexc.com") },
+  { pattern: /gate/i, url: brandFavicon("gate.io") },
+  { pattern: /kucoin/i, url: brandFavicon("kucoin.com") },
+  { pattern: /bitget/i, url: brandFavicon("bitget.com") },
+  { pattern: /bybit/i, url: brandFavicon("bybit.com") },
+  { pattern: /coinmarketcap/i, url: brandFavicon("coinmarketcap.com") },
+  { pattern: /\bhtx\b|huobi/i, url: brandFavicon("htx.com") },
+  { pattern: /upbit/i, url: brandFavicon("upbit.com") },
+  { pattern: /phemex/i, url: brandFavicon("phemex.com") },
+  { pattern: /poloniex/i, url: brandFavicon("poloniex.com") },
+  { pattern: /kraken/i, url: brandFavicon("kraken.com") },
+  { pattern: /coinbase/i, url: brandFavicon("coinbase.com") },
+  { pattern: /dao\s*maker/i, url: brandFavicon("daomaker.com") },
+  { pattern: /bitmart/i, url: brandFavicon("bitmart.com") },
+  { pattern: /bingx/i, url: brandFavicon("bingx.com") },
+  { pattern: /coinstore/i, url: brandFavicon("coinstore.com") },
+  { pattern: /latoken/i, url: brandFavicon("latoken.com") },
+  { pattern: /lbank/i, url: brandFavicon("lbank.com") },
+  { pattern: /blofin/i, url: brandFavicon("blofin.com") },
+  { pattern: /coingecko/i, url: brandFavicon("coingecko.com") },
+  { pattern: /trust\s*wallet/i, url: brandFavicon("trustwallet.com") },
+  { pattern: /metamask/i, url: brandFavicon("metamask.io") },
+  { pattern: /dextools/i, url: brandFavicon("dextools.io") },
+  { pattern: /\bxt\b/i, url: brandFavicon("xt.com") },
+  { pattern: /certik/i, url: brandFavicon("certik.com") },
 ];
 
 export function getServiceLogoUrl(service: { name: string; logo_url?: string | null }) {

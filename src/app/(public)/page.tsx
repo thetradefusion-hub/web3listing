@@ -10,6 +10,8 @@ import { HomeDisclaimer } from "@/components/public/home/disclaimer";
 import { HowItWorksSection } from "@/components/public/home/how-it-works-section";
 import { PopularServicesSection } from "@/components/public/home/popular-services-section";
 import { WhyChooseSection } from "@/components/public/home/why-choose-section";
+import { ScrollToTop } from "@/components/public/scroll-to-top";
+import { TelegramChatFab } from "@/components/public/telegram-chat-fab";
 import { getHomeFeaturedServices } from "@/lib/home-featured-services";
 
 export const revalidate = 300;
@@ -63,6 +65,8 @@ export default function HomePage() {
         secondaryHref="/signup"
       />
       <HomeDisclaimer />
+      <TelegramChatFab />
+      <ScrollToTop />
     </>
   );
 }

@@ -38,11 +38,12 @@ export default async function OnboardingKycPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold">KYC verification</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="lh-accent text-[11px] font-semibold uppercase tracking-wide">Step 2 of 4</p>
+      <h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground">KYC verification</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
         Upload identity, address proof, and authorized representative ID.
       </p>
-      <div className="mt-6">
+      <div className="mt-7">
         <KycForm
           kycStatus={profile.kyc_status}
           underReview={underReview}

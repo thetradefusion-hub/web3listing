@@ -69,29 +69,53 @@ export const WHY_NEED_US = [
 
 export const SERVICE_PILLARS = [
   {
-    title: "Exchange Listing",
-    desc: "Listing strategy, exchange communication, documentation, and onboarding support across 20+ partner ecosystems.",
-    href: "/services?category=listing-services",
+    slug: "development",
+    title: "Development",
+    desc: "Smart contracts, dApps, bots, and custom Web3 product development for launch-ready projects.",
+    highlights: ["Smart contracts", "dApps", "Custom bots"],
+    href: "/services?category=development",
   },
   {
+    slug: "security",
+    title: "Security",
+    desc: "Smart contract audits, KYC/AML tooling, and token security services to build investor trust.",
+    highlights: ["Audits", "KYC/AML", "Token security"],
+    href: "/services?category=security",
+  },
+  {
+    slug: "marketing",
+    title: "Marketing",
+    desc: "PR, influencer campaigns, community growth, and brand awareness across global crypto media.",
+    highlights: ["PR & media", "KOL campaigns", "Community"],
+    href: "/services?category=marketing",
+  },
+  {
+    slug: "exchange-listing",
+    title: "Exchange Listing",
+    desc: "CEX and DEX listing preparation, documentation, submission, and follow-up across 20+ ecosystems.",
+    highlights: ["CEX listing", "DEX listing", "Documentation"],
+    href: "/services?category=exchange-listing",
+  },
+  {
+    slug: "market-making",
     title: "Market Making",
-    desc: "Liquidity strategy, MM bot setup, spread optimization, and post-listing market support on CEX and DEX.",
+    desc: "Liquidity bots, volume support, spread optimization, and market making for CEX and DEX pairs.",
+    highlights: ["MM bots", "Liquidity", "Volume support"],
     href: "/services?category=market-making",
   },
   {
-    title: "Marketing & PR",
-    desc: "Crypto media distribution, KOL campaigns, influencer outreach, and brand visibility across global publications.",
-    href: "/services?category=pr-distribution",
-  },
-  {
-    title: "Data Platform Support",
-    desc: "CoinMarketCap, CoinGecko, DEXTools, and explorer updates — increase discoverability across the Web3 stack.",
+    slug: "listing-services",
+    title: "Listing Services",
+    desc: "Tracker, wallet, explorer, and discovery platform listing — CoinMarketCap, CoinGecko, DEXTools & more.",
+    highlights: ["CMC & CoinGecko", "Wallets", "Explorers"],
     href: "/services?category=listing-services",
   },
   {
-    title: "Advisory Services",
-    desc: "Exchange readiness, tokenomics review, fundraising prep, and strategic consulting from Web3 growth experts.",
-    href: "/services?category=premium-advisory",
+    slug: "growth",
+    title: "Growth",
+    desc: "Trending, launch support, advisory, and full-funnel Web3 growth packages to scale faster.",
+    highlights: ["Trending", "Launch support", "Advisory"],
+    href: "/services?category=growth",
   },
 ] as const;
 
@@ -167,6 +191,29 @@ export const PARTNER_EXCHANGES = [
   "CoinGecko",
   "DEXTools",
   "Trust Wallet",
+] as const;
+
+export const PARTNER_PLATFORMS = [
+  { name: "OKX", type: "exchange", domain: "okx.com" },
+  { name: "HTX", type: "exchange", domain: "htx.com" },
+  { name: "Binance", type: "exchange", domain: "binance.com" },
+  { name: "KuCoin", type: "exchange", domain: "kucoin.com" },
+  { name: "Upbit", type: "exchange", domain: "upbit.com" },
+  { name: "Gate.io", type: "exchange", domain: "gate.io" },
+  { name: "MEXC", type: "exchange", domain: "mexc.com" },
+  { name: "Bitget", type: "exchange", domain: "bitget.com" },
+  { name: "LBank", type: "exchange", domain: "lbank.com" },
+  { name: "BitMart", type: "exchange", domain: "bitmart.com" },
+  { name: "Phemex", type: "exchange", domain: "phemex.com" },
+  { name: "Coinstore", type: "exchange", domain: "coinstore.com" },
+  { name: "BingX", type: "exchange", domain: "bingx.com" },
+  { name: "XT", type: "exchange", domain: "xt.com" },
+  { name: "Coinbase", type: "exchange", domain: "coinbase.com" },
+  { name: "CoinMarketCap", type: "exchange", domain: "coinmarketcap.com" },
+  { name: "DAO Maker", type: "launchpad", domain: "daomaker.com" },
+  { name: "Poloniex", type: "exchange", domain: "poloniex.com" },
+  { name: "LATOKEN", type: "exchange", domain: "latoken.com" },
+  { name: "Kraken", type: "exchange", domain: "kraken.com" },
 ] as const;
 
 export type ServiceCategoryBlock = {

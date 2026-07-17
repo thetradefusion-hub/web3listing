@@ -16,14 +16,15 @@ import { KycFileUpload } from "@/components/partner/kyc-file-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { KycStatus } from "@/types/database";
 
-const inputClass = "h-10 w-full min-w-0 rounded-xl border-input bg-background pl-10 shadow-sm";
-const selectClass = "h-10 w-full min-w-0 rounded-xl border-input bg-background pl-10 shadow-sm";
+const inputClass =
+  "h-11 w-full min-w-0 rounded-xl border-input bg-background pl-10 shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25";
+const selectClass =
+  "h-11 w-full min-w-0 rounded-xl border-input bg-background pl-10 shadow-sm focus-visible:border-primary/50 focus-visible:ring-primary/25";
 const SUPPORTED_ID_DOCUMENTS = [
   "Passport",
   "Aadhaar Card",
@@ -73,7 +74,7 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 rounded-xl border border-border/60 bg-muted/15 p-4 sm:p-5">
       <div>
         <p className="text-sm font-semibold text-foreground">{title}</p>
         {description ? <p className="mt-0.5 text-xs text-muted-foreground">{description}</p> : null}
@@ -172,7 +173,7 @@ export function KycForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       {underReview ? (
         <StatusBanner tone="warning" title="Under review">
           Your submission is being reviewed. You cannot edit details until the review is complete.
@@ -209,8 +210,6 @@ export function KycForm({
         </div>
       </FormSection>
 
-      <Separator />
-
       <FormSection title="Contact information" description="How we reach you for verification">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field id="mobile" label="Mobile" icon={Phone} required>
@@ -246,8 +245,6 @@ export function KycForm({
           </Field>
         </div>
       </FormSection>
-
-      <Separator />
 
       <FormSection
         title="Identity documents"
@@ -326,14 +323,14 @@ export function KycForm({
         </div>
       </FormSection>
 
-      <div className="flex flex-col-reverse gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-2">
+      <div className="flex flex-col-reverse gap-3 border-t border-border/70 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-center text-xs text-muted-foreground sm:text-left">
           By submitting, you confirm all information is accurate and documents belong to you.
         </p>
         <Button
           type="submit"
           disabled={loading || underReview}
-          className="h-11 w-full shrink-0 rounded-xl px-6 font-semibold sm:h-10 sm:w-auto sm:min-w-[160px]"
+          className="h-11 w-full shrink-0 rounded-xl px-6 font-semibold sm:w-auto sm:min-w-[160px]"
         >
           {underReview ? "Under Review" : loading ? "Submitting..." : "Submit KYC"}
         </Button>

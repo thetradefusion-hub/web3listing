@@ -23,11 +23,12 @@ export default async function BusinessProfilePage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold">Business profile</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="lh-accent text-[11px] font-semibold uppercase tracking-wide">Step 1 of 4</p>
+      <h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Business profile</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
         Tell us about your company so we can review your partner fit.
       </p>
-      <div className="mt-6">
+      <div className="mt-7">
         <BusinessProfileForm
           defaults={{
             company_description: profile.company_description,
