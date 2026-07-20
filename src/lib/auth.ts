@@ -1,10 +1,14 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/types/database";
 import { CLIENT_ROLE, PARTNER_ROLE } from "@/lib/constants";
 
-export async function getCurrentUser() {
+/** Dedupes auth + profile fetch within a single request (layout + page). */
+export const getCurrentUser = cache(async () => {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return null;
 
   const { data: profile } = await supabase
@@ -14,7 +18,7 @@ export async function getCurrentUser() {
     .single();
 
   return profile as Profile | null;
-}
+});
 
 export async function requireAuth(allowedRoles?: UserRole[]) {
   const profile = await getCurrentUser();

@@ -238,7 +238,11 @@ export function ServiceDetailView({
   const orderHref = getServiceOrderPath(basePath, service.slug, defaultProjectId);
 
   return (
-    <PartnerPageShell compact fullWidth className="gap-4 pb-20 sm:gap-5 lg:pb-0">
+    <PartnerPageShell
+      compact
+      fullWidth
+      className="gap-4 pb-[calc(8.75rem+env(safe-area-inset-bottom,0px))] sm:gap-5 sm:pb-24 md:pb-0 lg:pb-0"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2 sm:items-start sm:gap-3">
         <nav className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground sm:hidden">
           <Link href={`${basePath}/services${projectQuery}`} className="shrink-0 transition hover:text-primary">
@@ -647,8 +651,8 @@ export function ServiceDetailView({
         </aside>
       </div>
 
-      {/* Mobile sticky order bar */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-card/80 sm:hidden">
+      {/* Mobile sticky order bar — sits above portal bottom nav */}
+      <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] z-40 border-t border-border bg-card/95 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-card/80 md:hidden">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-[10px] font-medium text-muted-foreground">{service.name}</p>

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { getAccountManagerForProfile } from "@/lib/account-manager";
 import { PartnerPortalShell } from "@/components/partner/portal-shell";
 import { PartnerOnboardingShell } from "@/components/partner/onboarding/onboarding-shell";
 import {
@@ -33,14 +33,7 @@ export default async function PartnerLayout({
     );
   }
 
-  const supabase = await createClient();
-  const { data: manager } = profile.account_manager_id
-    ? await supabase
-        .from("account_managers")
-        .select("*")
-        .eq("id", profile.account_manager_id)
-        .single()
-    : await supabase.from("account_managers").select("*").eq("is_active", true).limit(1).single();
+  const manager = await getAccountManagerForProfile(profile);
 
   return (
     <PartnerPortalShell profile={profile} manager={manager}>

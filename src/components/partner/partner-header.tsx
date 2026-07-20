@@ -72,9 +72,8 @@ export function PartnerHeader({
   const isVerified = profile.kyc_status === "approved";
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-card/75">
-      <div className="flex h-[3.75rem] items-center justify-between gap-3 px-3 sm:px-4 lg:px-5">
-        {/* Left — workspace */}
+    <header className="portal-app-header sticky top-0 z-20 border-b border-border/70 bg-card/90 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-card/80">
+      <div className="flex h-12 items-center justify-between gap-2 px-3 sm:h-14 sm:gap-3 sm:px-4 lg:px-5">
         <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
           <MobileMenuButton className="size-9 shrink-0 rounded-xl border border-border md:hidden" />
           <SidebarToggleButton />
@@ -96,23 +95,30 @@ export function PartnerHeader({
                   </PartnerBadge>
                 </span>
               </div>
-              <p className="truncate text-[11px] text-muted-foreground sm:text-xs">
+              <p className="hidden truncate text-[11px] text-muted-foreground sm:block sm:text-xs">
                 {isVerified ? "Partner workspace" : "Complete KYC to unlock full access"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right — actions */}
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <div className="flex items-center gap-0.5 rounded-xl border border-border/80 bg-muted/25 p-0.5 sm:gap-1 sm:p-1">
             {manager?.telegram_link ? (
-              <HeaderToolButton href={buildTelegramLink(manager.telegram_link)} label="Message on Telegram">
+              <HeaderToolButton
+                href={buildTelegramLink(manager.telegram_link)}
+                label="Message on Telegram"
+                className="hidden sm:flex"
+              >
                 <Send className="size-4" strokeWidth={2} />
               </HeaderToolButton>
             ) : null}
 
-            <HeaderToolButton href="/partner/support" label="Help & support">
+            <HeaderToolButton
+              href="/partner/support"
+              label="Help & support"
+              className="hidden sm:flex"
+            >
               <HelpCircle className="size-4" strokeWidth={2} />
             </HeaderToolButton>
 
@@ -139,10 +145,24 @@ export function PartnerHeader({
             className="sm:hidden"
           />
 
-          <Button asChild size="sm" className="h-9 rounded-xl px-3 font-semibold shadow-sm shadow-primary/15 sm:px-3.5">
+          <Button
+            asChild
+            size="sm"
+            className="hidden h-9 rounded-xl px-3 font-semibold shadow-sm shadow-primary/15 sm:inline-flex sm:px-3.5"
+          >
             <Link href="/partner/projects/new" aria-label="Create new project">
               <Plus data-icon="inline-start" />
               <span className="hidden sm:inline">New Project</span>
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            size="icon"
+            className="size-9 rounded-xl shadow-sm shadow-primary/15 sm:hidden"
+          >
+            <Link href="/partner/projects/new" aria-label="Create new project">
+              <Plus className="size-4" />
             </Link>
           </Button>
         </div>

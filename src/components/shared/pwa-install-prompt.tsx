@@ -5,9 +5,15 @@ import Image from "next/image";
 import { Download, Share, Smartphone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { PERF_COOKIES } from "@/lib/perf-cookies";
 
 const DISMISS_KEY = "pwa-install-dismissed-at";
 const DISMISS_DAYS = 7;
+
+function isReturningVisitor() {
+  if (typeof document === "undefined") return false;
+  return document.cookie.includes(`${PERF_COOKIES.returning}=1`);
+}
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -61,10 +67,11 @@ export function PwaInstallPrompt() {
 
     let iosTimer: ReturnType<typeof setTimeout> | undefined;
     if (isIosSafari()) {
+      const delay = isReturningVisitor() ? 8000 : 2500;
       iosTimer = setTimeout(() => {
         setIosGuide(true);
         setOpen(true);
-      }, 2500);
+      }, delay);
     }
 
     return () => {

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -1614,6 +1614,8 @@ export async function upsertService(
   revalidatePath(`/partner/services/${slug}`);
   revalidatePath(`/user/services/${slug}`);
   revalidatePath(`/services/${slug}`);
+  revalidateTag("services", "max");
+  revalidateTag("catalog", "max");
   return { success: true };
 }
 
@@ -1641,6 +1643,8 @@ export async function deleteService(id: string) {
   revalidatePath("/services");
   revalidatePath("/partner/services");
   revalidatePath("/user/services");
+  revalidateTag("services", "max");
+  revalidateTag("catalog", "max");
   return { success: true };
 }
 
@@ -1653,6 +1657,8 @@ export async function toggleServiceActive(id: string, isActive: boolean) {
   revalidatePath("/admin/services/new");
   revalidatePath("/services");
   revalidatePath("/partner/services");
+  revalidateTag("services", "max");
+  revalidateTag("catalog", "max");
   return { success: true };
 }
 

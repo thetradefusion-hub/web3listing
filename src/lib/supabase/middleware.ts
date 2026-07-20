@@ -1,7 +1,36 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getPortalPathForRole, pathRequiresKyc } from "@/lib/portal-config";
+import {
+  CATALOG_CACHE_VERSION,
+  catalogVersionCookieName,
+  PERF_COOKIE_MAX_AGE,
+  PERF_COOKIES,
+} from "@/lib/perf-cookies";
 import type { PartnerOnboardingStatus } from "@/types/database";
+
+function attachPerfCookies(request: NextRequest, response: NextResponse) {
+  if (!request.cookies.get(PERF_COOKIES.returning)) {
+    response.cookies.set(PERF_COOKIES.returning, "1", {
+      path: "/",
+      maxAge: PERF_COOKIE_MAX_AGE,
+      sameSite: "lax",
+    });
+  }
+
+  if (
+    request.nextUrl.pathname.startsWith("/services") &&
+    request.cookies.get(catalogVersionCookieName)?.value !== CATALOG_CACHE_VERSION
+  ) {
+    response.cookies.set(catalogVersionCookieName, CATALOG_CACHE_VERSION, {
+      path: "/",
+      maxAge: PERF_COOKIE_MAX_AGE,
+      sameSite: "lax",
+    });
+  }
+
+  return response;
+}
 
 function clearSupabaseAuthCookies(request: NextRequest, response: NextResponse) {
   for (const cookie of request.cookies.getAll()) {
@@ -63,7 +92,7 @@ export async function updateSession(request: NextRequest) {
       url.searchParams.set("redirect", path);
       return NextResponse.redirect(url);
     }
-    return NextResponse.next({ request });
+    return attachPerfCookies(request, NextResponse.next({ request }));
   }
 
   let supabaseResponse = NextResponse.next({ request });

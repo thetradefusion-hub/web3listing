@@ -1,19 +1,19 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { getPublishedBlogPostBySlug } from "@/lib/public-catalog-cache";
+
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data: post } = await supabase.from("blog_posts").select("title").eq("slug", slug).single();
+  const post = await getPublishedBlogPostBySlug(slug);
   return { title: post?.title || "Blog" };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data: post } = await supabase.from("blog_posts").select("*").eq("slug", slug).eq("is_published", true).single();
+  const post = await getPublishedBlogPostBySlug(slug);
 
   if (!post) notFound();
 
@@ -27,7 +27,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {post.published_at ? new Date(post.published_at).toLocaleDateString() : ""}
       </p>
       <div className="prose prose-invert mt-8 max-w-none">
-        <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">{post.content}</p>
+        <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{post.content}</p>
       </div>
     </article>
   );

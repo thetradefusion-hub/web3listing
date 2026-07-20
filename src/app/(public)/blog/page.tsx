@@ -1,22 +1,18 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getPublishedBlogPosts } from "@/lib/public-catalog-cache";
 
 export const metadata = { title: "Blog" };
+export const revalidate = 300;
 
 export default async function BlogPage() {
-  const supabase = await createClient();
-  const { data: posts } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .eq("is_published", true)
-    .order("published_at", { ascending: false });
+  const posts = await getPublishedBlogPosts();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
       <h1 className="mb-12 text-4xl font-bold">Blog & Knowledge Base</h1>
       <div className="space-y-6">
-        {posts?.map((post) => (
+        {posts.map((post) => (
           <Link key={post.id} href={`/blog/${post.slug}`}>
             <Card className="transition-colors hover:border-primary/30">
               <CardHeader>
@@ -31,7 +27,7 @@ export default async function BlogPage() {
             </Card>
           </Link>
         ))}
-        {(!posts || posts.length === 0) && (
+        {posts.length === 0 && (
           <p className="text-center text-muted-foreground">No blog posts yet</p>
         )}
       </div>

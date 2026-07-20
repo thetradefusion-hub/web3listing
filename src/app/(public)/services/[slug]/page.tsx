@@ -1,16 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Clock,
-  ExternalLink,
-} from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { ArrowLeft, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PricingBadge } from "@/components/shared/pricing-badge";
 import { ServicePricingCard } from "@/components/shared/service-pricing-card";
 import { PRICING_CTA } from "@/lib/pricing";
+import { getPublicServiceBySlug } from "@/lib/public-catalog-cache";
 import {
   getCategoryIcon,
   getServiceLogoColor,
@@ -19,23 +15,21 @@ import {
 import { cn } from "@/lib/utils";
 import type { PricingModel } from "@/types/database";
 
+export const revalidate = 300;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data: service } = await supabase.from("services").select("name").eq("slug", slug).single();
+  const service = await getPublicServiceBySlug(slug);
   return { title: service?.name || "Service" };
 }
 
-export default async function PublicServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PublicServiceDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const supabase = await createClient();
-
-  const { data: service } = await supabase
-    .from("services")
-    .select("*, service_categories(name, slug)")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .single();
+  const service = await getPublicServiceBySlug(slug);
 
   if (!service) notFound();
 
@@ -66,7 +60,7 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
             >
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt="" className="size-12 object-contain" />
+                <img src={logoUrl} alt="" className="size-12 object-contain" loading="lazy" />
               ) : (
                 <CatIcon className="size-7" strokeWidth={2} />
               )}
@@ -95,7 +89,8 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
               </CardHeader>
               <CardContent>
                 <p className="leading-relaxed text-muted-foreground">
-                  {service.description || "Professional Web3 service with transparent pricing and dedicated support."}
+                  {service.description ||
+                    "Professional Web3 service with transparent pricing and dedicated support."}
                 </p>
               </CardContent>
             </Card>
@@ -106,7 +101,9 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{service.overview}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
+                    {service.overview}
+                  </p>
                 </CardContent>
               </Card>
             ) : null}
@@ -127,7 +124,11 @@ export default async function PublicServiceDetailPage({ params }: { params: Prom
                   ) : null}
                   {service.proof_of_work_url ? (
                     <Button variant="outline" className="rounded-xl" asChild>
-                      <a href={service.proof_of_work_url} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={service.proof_of_work_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink data-icon="inline-start" />
                         Proof of work
                       </a>

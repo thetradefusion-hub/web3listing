@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { PwaInstallPrompt } from "@/components/shared/pwa-install-prompt";
+import { DeferredPwaExtras } from "@/components/shared/deferred-ui";
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
@@ -39,7 +39,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      <PwaInstallPrompt />
+      <DeferredPwaExtras />
     </>
   );
 }

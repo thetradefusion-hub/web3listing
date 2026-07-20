@@ -252,6 +252,30 @@
     radial-gradient(ellipse 70% 45% at 100% 0%, color-mix(in srgb, #a3e635 6%, transparent), transparent 48%);
 }
 
+/* Mobile / PWA app chrome */
+.partner-portal .portal-app-header {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.partner-portal .portal-bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -8px 24px -16px color-mix(in srgb, #8b2cf5 35%, transparent);
+}
+
+.partner-portal .portal-main-scroll {
+  padding-bottom: 1rem;
+}
+
+@media (max-width: 767px) {
+  .partner-portal .portal-main-scroll {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .partner-portal .portal-more-sheet {
+    max-height: min(72dvh, 28rem);
+  }
+}
+
 /* Landing — Web3Listing symbol: purple W + lime 3 + black */
 .landing-shell {
   --background: #faf8ff;

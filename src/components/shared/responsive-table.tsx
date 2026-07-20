@@ -13,7 +13,7 @@ export function ResponsiveTableShell({
   return (
     <>
       <div className={cn("hidden overflow-x-auto md:block", className)}>{table}</div>
-      <div className="space-y-3 p-6 md:hidden">{mobile}</div>
+      <div className="space-y-2.5 p-3 sm:space-y-3 sm:p-6 md:hidden">{mobile}</div>
     </>
   );
 }
@@ -26,7 +26,7 @@ export function MobileDataCard({
   href?: string;
 }) {
   const className =
-    "block rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:border-border hover:bg-muted/40 hover:shadow-md";
+    "block rounded-2xl border border-border bg-card p-4 shadow-sm transition hover:border-border hover:bg-muted/40 hover:shadow-md sm:p-5";
 
   if (href) {
     return (

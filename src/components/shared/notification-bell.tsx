@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { markNotificationRead } from "@/lib/actions";
@@ -16,18 +16,25 @@ export function NotificationBell({
 }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
+  const loadNotifications = useCallback(async () => {
     const supabase = createClient();
-    supabase
+    const { data } = await supabase
       .from("notifications")
       .select("*")
       .eq("user_id", userId)
       .eq("is_read", false)
       .order("created_at", { ascending: false })
-      .limit(5)
-      .then(({ data }) => setNotifications(data || []));
+      .limit(5);
+    setNotifications(data || []);
+    setLoaded(true);
   }, [userId]);
+
+  useEffect(() => {
+    if (!open || loaded) return;
+    void loadNotifications();
+  }, [open, loaded, loadNotifications]);
 
   const unreadCount = notifications.length;
   const isPartner = variant === "partner";

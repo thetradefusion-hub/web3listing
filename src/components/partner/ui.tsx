@@ -55,19 +55,19 @@ export function PartnerPageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-6">
-      <div>
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-[32px] font-bold leading-tight tracking-tight text-foreground">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-6">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <h1 className="text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-[32px]">
             {title}
           </h1>
           {badge}
         </div>
         {description && (
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground sm:mt-2">{description}</p>
         )}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto">{action}</div>}
     </div>
   );
 }
