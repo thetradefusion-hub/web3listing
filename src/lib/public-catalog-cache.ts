@@ -3,8 +3,53 @@ import { CATALOG_CACHE_VERSION } from "@/lib/perf-cookies";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Service, ServiceCategory } from "@/types/database";
 
-export type PublicServiceRow = Service & {
-  service_categories?: { name?: string; slug?: string } | null;
+type ServiceCategoryRef =
+  | { name?: string; slug?: string }
+  | { name?: string; slug?: string }[]
+  | null;
+
+export type PublicServiceRow = Pick<
+  Service,
+  | "id"
+  | "name"
+  | "slug"
+  | "description"
+  | "logo_url"
+  | "pricing_model"
+  | "price"
+  | "service_fee"
+  | "badge"
+  | "sort_order"
+  | "is_active"
+  | "estimated_tat"
+  | "category_id"
+> & {
+  service_categories?: ServiceCategoryRef;
+};
+
+export type PublicServiceDetail = Pick<
+  Service,
+  | "id"
+  | "name"
+  | "slug"
+  | "description"
+  | "overview"
+  | "logo_url"
+  | "pricing_model"
+  | "price"
+  | "service_fee"
+  | "badge"
+  | "sort_order"
+  | "is_active"
+  | "estimated_tat"
+  | "category_id"
+  | "demo_link"
+  | "proof_of_work_url"
+  | "payment_terms"
+  | "third_party_fee_note"
+  | "requires_third_party_ack"
+> & {
+  service_categories?: ServiceCategoryRef;
 };
 
 export const getPublicServicesCatalog = unstable_cache(
@@ -29,8 +74,8 @@ export const getPublicServicesCatalog = unstable_cache(
     ]);
 
     return {
-      categories: (categories || []) as ServiceCategory[],
-      services: (services || []) as PublicServiceRow[],
+      categories: (categories ?? []) as ServiceCategory[],
+      services: (services ?? []) as PublicServiceRow[],
     };
   },
   ["public-services-catalog", CATALOG_CACHE_VERSION],
@@ -38,17 +83,17 @@ export const getPublicServicesCatalog = unstable_cache(
 );
 
 export const getPublicServiceBySlug = unstable_cache(
-  async (slug: string) => {
+  async (slug: string): Promise<PublicServiceDetail | null> => {
     const admin = createAdminClient();
     const { data } = await admin
       .from("services")
       .select(
-        "id, name, slug, description, overview, logo_url, pricing_model, price, service_fee, badge, sort_order, is_active, estimated_tat, category_id, demo_link, proof_of_work_url, service_categories(name, slug)"
+        "id, name, slug, description, overview, logo_url, pricing_model, price, service_fee, badge, sort_order, is_active, estimated_tat, category_id, demo_link, proof_of_work_url, payment_terms, third_party_fee_note, requires_third_party_ack, service_categories(name, slug)"
       )
       .eq("slug", slug)
       .eq("is_active", true)
       .maybeSingle();
-    return data;
+    return (data as PublicServiceDetail | null) ?? null;
   },
   ["public-service-by-slug", CATALOG_CACHE_VERSION],
   { revalidate: 300, tags: ["services"] }
@@ -70,7 +115,7 @@ export const getPublishedBlogPosts = unstable_cache(
       .select("id, title, slug, excerpt, published_at")
       .eq("is_published", true)
       .order("published_at", { ascending: false });
-    return (data || []) as BlogPostSummary[];
+    return (data ?? []) as BlogPostSummary[];
   },
   ["published-blog-posts-v1"],
   { revalidate: 300, tags: ["blog"] }

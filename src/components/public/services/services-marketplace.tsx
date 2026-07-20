@@ -24,11 +24,10 @@ import {
   getServiceLogoUrl,
 } from "@/lib/service-catalog";
 import { cn } from "@/lib/utils";
-import type { PricingModel, Service, ServiceCategory } from "@/types/database";
+import type { PricingModel, ServiceCategory } from "@/types/database";
+import type { PublicServiceRow } from "@/lib/public-catalog-cache";
 
-type ServiceWithCategory = Service & {
-  service_categories?: { name?: string; slug?: string } | null;
-};
+type ServiceWithCategory = PublicServiceRow;
 
 function getCategory(service: ServiceWithCategory) {
   const cat = service.service_categories;
