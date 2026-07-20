@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { DeferredPwaExtras } from "@/components/shared/deferred-ui";
+import { PwaSplashScreen } from "@/components/shared/pwa-splash-screen";
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
@@ -38,6 +39,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <PwaSplashScreen />
       {children}
       <DeferredPwaExtras />
     </>

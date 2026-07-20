@@ -1,5 +1,5 @@
-const CACHE_NAME = "web3listing-v4";
-const PRECACHE_URLS = ["/login", "/offline", "/pwa/icon-192.png", "/pwa/splash.jpg"];
+const CACHE_NAME = "web3listing-v5";
+const PRECACHE_URLS = ["/login", "/offline", "/pwa/icon-192.png", "/web3_exact_colors.svg"];
 
 const STATIC_ASSET =
   /\/_next\/static\/|\.(?:js|css|woff2?|png|jpg|jpeg|webp|svg|ico)(?:\?|$)/i;

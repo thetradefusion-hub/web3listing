@@ -29,44 +29,6 @@ export const metadata: Metadata = {
     capable: true,
     title: "Web3Listing",
     statusBarStyle: "black-translucent",
-    startupImage: [
-      {
-        url: "/pwa/splash-750x1334.jpg",
-        media:
-          "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
-      },
-      {
-        url: "/pwa/splash-828x1792.jpg",
-        media:
-          "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)",
-      },
-      {
-        url: "/pwa/splash-1125x2436.jpg",
-        media:
-          "(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)",
-      },
-      {
-        url: "/pwa/splash-1170x2532.jpg",
-        media:
-          "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)",
-      },
-      {
-        url: "/pwa/splash-1242x2688.jpg",
-        media:
-          "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)",
-      },
-      {
-        url: "/pwa/splash-1290x2796.jpg",
-        media:
-          "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)",
-      },
-      {
-        url: "/pwa/splash-2048x2732.jpg",
-        media:
-          "(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)",
-      },
-      "/pwa/splash.jpg",
-    ],
   },
   formatDetection: {
     telephone: false,
@@ -92,13 +54,37 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const PWA_BOOT_SPLASH_SCRIPT = `(function(){try{var s=window.matchMedia("(display-mode: standalone)").matches||("standalone"in navigator&&navigator.standalone);if(!s||sessionStorage.getItem("pwa-splash-seen-session")==="1")return;var e=document.getElementById("pwa-boot-splash");if(e)e.hidden=false;}catch(_){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: PWA_BOOT_SPLASH_SCRIPT }} />
       </head>
       <body className="min-h-screen font-sans antialiased">
+        <div id="pwa-boot-splash" className="pwa-splash" hidden suppressHydrationWarning>
+          <div className="pwa-splash__bg" />
+          <div className="pwa-splash__grid" aria-hidden />
+          <div className="pwa-splash__glow pwa-splash__glow--purple" aria-hidden />
+          <div className="pwa-splash__glow pwa-splash__glow--lime" aria-hidden />
+          <div className="pwa-splash__content">
+            <div className="pwa-splash__logo-stack">
+              <span className="pwa-splash__ring pwa-splash__ring--outer" aria-hidden />
+              <span className="pwa-splash__ring pwa-splash__ring--inner" aria-hidden />
+              <div className="pwa-splash__logo-wrap">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/web3_exact_colors.svg" alt="" className="pwa-splash__logo" />
+              </div>
+            </div>
+            <p className="pwa-splash__brand">Web3Listing</p>
+            <p className="pwa-splash__tagline">List · Market · Grow</p>
+            <div className="pwa-splash__progress" aria-hidden>
+              <span className="pwa-splash__progress-bar" />
+            </div>
+          </div>
+        </div>
         <ThemeProvider>
           <TooltipProvider>
             <PwaProvider>
