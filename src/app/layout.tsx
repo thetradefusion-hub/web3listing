@@ -37,7 +37,6 @@ export const metadata: Metadata = {
     icon: [
       { url: "/pwa/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/pwa/icon-512.png", sizes: "512x512", type: "image/png" },
-      { url: "/web3_exact_colors.svg", type: "image/svg+xml" },
     ],
     shortcut: "/pwa/icon-192.png",
     apple: [{ url: "/pwa/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
