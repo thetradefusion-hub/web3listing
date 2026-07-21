@@ -56,9 +56,9 @@ export const BLOCKCHAIN_NETWORKS = [
   "Other",
 ] as const;
 
-export const TELEGRAM_SUPPORT =
-  process.env.NEXT_PUBLIC_TELEGRAM_SUPPORT_GROUP_URL ||
-  buildTelegramLink(DEFAULT_MANAGER_TELEGRAM_USERNAME);
+// Hard-coded to the official handle — a stale Vercel env var was pointing
+// the homepage chat to the wrong Telegram ID.
+export const TELEGRAM_SUPPORT = buildTelegramLink(DEFAULT_MANAGER_TELEGRAM_USERNAME);
 
 export const TICKET_STATUS_LABELS: Record<string, string> = {
   open: "Open",
