@@ -835,10 +835,24 @@ export async function acceptQuotation(quotationId: string) {
   const { data: quote } = await supabase.from("quotations").select("*, orders(*)").eq("id", quotationId).single();
   if (!quote || quote.orders.agent_id !== profile.id) return { error: "Not found" };
 
-  await supabase.from("quotations").update({ status: "accepted" }).eq("id", quotationId);
-  await supabase.from("orders").update({ status: "waiting_payment" }).eq("id", quote.order_id);
+  // Owners can't update quotations under RLS (admin-only policy), so use the
+  // admin client after the ownership check above.
+  const admin = createAdminClient();
+  const { error: quoteError } = await admin
+    .from("quotations")
+    .update({ status: "accepted" })
+    .eq("id", quotationId);
+  if (quoteError) return { error: quoteError.message };
+
+  const { error: orderError } = await admin
+    .from("orders")
+    .update({ status: "waiting_payment" })
+    .eq("id", quote.order_id);
+  if (orderError) return { error: orderError.message };
 
   revalidatePath(`${base}/orders`);
+  revalidatePath(`${base}/orders/${quote.order_id}`);
+  revalidatePath(`/admin/orders/${quote.order_id}`);
   return { success: true };
 }
 

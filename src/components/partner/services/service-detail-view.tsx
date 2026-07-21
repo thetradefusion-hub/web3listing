@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { expandFaqs } from "@/components/admin/service-form-utils";
+import { ServiceFaqAccordion } from "@/components/shared/service-faq-accordion";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
@@ -533,16 +534,12 @@ export function ServiceDetailView({
 
               <TabsContent value="faq" className="p-4 sm:p-5">
                 {faqs.length > 0 ? (
-                  <div className="divide-y divide-border">
-                    {faqs.map((faq, index) => (
-                      <div key={`${index}-${faq.question}`} className="py-3 first:pt-0 last:pb-0">
-                        <p className="text-sm font-semibold text-foreground">{faq.question}</p>
-                        <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                          {faq.answer.replace(/\n{3,}/g, "\n\n").trim()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                  <ServiceFaqAccordion
+                    faqs={faqs.map((faq) => ({
+                      question: faq.question,
+                      answer: faq.answer.replace(/\n{3,}/g, "\n\n").trim(),
+                    }))}
+                  />
                 ) : (
                   <Empty className="border-0 bg-transparent py-6">
                     <EmptyHeader>

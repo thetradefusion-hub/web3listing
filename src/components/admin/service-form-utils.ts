@@ -117,6 +117,43 @@ function parseLabeledFaqs(text: string): FaqItem[] | null {
   return faqs;
 }
 
+/**
+ * Un-numbered Q&A lines where each question ends with "?":
+ *
+ * What makes this different?
+ * Unlike standard bots, ...
+ * Is my API secure?
+ * Yes. Only trading permissions...
+ */
+function parseQuestionMarkFaqs(text: string): FaqItem[] | null {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length < 3) return null;
+
+  const isQuestionLine = (line: string) => line.endsWith("?");
+  if (!isQuestionLine(lines[0])) return null;
+
+  const starts: number[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (isQuestionLine(lines[i])) starts.push(i);
+  }
+  if (starts.length < 2) return null;
+
+  const faqs: FaqItem[] = [];
+  for (let s = 0; s < starts.length; s++) {
+    const start = starts[s];
+    const end = s + 1 < starts.length ? starts[s + 1] : lines.length;
+    const answer = lines.slice(start + 1, end).join("\n");
+    // Consecutive question lines mean the format is ambiguous — bail out.
+    if (!answer.trim()) return null;
+    pushFaq(faqs, lines[start], answer);
+  }
+
+  return faqs.length > 1 ? faqs : null;
+}
+
 /** Blank-line / --- separated FAQ blocks. First line = question, rest = answer. */
 function parseBlankSeparatedFaqs(text: string): FaqItem[] {
   const faqs: FaqItem[] = [];
@@ -189,6 +226,15 @@ export function linesToFaqs(value: string): FaqItem[] {
     if (pipe.length > 0) return pipe;
   }
 
+  // Blank-line separated blocks take priority when clearly present.
+  if (/\n\s*\n|\n\s*---\s*\n/.test(text)) {
+    const blankSeparated = parseBlankSeparatedFaqs(text);
+    if (blankSeparated.length > 1) return blankSeparated;
+  }
+
+  const questionMark = parseQuestionMarkFaqs(text);
+  if (questionMark && questionMark.length > 0) return questionMark;
+
   const blankSeparated = parseBlankSeparatedFaqs(text);
   if (blankSeparated.length > 0) return blankSeparated;
 
@@ -230,6 +276,16 @@ export function expandFaqs(
     const repaired = parseNumberedFaqs(
       /^\s*\d+[\.\)]/.test(combined) ? combined : `1. ${combined}`
     );
+    if (repaired && repaired.length > faqs.length) return repaired;
+  }
+
+  // Repair answers that still hide un-numbered "Question?" lines inside them.
+  const hasHiddenQuestions = faqs.some((f) =>
+    f.answer.split("\n").some((line, idx) => idx > 0 && line.trim().endsWith("?"))
+  );
+  if (hasHiddenQuestions) {
+    const combined = faqs.map((f) => `${f.question}\n${f.answer}`).join("\n");
+    const repaired = parseQuestionMarkFaqs(combined);
     if (repaired && repaired.length > faqs.length) return repaired;
   }
 

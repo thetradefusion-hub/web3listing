@@ -209,8 +209,6 @@ export function QuotationSection({ quotation }: { quotation: Quotation }) {
     router.refresh();
   }
 
-  if (quotation.status === "accepted") return null;
-
   return (
     <PartnerPanel className="border-primary/20 bg-gradient-to-br from-primary/5 via-card to-chart-2/5">
       <PartnerPanelHeader title="Quotation" />
@@ -227,8 +225,14 @@ export function QuotationSection({ quotation }: { quotation: Quotation }) {
         ) : null}
         {quotation.status === "sent" && (
           <Button onClick={handleAccept} disabled={loading} className="w-full rounded-xl font-semibold">
-            Accept Quotation & Proceed to Payment
+            {loading ? "Accepting..." : "Accept Quotation & Proceed to Payment"}
           </Button>
+        )}
+        {quotation.status === "accepted" && (
+          <div className="flex items-center gap-2 rounded-xl border border-chart-2/30 bg-chart-2/10 px-3 py-2.5 text-sm font-medium text-foreground">
+            <CheckCircle2 className="size-4 shrink-0 text-chart-2" />
+            Quotation accepted successfully
+          </div>
         )}
       </PartnerPanelBody>
     </PartnerPanel>
