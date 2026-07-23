@@ -104,20 +104,43 @@ export type BlogPostSummary = {
   title: string;
   slug: string;
   excerpt: string | null;
+  cover_image: string | null;
+  category: string | null;
+  is_featured: boolean;
   published_at: string | null;
 };
 
 export const getPublishedBlogPosts = unstable_cache(
   async (): Promise<BlogPostSummary[]> => {
     const admin = createAdminClient();
-    const { data } = await admin
+    const primary = await admin
       .from("blog_posts")
-      .select("id, title, slug, excerpt, published_at")
+      .select("id, title, slug, excerpt, cover_image, category, is_featured, published_at")
       .eq("is_published", true)
       .order("published_at", { ascending: false });
-    return (data ?? []) as BlogPostSummary[];
+
+    if (!primary.error) {
+      return ((primary.data ?? []) as BlogPostSummary[]).map((p) => ({
+        ...p,
+        category: p.category || "Crypto",
+        is_featured: Boolean(p.is_featured),
+      }));
+    }
+
+    // Fallback before migration 032 is applied on the remote DB.
+    const fallback = await admin
+      .from("blog_posts")
+      .select("id, title, slug, excerpt, cover_image, published_at")
+      .eq("is_published", true)
+      .order("published_at", { ascending: false });
+
+    return ((fallback.data ?? []) as Omit<BlogPostSummary, "category" | "is_featured">[]).map((p) => ({
+      ...p,
+      category: "Crypto",
+      is_featured: false,
+    }));
   },
-  ["published-blog-posts-v1"],
+  ["published-blog-posts-v2"],
   { revalidate: 300, tags: ["blog"] }
 );
 
@@ -132,6 +155,6 @@ export const getPublishedBlogPostBySlug = unstable_cache(
       .maybeSingle();
     return data;
   },
-  ["published-blog-post-by-slug-v1"],
+  ["published-blog-post-by-slug-v2"],
   { revalidate: 300, tags: ["blog"] }
 );

@@ -386,9 +386,12 @@ export interface BlogPost {
   excerpt: string | null;
   content: string;
   cover_image: string | null;
+  category?: string | null;
+  is_featured?: boolean;
   is_published: boolean;
   published_at: string | null;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface LegalPage {

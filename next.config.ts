@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       "recharts",
       "date-fns",
       "@base-ui/react",
+      "@tiptap/react",
     ],
   },
   async headers() {

@@ -15,6 +15,7 @@ import {
   UserCheck,
   FileText,
   ClipboardList,
+  Newspaper,
 } from "lucide-react";
 import { signOut } from "@/lib/actions";
 import { usePortalShell } from "@/components/shared/mobile-nav-context";
@@ -56,6 +57,7 @@ const navSections: { label: string; items: NavItem[] }[] = [
   {
     label: "Growth",
     items: [
+      { href: "/admin/blog", label: "Blog", icon: Newspaper },
       { href: "/admin/leads", label: "CRM Leads", icon: FileText },
       { href: "/admin/tickets", label: "Support Tickets", icon: Headphones },
       { href: "/admin/reports", label: "Reports", icon: BarChart3 },

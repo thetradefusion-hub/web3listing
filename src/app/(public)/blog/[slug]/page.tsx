@@ -1,34 +1,33 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { getPublishedBlogPostBySlug } from "@/lib/public-catalog-cache";
+import { BlogArticlePage } from "@/components/public/blog/blog-article-page";
+import { getPublishedBlogPostBySlug, getPublishedBlogPosts } from "@/lib/public-catalog-cache";
+import type { BlogPost } from "@/types/database";
 
 export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await getPublishedBlogPostBySlug(slug);
-  return { title: post?.title || "Blog" };
+  return {
+    title: post?.title || "Blog",
+    description: post?.excerpt || undefined,
+  };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await getPublishedBlogPostBySlug(slug);
+  const [post, allPosts] = await Promise.all([
+    getPublishedBlogPostBySlug(slug),
+    getPublishedBlogPosts(),
+  ]);
 
   if (!post) notFound();
 
-  return (
-    <article className="mx-auto max-w-3xl px-4 py-16">
-      <Button variant="ghost" size="sm" asChild className="mb-6">
-        <Link href="/blog">← Back to Blog</Link>
-      </Button>
-      <h1 className="text-4xl font-bold">{post.title}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {post.published_at ? new Date(post.published_at).toLocaleDateString() : ""}
-      </p>
-      <div className="prose prose-invert mt-8 max-w-none">
-        <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{post.content}</p>
-      </div>
-    </article>
-  );
+  const popular = (
+    allPosts.filter((p) => p.is_featured && p.slug !== post.slug).length > 0
+      ? allPosts.filter((p) => p.is_featured && p.slug !== post.slug)
+      : allPosts.filter((p) => p.slug !== post.slug)
+  ).slice(0, 8);
+
+  return <BlogArticlePage post={post as BlogPost} popular={popular} />;
 }

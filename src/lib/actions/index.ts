@@ -1940,3 +1940,116 @@ export async function respondToCustomRequirementQuote(
   revalidatePath(`/admin/custom-requirements/${requirementId}`);
   return { success: true };
 }
+
+export async function upsertBlogPost(
+  data: {
+    title: string;
+    slug?: string;
+    excerpt?: string | null;
+    content: string;
+    cover_image?: string | null;
+    category?: string | null;
+    is_published?: boolean;
+    is_featured?: boolean;
+  },
+  id?: string
+) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const title = data.title.trim();
+  if (!title) return { error: "Title is required" };
+  if (!data.content.trim()) return { error: "Content is required" };
+
+  const slug =
+    data.slug?.trim() ||
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  if (!slug) return { error: "Slug is required" };
+
+  const isPublished = data.is_published ?? false;
+  const now = new Date().toISOString();
+
+  let publishedAt: string | null = null;
+  if (id) {
+    const { data: existing } = await supabase
+      .from("blog_posts")
+      .select("published_at, is_published")
+      .eq("id", id)
+      .maybeSingle();
+    if (isPublished) {
+      publishedAt = existing?.published_at || now;
+    } else {
+      publishedAt = existing?.published_at || null;
+    }
+  } else if (isPublished) {
+    publishedAt = now;
+  }
+
+  const payload = {
+    title,
+    slug,
+    excerpt: data.excerpt?.trim() || null,
+    content: data.content.trim(),
+    cover_image: data.cover_image?.trim() || null,
+    category: data.category?.trim() || "Crypto",
+    is_published: isPublished,
+    is_featured: data.is_featured ?? false,
+    published_at: publishedAt,
+    updated_at: now,
+  };
+
+  const run = (body: Record<string, unknown>) =>
+    id
+      ? supabase.from("blog_posts").update(body).eq("id", id).select("id").single()
+      : supabase.from("blog_posts").insert(body).select("id").single();
+
+  let { data: row, error } = await run(payload);
+
+  // Fallback if migration 032 columns are not yet applied.
+  if (error && /category|is_featured|updated_at/i.test(error.message)) {
+    const {
+      category: _c,
+      is_featured: _f,
+      updated_at: _u,
+      ...legacy
+    } = payload;
+    ({ data: row, error } = await run(legacy));
+  }
+
+  if (error) {
+    if (error.message.toLowerCase().includes("duplicate") || error.code === "23505") {
+      return { error: "A post with this slug already exists" };
+    }
+    return { error: error.message };
+  }
+
+  revalidateTag("blog", "max");
+  revalidatePath("/blog");
+  revalidatePath(`/blog/${slug}`);
+  revalidatePath("/admin/blog");
+  if (id) revalidatePath(`/admin/blog/${id}/edit`);
+  revalidatePath("/sitemap.xml");
+
+  return { success: true, id: row.id };
+}
+
+export async function deleteBlogPost(id: string) {
+  await requireAuth(["super_admin", "operations_manager"]);
+  const supabase = createAdminClient();
+
+  const { data: existing } = await supabase.from("blog_posts").select("slug").eq("id", id).maybeSingle();
+  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidateTag("blog", "max");
+  revalidatePath("/blog");
+  if (existing?.slug) revalidatePath(`/blog/${existing.slug}`);
+  revalidatePath("/admin/blog");
+  revalidatePath("/sitemap.xml");
+
+  return { success: true };
+}
