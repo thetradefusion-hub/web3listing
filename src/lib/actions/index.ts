@@ -2027,6 +2027,8 @@ export async function upsertBlogPost(
     return { error: error.message };
   }
 
+  if (!row?.id) return { error: "Failed to save blog post" };
+
   revalidateTag("blog", "max");
   revalidatePath("/blog");
   revalidatePath(`/blog/${slug}`);
