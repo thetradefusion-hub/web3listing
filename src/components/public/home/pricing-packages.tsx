@@ -39,7 +39,9 @@ export function PricingPackages() {
               </div>
 
               <div className="mt-5 border-t border-border pt-5 sm:mt-8 sm:pt-8">
-                <p className="text-xl font-extrabold text-foreground sm:text-3xl">{pkg.price}</p>
+                <p className="text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
+                  Custom Quote
+                </p>
                 <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{pkg.priceNote}</p>
               </div>
 

@@ -13,6 +13,16 @@ export const PRICING_PACKAGE: Record<PricingModel, string> = {
   enterprise: "Package C — Enterprise Service",
 };
 
+export function getServiceApproxPriceLabel(
+  service: Pick<Service, "pricing_model" | "approx_price">
+) {
+  if (service.pricing_model !== "quote" && service.pricing_model !== "enterprise") {
+    return null;
+  }
+  const value = service.approx_price?.trim();
+  return value || null;
+}
+
 export function getServicePriceLabel(service: Pick<Service, "pricing_model" | "price" | "service_fee">) {
   if (service.pricing_model === "fixed" && service.price != null) {
     return formatCurrency(service.price);

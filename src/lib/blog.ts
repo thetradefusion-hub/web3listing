@@ -24,7 +24,7 @@ export const BLOG_CATEGORIES = [
 
 export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
 
-export const BLOG_PAGE_SIZE = 12;
+export const BLOG_PAGE_SIZE = 24;
 
 export function slugifyBlogTitle(title: string) {
   return title

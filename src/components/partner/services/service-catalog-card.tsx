@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Clock, CreditCard, FileCheck, Flame, ShieldCheck, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getServiceApproxPriceLabel } from "@/lib/pricing";
 import {
   BADGE_LABELS,
   BADGE_STYLES,
@@ -63,6 +64,7 @@ export function ServiceCatalogCard({
   const logoColor = getServiceLogoColor(service.name);
   const accent = getServiceAccent(service.name);
   const description = service.overview || service.description;
+  const approxPrice = getServiceApproxPriceLabel(service);
   const cat = Array.isArray(service.service_categories)
     ? service.service_categories[0]
     : service.service_categories;
@@ -172,6 +174,14 @@ export function ServiceCatalogCard({
 
         {/* Right — actions */}
         <div className="flex flex-col justify-center gap-1.5 p-3 sm:p-4 md:w-[148px] md:shrink-0 md:px-3 lg:w-[156px]">
+          {approxPrice ? (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-2 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Approx.
+              </p>
+              <p className="mt-0.5 text-xs font-bold text-primary sm:text-[13px]">{approxPrice}</p>
+            </div>
+          ) : null}
           <Button variant="outline" className="h-8 w-full rounded-lg text-[11px] font-semibold sm:h-9 sm:text-xs" asChild>
             <Link href={href}>View Details</Link>
           </Button>

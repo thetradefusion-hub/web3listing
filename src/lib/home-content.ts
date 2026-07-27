@@ -71,50 +71,43 @@ export const SERVICE_PILLARS = [
   {
     slug: "development",
     title: "Development",
-    desc: "Smart contracts, dApps, bots, and custom Web3 product development for launch-ready projects.",
-    highlights: ["Smart contracts", "dApps", "Custom bots"],
+    desc: "Smart contracts, dApps, bots, and custom Web3 builds for launch-ready projects.",
     href: "/services?category=development",
   },
   {
     slug: "security",
     title: "Security",
-    desc: "Smart contract audits, KYC/AML tooling, and token security services to build investor trust.",
-    highlights: ["Audits", "KYC/AML", "Token security"],
+    desc: "Audits, KYC/AML, and token security to strengthen trust before you go live.",
     href: "/services?category=security",
   },
   {
     slug: "marketing",
     title: "Marketing",
-    desc: "PR, influencer campaigns, community growth, and brand awareness across global crypto media.",
-    highlights: ["PR & media", "KOL campaigns", "Community"],
+    desc: "PR, KOLs, and community campaigns that amplify your listing and launch.",
     href: "/services?category=marketing",
   },
   {
     slug: "exchange-listing",
     title: "Exchange Listing",
-    desc: "CEX and DEX listing preparation, documentation, submission, and follow-up across 20+ ecosystems.",
-    highlights: ["CEX listing", "DEX listing", "Documentation"],
+    desc: "CEX & DEX listing strategy, documentation, and exchange communication.",
     href: "/services?category=exchange-listing",
   },
   {
     slug: "market-making",
     title: "Market Making",
-    desc: "Liquidity bots, volume support, spread optimization, and market making for CEX and DEX pairs.",
-    highlights: ["MM bots", "Liquidity", "Volume support"],
+    desc: "Liquidity, volume support, and market making for CEX and DEX pairs.",
     href: "/services?category=market-making",
   },
   {
     slug: "listing-services",
     title: "Listing Services",
-    desc: "Tracker, wallet, explorer, and discovery platform listing — CoinMarketCap, CoinGecko, DEXTools & more.",
-    highlights: ["CMC & CoinGecko", "Wallets", "Explorers"],
+    desc: "CMC, CoinGecko, wallets, explorers, and discovery platform listings.",
     href: "/services?category=listing-services",
   },
   {
     slug: "growth",
     title: "Growth",
-    desc: "Trending, launch support, advisory, and full-funnel Web3 growth packages to scale faster.",
-    highlights: ["Trending", "Launch support", "Advisory"],
+    desc: "Trending, launch support, and advisory to scale after you list.",
     href: "/services?category=growth",
   },
 ] as const;
@@ -123,19 +116,19 @@ export const PRICING_PACKAGES = [
   {
     name: "Package A",
     subtitle: "Self Service",
-    badge: "Fixed Price",
-    price: "From $99",
-    priceNote: "Transparent pricing · Order directly",
+    badge: "Custom Quote",
+    price: "Custom Quote",
+    priceNote: "Scope reviewed · Quote before work starts",
     features: [
       "BSCScan & explorer logo updates",
       "DEXTools & data platform updates",
       "Liquidity lock & LP setup",
       "AI Telegram bot setup",
-      "Instant order placement",
-      "100% advance payment",
+      "Fast turnaround on approved quotes",
+      "Clear deliverables & timelines",
     ],
-    cta: "Browse Fixed Services",
-    href: "/services",
+    cta: "Request Quote",
+    href: "/contact",
     featured: false,
   },
   {
@@ -159,9 +152,9 @@ export const PRICING_PACKAGES = [
   {
     name: "Package C",
     subtitle: "Enterprise Service",
-    badge: "Consultation Required",
-    price: "From $199",
-    priceNote: "Third-party approval not guaranteed",
+    badge: "Custom Quote",
+    price: "Custom Quote",
+    priceNote: "Consultation required · Third-party approval not guaranteed",
     features: [
       "Binance ecosystem advisory",
       "CoinMarketCap & CoinGecko support",
@@ -170,7 +163,7 @@ export const PRICING_PACKAGES = [
       "Fundraising & investor introductions",
       "Book consultation before order",
     ],
-    cta: "Book Consultation",
+    cta: "Request Quote",
     href: "/contact",
     featured: false,
   },
@@ -493,5 +486,11 @@ export const HOME_FAQS = [
   },
 ] as const;
 
-export const DISCLAIMER =
-  "Web3Listing.com is an independent Web3 consulting and service marketplace. We are not affiliated with, endorsed by, or officially partnered with any exchange, wallet provider, media company, audit firm, or third-party platform unless specifically disclosed. All trademarks and brand names belong to their respective owners. Final approvals for listings, publications, audits, wallet integrations, and other third-party services remain under the control of the respective organizations.";
+export const DISCLAIMER_PARAGRAPHS = [
+  "Web3Listing.com is an independent Web3 consulting, blockchain marketing, and service marketplace. We provide consultation, project coordination, and support services for blockchain projects, cryptocurrency businesses, and Web3 startups.",
+  "We are not affiliated with, endorsed by, sponsored by, or officially partnered with any cryptocurrency exchange, blockchain network, wallet provider, media platform, audit company, or other third-party organization unless explicitly stated on our website.",
+  "All trademarks, logos, brand names, exchange names, wallet names, and other intellectual property displayed on this website are the property of their respective owners and are used solely for identification and informational purposes.",
+] as const;
+
+/** @deprecated Prefer DISCLAIMER_PARAGRAPHS for multi-paragraph rendering. */
+export const DISCLAIMER = DISCLAIMER_PARAGRAPHS.join(" ");

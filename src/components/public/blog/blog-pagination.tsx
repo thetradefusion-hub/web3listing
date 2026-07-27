@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { categoryToParam } from "@/lib/blog";
 
@@ -25,15 +24,21 @@ export function BlogPagination({
   const pages = buildPageList(page, totalPages);
 
   return (
-    <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="Blog pagination">
-      <PaginationLink href={hrefFor(Math.max(1, page - 1))} disabled={page <= 1} label="Previous">
-        <ChevronLeft className="size-4" />
-        <span className="hidden sm:inline">Previous</span>
+    <nav
+      className="mt-10 flex flex-wrap items-center justify-center gap-2 sm:mt-12"
+      aria-label="Blog pagination"
+    >
+      <PaginationLink
+        href={hrefFor(Math.max(1, page - 1))}
+        disabled={page <= 1}
+        label="Previous"
+      >
+        Previous
       </PaginationLink>
 
       {pages.map((item, index) =>
         item === "…" ? (
-          <span key={`ellipsis-${index}`} className="px-2 text-sm text-muted-foreground">
+          <span key={`ellipsis-${index}`} className="px-1 text-sm text-muted-foreground">
             …
           </span>
         ) : (
@@ -41,10 +46,10 @@ export function BlogPagination({
             key={item}
             href={hrefFor(item)}
             className={cn(
-              "inline-flex size-9 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
+              "inline-flex min-w-9 items-center justify-center px-2 py-1.5 text-sm font-semibold transition-colors",
               item === page
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card/60 text-foreground hover:border-primary/40"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             )}
             aria-current={item === page ? "page" : undefined}
           >
@@ -58,8 +63,7 @@ export function BlogPagination({
         disabled={page >= totalPages}
         label="Next"
       >
-        <span className="hidden sm:inline">Next</span>
-        <ChevronRight className="size-4" />
+        Next
       </PaginationLink>
     </nav>
   );
@@ -79,7 +83,7 @@ function PaginationLink({
   if (disabled) {
     return (
       <span
-        className="inline-flex h-9 items-center gap-1 rounded-lg border border-border/60 px-3 text-sm font-medium text-muted-foreground/50"
+        className="px-2 py-1.5 text-sm font-medium text-muted-foreground/40"
         aria-disabled
       >
         {children}
@@ -91,7 +95,7 @@ function PaginationLink({
     <Link
       href={href}
       aria-label={label}
-      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-card/60 px-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40"
+      className="px-2 py-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
     >
       {children}
     </Link>

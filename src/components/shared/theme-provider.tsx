@@ -65,7 +65,7 @@ function readStoredTheme(defaultTheme: Theme): Theme {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
 }: {
   children: ReactNode;
   defaultTheme?: Theme;
@@ -127,5 +127,5 @@ export function useTheme() {
   return ctx;
 }
 
-/** Inline script for layout — cookie first, then localStorage (prevents theme flash). */
-export const THEME_INIT_SCRIPT = `(function(){try{var d=document.documentElement,c=d.classList,w=['light','dark'];function s(t){c.remove('light','dark');c.add(t);d.style.colorScheme=t}function g(){return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function r(){var m=document.cookie.match(/(?:^|; )w3l_theme=([^;]+)/);if(m){var t=decodeURIComponent(m[1]);if(t==='light'||t==='dark'||t==='system')return t}return localStorage.getItem('theme')||'system'}var e=r();s(e==='system'?g():e)}catch(e){}})();`;
+/** Inline script for layout — cookie first, then localStorage (prevents theme flash). Default: dark. */
+export const THEME_INIT_SCRIPT = `(function(){try{var d=document.documentElement,c=d.classList;function s(t){c.remove('light','dark');c.add(t);d.style.colorScheme=t}function g(){return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function r(){var m=document.cookie.match(/(?:^|; )w3l_theme=([^;]+)/);if(m){var t=decodeURIComponent(m[1]);if(t==='light'||t==='dark'||t==='system')return t}return localStorage.getItem('theme')||'dark'}var e=r();s(e==='system'?g():e)}catch(e){s('dark')}})();`;

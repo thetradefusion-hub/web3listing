@@ -151,6 +151,10 @@ export function ServiceForm({
         faqs,
         pricing_model: pricingModel,
         price: pricingModel === "fixed" ? Number(form.get("price")) || null : null,
+        approx_price:
+          pricingModel === "quote" || pricingModel === "enterprise"
+            ? ((form.get("approx_price") as string) || "").trim() || null
+            : null,
         service_fee: Number(form.get("service_fee")) || null,
         commission_type: commissionType,
         commission_value: Number(form.get("commission_value")),
@@ -377,6 +381,17 @@ export function ServiceForm({
         ) : (
           <div className="hidden sm:block" />
         )}
+        {pricingModel === "quote" || pricingModel === "enterprise" ? (
+          <Field label="Approx price (display only)" htmlFor="approx_price">
+            <Input
+              id="approx_price"
+              name="approx_price"
+              className={inputClass}
+              defaultValue={service?.approx_price || ""}
+              placeholder="e.g. $5,000+"
+            />
+          </Field>
+        ) : null}
         <Field label="Platform fee (USD)" htmlFor="service_fee">
           <Input
             id="service_fee"

@@ -1,4 +1,4 @@
-import { DISCLAIMER } from "@/lib/home-content";
+import { DISCLAIMER_PARAGRAPHS } from "@/lib/home-content";
 
 export function HomeDisclaimer() {
   return (
@@ -8,7 +8,11 @@ export function HomeDisclaimer() {
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:tracking-[0.2em]">
             Disclaimer
           </p>
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground sm:mt-4 sm:text-sm">{DISCLAIMER}</p>
+          <div className="mt-3 space-y-3 text-xs leading-relaxed text-muted-foreground sm:mt-4 sm:space-y-3.5 sm:text-sm">
+            {DISCLAIMER_PARAGRAPHS.map((paragraph) => (
+              <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+            ))}
+          </div>
           <p className="mt-5 text-sm font-semibold text-foreground/80 sm:mt-6">
             Web3Listing.com — Your Web3 Growth Marketplace
           </p>

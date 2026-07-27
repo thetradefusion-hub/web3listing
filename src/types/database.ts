@@ -168,6 +168,7 @@ export interface Service {
   proof_of_work_url: string | null;
   pricing_model: PricingModel;
   price: number | null;
+  approx_price: string | null;
   service_fee: number | null;
   third_party_fee_note: string | null;
   commission_type: CommissionType;

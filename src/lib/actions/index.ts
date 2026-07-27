@@ -1545,6 +1545,7 @@ export async function upsertService(
     proof_of_work_url?: string | null;
     pricing_model: "fixed" | "quote" | "enterprise";
     price?: number | null;
+    approx_price?: string | null;
     service_fee?: number | null;
     commission_type: "fixed" | "percentage";
     commission_value: number;
@@ -1590,6 +1591,10 @@ export async function upsertService(
     proof_of_work_url: data.proof_of_work_url?.trim() || null,
     pricing_model: data.pricing_model,
     price: data.pricing_model === "fixed" ? data.price ?? null : null,
+    approx_price:
+      data.pricing_model === "quote" || data.pricing_model === "enterprise"
+        ? data.approx_price?.trim() || null
+        : null,
     service_fee: data.service_fee ?? null,
     commission_type: data.commission_type,
     commission_value: data.commission_value,
