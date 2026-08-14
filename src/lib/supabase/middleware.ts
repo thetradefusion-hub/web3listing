@@ -256,13 +256,6 @@ export async function updateSession(request: NextRequest) {
       url.pathname = role === "agent" ? "/partner" : getPortalPathForRole(role as Parameters<typeof getPortalPathForRole>[0]);
       return NextResponse.redirect(url);
     }
-
-    if (pathRequiresKyc(path, "user") && profile?.kyc_status !== "approved") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/user/kyc";
-      url.searchParams.set("required", "true");
-      return NextResponse.redirect(url);
-    }
   }
 
   return supabaseResponse;

@@ -7,7 +7,6 @@ import {
   Store,
   Package,
   Headphones,
-  ShieldCheck,
   UserCog,
   CreditCard,
   ClipboardList,
@@ -39,7 +38,6 @@ const navSections: { label: string; items: NavItem[] }[] = [
   {
     label: "Account",
     items: [
-      { href: "/user/kyc", label: "KYC", icon: ShieldCheck },
       { href: "/user/profile", label: "Profile", icon: UserCog },
       { href: "/user/support", label: "Support", icon: Headphones },
     ],

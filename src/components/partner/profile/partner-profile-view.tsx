@@ -47,7 +47,7 @@ export function PartnerProfileView({
     .map((w) => w[0]?.toUpperCase())
     .join("") || "P";
   const isClientPortal = basePath === "/user";
-  const kycRequired = profile.kyc_status !== "approved";
+  const kycRequired = !isClientPortal && profile.kyc_status !== "approved";
   const walletConfigured = Boolean(profile.wallet_address?.trim());
   const accent = getServiceAccent(displayName);
 
@@ -74,9 +74,11 @@ export function PartnerProfileView({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="truncate text-lg font-bold text-foreground sm:text-xl">{displayName}</h1>
-                <PartnerBadge variant={kycStatusVariant(profile.kyc_status)}>
-                  {kycLabel(profile.kyc_status)}
-                </PartnerBadge>
+                {!isClientPortal ? (
+                  <PartnerBadge variant={kycStatusVariant(profile.kyc_status)}>
+                    {kycLabel(profile.kyc_status)}
+                  </PartnerBadge>
+                ) : null}
               </div>
               <p className="mt-0.5 truncate text-sm text-muted-foreground">{profile.email}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -109,22 +111,24 @@ export function PartnerProfileView({
         aria-label="Account overview"
         className={cn(
           "grid grid-cols-2 gap-3 sm:gap-4",
-          isClientPortal ? "lg:grid-cols-3" : "lg:grid-cols-4"
+          isClientPortal ? "lg:grid-cols-2" : "lg:grid-cols-4"
         )}
       >
-        <PartnerStatCard
-          title="KYC Status"
-          value={kycLabel(profile.kyc_status)}
-          subtitle={kycRequired ? "Action required" : "Account verified"}
-          icon={ShieldCheck}
-          color={
-            profile.kyc_status === "approved"
-              ? "green"
-              : profile.kyc_status === "rejected"
-                ? "purple"
-                : "orange"
-          }
-        />
+        {!isClientPortal ? (
+          <PartnerStatCard
+            title="KYC Status"
+            value={kycLabel(profile.kyc_status)}
+            subtitle={kycRequired ? "Action required" : "Account verified"}
+            icon={ShieldCheck}
+            color={
+              profile.kyc_status === "approved"
+                ? "green"
+                : profile.kyc_status === "rejected"
+                  ? "purple"
+                  : "orange"
+            }
+          />
+        ) : null}
         <PartnerStatCard
           title="My Projects"
           value={projectCount}

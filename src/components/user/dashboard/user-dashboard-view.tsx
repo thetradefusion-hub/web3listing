@@ -4,7 +4,6 @@ import {
   ClipboardList,
   Clock,
   CheckCircle2,
-  AlertTriangle,
   ArrowRight,
   LayoutGrid,
   PieChart,
@@ -29,7 +28,6 @@ import { DashboardSupportSection } from "@/components/partner/dashboard/dashboar
 import { OrderDonutChart } from "@/components/admin/dashboard/dashboard-charts";
 import { ProjectStatusChart } from "@/components/partner/dashboard/project-status-chart";
 import { rel, PartnerPageShell } from "@/components/partner/ui";
-import { Alert, AlertAction, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -76,7 +74,6 @@ type RecentOrder = {
 };
 
 export function UserDashboardView({
-  kycRequired,
   stats,
   recentOrders,
   quoteMap,
@@ -88,7 +85,6 @@ export function UserDashboardView({
   quickActions,
   manager,
 }: {
-  kycRequired: boolean;
   stats: {
     projectCount: number;
     orderCount: number;
@@ -113,18 +109,6 @@ export function UserDashboardView({
 
   return (
     <PartnerPageShell compact fullWidth className="w-full gap-4 sm:gap-5">
-      {kycRequired && (
-        <Alert>
-          <AlertTriangle />
-          <AlertTitle>Complete KYC to place orders</AlertTitle>
-          <AlertAction>
-            <Button asChild size="sm">
-              <Link href="/user/kyc">KYC</Link>
-            </Button>
-          </AlertAction>
-        </Alert>
-      )}
-
       <section aria-label="Key metrics" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
         <PartnerStatCard
           title="Total Project"
@@ -352,7 +336,7 @@ export function UserDashboardView({
         </DashboardPanel>
       </div>
 
-      <DashboardSupportSection manager={manager} kycRequired={kycRequired} basePath="/user" />
+      <DashboardSupportSection manager={manager} kycRequired={false} basePath="/user" />
     </PartnerPageShell>
   );
 }

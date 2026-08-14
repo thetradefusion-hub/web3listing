@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import Script from "next/script";
-import { Inter, Oswald } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ThemeProvider, THEME_INIT_SCRIPT } from "@/components/shared/theme-provider";
 import {
   DeferredRouteLoader,
@@ -18,13 +18,6 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
   weight: ["400", "600", "700"],
-});
-
-const oswald = Oswald({
-  subsets: ["latin"],
-  variable: "--font-oswald",
-  display: "swap",
-  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -70,8 +63,14 @@ const PWA_BOOT_SPLASH_SCRIPT = `(function(){try{var s=window.matchMedia("(displa
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${oswald.variable} dark`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: PWA_BOOT_SPLASH_SCRIPT }} />
       </head>

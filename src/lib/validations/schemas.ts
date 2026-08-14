@@ -10,8 +10,11 @@ export const signupSchema = z.object({
   email: z.string().email("Valid email required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   full_name: z.string().min(2, "Name is required"),
-  company_name: z.string().optional(),
+  telegram_username: z.string().min(2, "Telegram ID is required"),
   country: z.string().min(2, "Country is required"),
+  terms_accepted: z.literal(true, {
+    message: "You must accept the Terms & Conditions",
+  }),
 });
 
 export const projectSchema = z.object({

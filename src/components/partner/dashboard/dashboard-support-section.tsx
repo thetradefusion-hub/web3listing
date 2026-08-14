@@ -42,6 +42,8 @@ export function DashboardSupportSection({
   kycRequired: boolean;
   basePath?: string;
 }) {
+  const isClientPortal = basePath === "/user";
+  const showKyc = !isClientPortal;
   const managerDisplayName =
     manager?.name?.toLowerCase().includes("abhay") ? "Listing Manager" : manager?.name;
   const managerInitials = manager?.name
@@ -180,34 +182,38 @@ export function DashboardSupportSection({
             </div>
             <div className="min-w-0">
               <CardTitle>Security</CardTitle>
-              <CardDescription>Keep your partner account safe</CardDescription>
+              <CardDescription>
+                {isClientPortal ? "Keep your account safe" : "Keep your partner account safe"}
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col gap-3">
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-xl border px-3.5 py-3",
-              kycRequired
-                ? "border-chart-3/30 bg-chart-3/10"
-                : "border-chart-2/30 bg-chart-2/10"
-            )}
-          >
-            <ShieldCheck
-              className={cn("size-5 shrink-0", kycRequired ? "text-chart-3" : "text-chart-2")}
-              strokeWidth={2}
-            />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground">
-                {kycRequired ? "KYC verification pending" : "Identity verified"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {kycRequired
-                  ? "Complete KYC to unlock orders and withdrawals"
-                  : "Your account passed partner verification"}
-              </p>
+          {showKyc ? (
+            <div
+              className={cn(
+                "flex items-center gap-3 rounded-xl border px-3.5 py-3",
+                kycRequired
+                  ? "border-chart-3/30 bg-chart-3/10"
+                  : "border-chart-2/30 bg-chart-2/10"
+              )}
+            >
+              <ShieldCheck
+                className={cn("size-5 shrink-0", kycRequired ? "text-chart-3" : "text-chart-2")}
+                strokeWidth={2}
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">
+                  {kycRequired ? "KYC verification pending" : "Identity verified"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {kycRequired
+                    ? "Complete KYC to unlock orders and withdrawals"
+                    : "Your account passed partner verification"}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
           <ul className="flex flex-col gap-2.5">
             <HelpListItem>Only trust messages from official Telegram contacts</HelpListItem>
             <HelpListItem>Never share passwords or private keys with staff</HelpListItem>
@@ -215,7 +221,7 @@ export function DashboardSupportSection({
           </ul>
         </CardContent>
         <CardFooter className="border-t bg-muted/20">
-          {kycRequired ? (
+          {showKyc && kycRequired ? (
             <Button asChild className="h-9 w-full rounded-xl font-semibold">
               <Link href={`${basePath}/kyc`}>Complete KYC</Link>
             </Button>

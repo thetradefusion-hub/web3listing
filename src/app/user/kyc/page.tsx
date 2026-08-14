@@ -1,30 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentUser } from "@/lib/auth";
-import { PartnerKycView } from "@/components/partner/kyc/partner-kyc-view";
+import { redirect } from "next/navigation";
 
-export default async function UserKycPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ required?: string }>;
-}) {
-  const profile = await getCurrentUser();
-  const supabase = await createClient();
-  const params = await searchParams;
-
-  const [{ data: kyc }, managerResult] = await Promise.all([
-    supabase.from("kyc_submissions").select("*").eq("user_id", profile!.id).single(),
-    profile?.account_manager_id
-      ? supabase.from("account_managers").select("telegram_link").eq("id", profile.account_manager_id).single()
-      : supabase.from("account_managers").select("telegram_link").eq("is_active", true).limit(1).single(),
-  ]);
-
-  return (
-    <PartnerKycView
-      profile={profile!}
-      kyc={kyc}
-      required={params.required === "true" || profile!.kyc_status !== "approved"}
-      managerTelegramLink={managerResult.data?.telegram_link}
-      basePath="/user"
-    />
-  );
+export default function UserKycPage() {
+  redirect("/user");
 }

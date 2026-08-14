@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { PARTNER_EXCHANGES } from "@/lib/home-content";
 import { CollaborateForm } from "@/components/public/home/collaborate-form";
+import { HeroDotField } from "@/components/public/home/hero-dot-field";
 import { getServiceInitials, getServiceLogoUrl } from "@/lib/service-catalog";
 
 function PartnerChip({ name }: { name: string }) {
@@ -34,13 +35,14 @@ function PartnerChip({ name }: { name: string }) {
 export function HomeHero() {
   return (
     <section className="relative overflow-hidden border-b border-border/60">
-      <div className="hero-mesh-bg pointer-events-none absolute inset-0" aria-hidden />
+      <HeroDotField />
+      <div className="hero-mesh-bg hero-mesh-overlay pointer-events-none absolute inset-0" aria-hidden />
       <div
-        className="pointer-events-none absolute inset-0 landing-grid opacity-[0.22] dark:opacity-15"
+        className="pointer-events-none absolute inset-0 landing-grid opacity-[0.14] dark:opacity-[0.22]"
         aria-hidden
       />
 
-      <div className="landing-container relative">
+      <div className="landing-container relative z-10">
         <div className="grid items-center gap-10 pb-14 pt-10 sm:gap-12 sm:pb-16 sm:pt-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:pb-20 lg:pt-16">
           <div className="flex min-w-0 flex-col">
             <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-3 py-1">
@@ -60,8 +62,9 @@ export function HomeHero() {
             <p className="lh-label lh-accent">Token listing & growth</p>
 
             <h1 className="lh-hero-display mt-4 max-w-3xl text-foreground">
-              Building the next stage of{" "}
-              <span className="lh-brand-gradient">token launches</span>
+              <span className="block">Building the next</span>
+              <span className="block">stage of</span>
+              <span className="block lh-brand-gradient">token launches</span>
             </h1>
 
             <p className="mt-5 max-w-xl text-pretty text-base font-medium leading-relaxed text-foreground/80 sm:mt-6 sm:text-lg">

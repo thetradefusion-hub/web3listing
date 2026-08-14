@@ -5,7 +5,6 @@ import {
   Headphones,
   FolderKanban,
   ClipboardList,
-  ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
@@ -19,7 +18,6 @@ const quickActions: { label: string; href: string; icon: typeof Plus; color: Qui
   { label: "Services", href: "/user/services", icon: Store, color: "green" },
   { label: "Orders", href: "/user/orders", icon: Package, color: "orange" },
   { label: "Custom Req.", href: "/user/custom-requirements/new", icon: ClipboardList, color: "purple" },
-  { label: "KYC", href: "/user/kyc", icon: ShieldCheck, color: "teal" },
   { label: "Support", href: "/user/support", icon: Headphones, color: "pink" },
 ];
 
@@ -131,7 +129,6 @@ export default async function UserDashboard() {
 
   return (
     <UserDashboardView
-      kycRequired={profile?.kyc_status !== "approved"}
       stats={{
         projectCount: projectCount || 0,
         orderCount: orderCount || 0,

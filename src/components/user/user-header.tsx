@@ -7,18 +7,11 @@ import { MobileMenuButton } from "@/components/shared/mobile-menu-button";
 import { SidebarToggleButton } from "@/components/shared/sidebar-toggle-button";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { PortalProfileMenu } from "@/components/shared/portal-profile-menu";
-import { PartnerBadge, kycStatusVariant } from "@/components/partner/ui";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { buildTelegramLink } from "@/lib/telegram";
 import type { Profile, AccountManager } from "@/types/database";
-
-function kycLabel(status: Profile["kyc_status"]) {
-  if (status === "approved") return "Verified";
-  if (status === "pending") return "KYC Pending";
-  return "KYC Required";
-}
 
 function HeaderToolButton({
   children,
@@ -69,7 +62,6 @@ export function UserHeader({
   manager: AccountManager | null;
 }) {
   const displayName = profile.company_name || profile.full_name || profile.email.split("@")[0];
-  const isVerified = profile.kyc_status === "approved";
 
   return (
     <header className="portal-app-header sticky top-0 z-20 border-b border-border/70 bg-card/90 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-card/80">
@@ -85,18 +77,11 @@ export function UserHeader({
               <LayoutDashboard className="size-4" strokeWidth={2.25} />
             </span>
             <div className="min-w-0">
-              <div className="flex min-w-0 items-center gap-2">
-                <p className="truncate text-sm font-bold tracking-tight text-foreground sm:text-[15px]">
-                  {displayName}
-                </p>
-                <span className="hidden shrink-0 sm:inline-flex">
-                  <PartnerBadge variant={kycStatusVariant(profile.kyc_status)}>
-                    {kycLabel(profile.kyc_status)}
-                  </PartnerBadge>
-                </span>
-              </div>
+              <p className="truncate text-sm font-bold tracking-tight text-foreground sm:text-[15px]">
+                {displayName}
+              </p>
               <p className="hidden truncate text-[11px] text-muted-foreground sm:block sm:text-xs">
-                {isVerified ? "Client workspace" : "Complete KYC to unlock full access"}
+                Client workspace
               </p>
             </div>
           </div>

@@ -121,11 +121,22 @@ export async function signUp(data: {
   email: string;
   password: string;
   full_name: string;
-  company_name?: string;
+  telegram_username: string;
   country: string;
+  terms_accepted: boolean;
 }) {
+  if (!data.terms_accepted) {
+    return { error: "You must accept the Terms & Conditions to create an account." };
+  }
+
+  const telegramUsername = data.telegram_username.trim().replace(/^@+/, "");
+  if (!telegramUsername) {
+    return { error: "Telegram ID is required." };
+  }
+
   const supabase = await createClient();
   const siteUrl = await getServerSiteUrl();
+  const termsAcceptedAt = new Date().toISOString();
   const { data: authData, error } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
@@ -134,13 +145,26 @@ export async function signUp(data: {
       data: {
         role: "user",
         full_name: data.full_name,
-        company_name: data.company_name || null,
+        telegram_username: telegramUsername,
         country: data.country,
+        terms_accepted_at: termsAcceptedAt,
+        terms_version: LEGAL_AGREEMENT_VERSION,
       },
     },
   });
 
   if (error) return { error: error.message };
+
+  if (authData.user) {
+    const admin = createAdminClient();
+    await admin
+      .from("profiles")
+      .update({
+        country: data.country,
+        telegram_username: telegramUsername,
+      })
+      .eq("id", authData.user.id);
+  }
 
   if (authData.user && !authData.session) {
     return { success: true, needsEmailConfirmation: true };

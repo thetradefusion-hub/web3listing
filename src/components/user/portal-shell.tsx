@@ -7,7 +7,6 @@ import {
   Headphones,
   LayoutDashboard,
   Package,
-  ShieldCheck,
   Store,
   UserCog,
 } from "lucide-react";
@@ -30,7 +29,6 @@ const userBottomItems = [
 const userMoreItems = [
   { href: "/user/custom-requirements", label: "Custom Requirements", icon: ClipboardList },
   { href: "/user/orders?status=waiting_payment", label: "Payments", icon: CreditCard, exact: true },
-  { href: "/user/kyc", label: "KYC", icon: ShieldCheck },
   { href: "/user/profile", label: "Profile", icon: UserCog },
   { href: "/user/support", label: "Support", icon: Headphones },
 ];

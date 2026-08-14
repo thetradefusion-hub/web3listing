@@ -19,7 +19,7 @@ export const PORTALS = {
     label: "User Panel",
     showCommission: false,
     showWallet: false,
-    kycRequired: true,
+    kycRequired: false,
     projectAutoApprove: true,
   },
 } as const;
@@ -27,7 +27,7 @@ export const PORTALS = {
 /** Route prefixes that require approved KYC before access. */
 export const KYC_GATED_PATH_PREFIXES: Record<PortalKind, readonly string[]> = {
   partner: ["/partner/services"],
-  user: ["/user/services", "/user/custom-requirements/new"],
+  user: [],
 };
 
 export function getPortalForRole(role: UserRole): PortalKind | null {
