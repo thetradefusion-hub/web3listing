@@ -5,7 +5,17 @@ export function HowItWorksSection() {
   return (
     <section className="landing-section border-y landing-section-alt">
       <div className="landing-container">
-        <HomeSectionHeader label="Process" title="How it works" className="mb-8 sm:mb-14" />
+        <HomeSectionHeader
+          label="Process"
+          title={
+            <>
+              How listing{" "}
+              <span className="lh-brand-gradient">gets done</span>
+            </>
+          }
+          description="From service selection to delivery — a clear path with progress you can track."
+          className="mb-8 sm:mb-14"
+        />
 
         <div className="relative">
           <div className="pointer-events-none absolute left-0 right-0 top-[2.75rem] hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent xl:block" />

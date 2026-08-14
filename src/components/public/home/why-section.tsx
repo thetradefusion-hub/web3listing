@@ -1,41 +1,52 @@
-import { CheckCircle2 } from "lucide-react";
-import { WHY_NEED_US } from "@/lib/home-content";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { HOME_SOLUTIONS } from "@/lib/home-content";
 
 export function WhySection() {
   return (
     <section className="landing-section border-b border-border">
       <div className="landing-container">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-16 xl:gap-20">
-          <div className="text-center lg:sticky lg:top-24 lg:text-left">
-            <p className="lh-label lh-accent">Why Web3Listing</p>
-            <h2 className="lh-display mt-3 text-foreground sm:mt-4">
-              Why do I need
-              <br />
-              <span className="lh-brand-gradient">Web3Listing?</span>
-            </h2>
-            <p className="mx-auto mt-5 max-w-md text-base font-medium leading-snug text-foreground sm:text-lg lg:mx-0">
-              We know the shortest way to listings, data platforms, and growth.
-            </p>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base lg:mx-0">
-              Transparent pricing, vetted partners, and one professional dashboard for your entire
-              Web3 launch stack.
-            </p>
-          </div>
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="lh-label lh-accent">Solutions</p>
+          <h2 className="lh-display mt-3 text-foreground sm:mt-4">
+            Bringing projects on exchange with{" "}
+            <span className="lh-brand-gradient">listing & growth</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
+            Creating the next phase of your launch by streamlining listing prep, proving readiness,
+            and moving visibility across exchanges and data platforms.
+          </p>
+        </div>
 
-          <div className="flex flex-col gap-3 sm:gap-4">
-            {WHY_NEED_US.map((item) => (
+        <div className="mt-10 grid gap-4 sm:mt-14 sm:gap-5 lg:grid-cols-3">
+          {HOME_SOLUTIONS.map((item, index) => (
+            <Link
+              key={item.title}
+              href={item.href}
+              className="group relative flex min-h-[220px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:shadow-[0_28px_60px_-28px_color-mix(in_srgb,var(--primary)_50%,transparent)] sm:min-h-[260px] sm:p-7"
+            >
               <div
-                key={item.title}
-                className="landing-card flex gap-3 p-4 transition-colors hover:border-primary/30 hover:bg-muted/40 sm:gap-4 sm:p-5"
-              >
-                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-chart-2" strokeWidth={2.25} />
-                <div className="min-w-0">
-                  <h3 className="text-base font-semibold text-foreground sm:text-lg">{item.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+                className="pointer-events-none absolute -right-10 -top-10 size-36 rounded-full bg-primary/10 blur-2xl transition-opacity group-hover:opacity-100"
+                aria-hidden
+              />
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
+                0{index + 1}
+              </span>
+              <h3 className="mt-5 text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
+                {item.title}
+              </h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {item.desc}
+              </p>
+              <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                Explore
+                <ArrowRight
+                  className="size-3.5 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

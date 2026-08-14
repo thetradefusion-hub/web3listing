@@ -1,9 +1,13 @@
 import { Suspense } from "react";
 import { HomeHero } from "@/components/public/home/hero";
 import { WhySection } from "@/components/public/home/why-section";
+import { IndustriesSection } from "@/components/public/home/industries-section";
+import { ListingDeepDive } from "@/components/public/home/listing-deep-dive";
 import { ServicePillars } from "@/components/public/home/service-pillars";
 import { PricingPackages } from "@/components/public/home/pricing-packages";
 import { PartnerStrip } from "@/components/public/home/partner-strip";
+import { GrowthStats } from "@/components/public/home/growth-stats";
+import { SetsApartSection } from "@/components/public/home/sets-apart-section";
 import { ConsultationCta } from "@/components/public/home/consultation-cta";
 import { HomeFaqSection } from "@/components/public/home/faq-section";
 import { HomeDisclaimer } from "@/components/public/home/disclaimer";
@@ -41,29 +45,20 @@ export default function HomePage() {
     <>
       <HomeHero />
       <WhySection />
-      <ServicePillars />
-      <ConsultationCta
-        title="Get a free consultation"
-        subtitle="Tell us about your project and we’ll recommend the right listing and growth path."
-        primaryLabel="Book a call with us"
-        secondaryLabel="Become our partner"
-        secondaryHref="/become-a-partner"
-      />
-      <PricingPackages />
       <PartnerStrip />
+      <IndustriesSection />
+      <ListingDeepDive />
+      <PricingPackages />
+      <ServicePillars />
+      <GrowthStats />
       <HowItWorksSection />
       <Suspense fallback={<PopularServicesFallback />}>
         <PopularServicesBlock />
       </Suspense>
+      <SetsApartSection />
       <WhyChooseSection />
       <HomeFaqSection />
-      <ConsultationCta
-        title="Ready to list & grow?"
-        subtitle="Launch faster, build trust, and scale your Web3 ecosystem with professional support."
-        primaryLabel="Get free consultation"
-        secondaryLabel="Create your account"
-        secondaryHref="/signup"
-      />
+      <ConsultationCta />
       <HomeDisclaimer />
       <TelegramChatFab />
       <ScrollToTop />

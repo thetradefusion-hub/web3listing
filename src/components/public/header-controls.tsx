@@ -128,6 +128,15 @@ export function PublicMobileNav() {
                   </Link>
                 </Button>
                 <Button className="lh-btn-cta h-11 w-full rounded-xl" asChild>
+                  <Link href="/contact" onClick={() => setOpen(false)}>
+                    Become our client
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-11 w-full justify-start gap-2.5 rounded-xl border-border/80"
+                  asChild
+                >
                   <Link href="/become-a-partner" onClick={() => setOpen(false)}>
                     <Handshake data-icon="inline-start" className="size-4" />
                     Become our partner
@@ -172,10 +181,9 @@ export function PublicHeaderActions() {
         className="lh-btn-cta h-9 rounded-full px-3 text-xs font-semibold shadow-md shadow-primary/20 sm:h-9 sm:gap-1.5 sm:px-4 sm:text-sm"
         asChild
       >
-        <Link href="/become-a-partner">
-          <Handshake className="hidden size-3.5 sm:block" />
-          <span className="sm:hidden">Partner</span>
-          <span className="hidden sm:inline">Become our partner</span>
+        <Link href="/contact">
+          <span className="sm:hidden">Consult</span>
+          <span className="hidden sm:inline">Become our client</span>
         </Link>
       </Button>
     </div>

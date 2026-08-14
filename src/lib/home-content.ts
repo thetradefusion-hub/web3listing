@@ -484,6 +484,113 @@ export const HOME_FAQS = [
     q: "What payment methods do you accept?",
     a: "Crypto payments and traditional payment methods where available.",
   },
+  {
+    q: "How fast can we get started?",
+    a: "Most supported services begin within 24–72 hours after requirements are approved and payment is confirmed.",
+  },
+  {
+    q: "Can agencies and freelancers partner with you?",
+    a: "Yes. Our partner program offers 10–30% commission with a dedicated dashboard, referral tracking, and withdrawals.",
+  },
+] as const;
+
+/** TokenMinds-style homepage sections — copy adapted for Web3Listing. */
+export const HOME_SOLUTIONS = [
+  {
+    title: "Exchange Listing",
+    desc: "Prepare docs, packages, and outreach for CEX & DEX listings across 20+ ecosystems.",
+    href: "/services?category=exchange-listing",
+  },
+  {
+    title: "Liquidity & Market Making",
+    desc: "Build healthy depth, tighter spreads, and sustainable trading activity after you list.",
+    href: "/services?category=market-making",
+  },
+  {
+    title: "Growth & Crypto Marketing",
+    desc: "PR, KOLs, community, and discovery listings that amplify your launch window.",
+    href: "/services?category=marketing",
+  },
+] as const;
+
+export const HOME_INDUSTRIES = [
+  {
+    title: "Token Projects",
+    desc: "Listing prep, CMC/CG, wallets, and launch support",
+  },
+  {
+    title: "Launchpads & Funds",
+    desc: "Portfolio visibility and go-to-market coordination",
+  },
+  {
+    title: "Fintech & Wallets",
+    desc: "Integrations, discovery, and trust signals",
+  },
+  {
+    title: "Agencies & KOLs",
+    desc: "White-label delivery via partner program",
+  },
+  {
+    title: "Community Builders",
+    desc: "Telegram, Discord, and engagement ops",
+  },
+] as const;
+
+export const HOME_LISTING_FEATURES = [
+  {
+    title: "Listing Preparation",
+    desc: "Define requirements, packaging, and readiness before you spend budget on the wrong venue.",
+  },
+  {
+    title: "Documentation & Compliance",
+    desc: "Align whitepapers, tokenomics, KYC/AML, and audit materials with what platforms expect.",
+  },
+  {
+    title: "Coordination & Follow-up",
+    desc: "Manage applications, communication, and status tracking from one professional dashboard.",
+  },
+] as const;
+
+export const HOME_GROWTH_STATS = [
+  {
+    value: "+40%",
+    label: "Faster Listing Readiness",
+    desc: "Through structured prep and vetted partner workflows",
+  },
+  {
+    value: "+30%",
+    label: "Stronger Post-List Visibility",
+    desc: "Via PR, data platforms, and discovery listings",
+  },
+  {
+    value: "+25%",
+    label: "Healthier Market Depth",
+    desc: "Driven by market making and liquidity support",
+  },
+] as const;
+
+export const HOME_SETS_APART = [
+  {
+    title: "Marketplace First",
+    desc: "Transparent pricing, clear deliverables, and a single portal for listings, PR, liquidity, audits, and growth.",
+  },
+  {
+    title: "360° Launch Stack",
+    desc: "From exchange onboarding to community and AI bots — integrated support across your full Web3 go-to-market.",
+  },
+  {
+    title: "Partner-Ready Ops",
+    desc: "Agencies and freelancers earn with real-time tracking, referrals, and dedicated support — not scattered vendors.",
+  },
+] as const;
+
+export const HOME_COLLAB_SERVICES = [
+  "Exchange Listing",
+  "Market Making",
+  "Crypto Marketing",
+  "CMC / CoinGecko",
+  "Smart Contract Audit",
+  "Other / Custom",
 ] as const;
 
 export const DISCLAIMER_PARAGRAPHS = [

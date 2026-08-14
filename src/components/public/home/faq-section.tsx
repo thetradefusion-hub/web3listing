@@ -13,7 +13,16 @@ export function HomeFaqSection() {
     <section className="landing-section border-t border-border">
       <div className="landing-container">
         <div className="mx-auto max-w-3xl">
-          <HomeSectionHeader label="FAQ" title="Frequently asked questions" className="mb-6 sm:mb-10" />
+          <HomeSectionHeader
+            label="FAQs"
+            title={
+              <>
+                Answers before you{" "}
+                <span className="lh-brand-gradient">kick off</span>
+              </>
+            }
+            className="mb-6 sm:mb-10"
+          />
 
           <div className="space-y-2">
             {HOME_FAQS.map((faq, i) => {

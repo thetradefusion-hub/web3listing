@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { Inter } from "next/font/google";
+import Script from "next/script";
+import { Inter, Oswald } from "next/font/google";
 import { ThemeProvider, THEME_INIT_SCRIPT } from "@/components/shared/theme-provider";
 import {
   DeferredRouteLoader,
@@ -10,11 +11,20 @@ import { PwaProvider } from "@/components/shared/pwa-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
+const GA_MEASUREMENT_ID = "G-FL94FFKPL8";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
   weight: ["400", "600", "700"],
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-oswald",
+  display: "swap",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -25,6 +35,9 @@ export const metadata: Metadata = {
   description:
     "One platform for Web3 listings, marketing, liquidity, PR, community, and growth services.",
   applicationName: "Web3Listing",
+  verification: {
+    google: "EnmJj3CTwWibrMu_ag1EiZ8lecwPPcCzyT-PZ2bWkws",
+  },
   appleWebApp: {
     capable: true,
     title: "Web3Listing",
@@ -57,12 +70,24 @@ const PWA_BOOT_SPLASH_SCRIPT = `(function(){try{var s=window.matchMedia("(displa
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${oswald.variable} dark`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: PWA_BOOT_SPLASH_SCRIPT }} />
       </head>
       <body className="min-h-screen font-sans antialiased">
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         <div id="pwa-boot-splash" className="pwa-splash" hidden suppressHydrationWarning>
           <div className="pwa-splash__bg" />
           <div className="pwa-splash__grid" aria-hidden />

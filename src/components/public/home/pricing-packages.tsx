@@ -9,7 +9,17 @@ export function PricingPackages() {
   return (
     <section className="landing-section border-y landing-section-alt">
       <div className="landing-container">
-        <HomeSectionHeader label="Pricing" title="Choose your package" className="mb-8 sm:mb-14" />
+        <HomeSectionHeader
+          label="Packages"
+          title={
+            <>
+              Launch packages for{" "}
+              <span className="lh-brand-gradient">every stage</span>
+            </>
+          }
+          description="Tokenize your go-to-market with the right custody of scope, security of delivery, and clear quotes."
+          className="mb-8 sm:mb-14"
+        />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {PRICING_PACKAGES.map((pkg) => (

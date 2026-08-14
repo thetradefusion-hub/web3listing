@@ -56,7 +56,12 @@ export function PopularServicesSection({ services }: { services: HomeFeaturedSer
           <HomeSectionHeader
             align="left"
             label="Catalog"
-            title="Popular services"
+            title={
+              <>
+                Popular{" "}
+                <span className="lh-brand-gradient">services</span>
+              </>
+            }
             description="Live listings from our marketplace — order directly or request a custom quote."
             className="mb-0 max-w-xl"
           />

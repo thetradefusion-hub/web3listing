@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-oswald), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -676,11 +676,21 @@ div[data-base-ui-inert][role="presentation"][inert] {
 
 /* Listing.help-inspired landing utilities */
 .lh-display {
-  font-weight: 800;
+  font-family: var(--font-oswald), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
   text-transform: uppercase;
   font-size: clamp(1.5rem, 4.5vw, 3rem);
+}
+
+.lh-hero-display {
+  font-family: var(--font-oswald), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-transform: uppercase;
+  font-size: clamp(2.15rem, 6.2vw, 4.35rem);
   overflow-wrap: anywhere;
 }
 

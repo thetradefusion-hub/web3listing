@@ -1,44 +1,33 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { WHY_CHOOSE, PARTNER_AUDIENCE, PARTNER_BENEFITS } from "@/lib/home-content";
-import { HomeSectionHeader } from "@/components/public/home/section-header";
+import { PARTNER_AUDIENCE, PARTNER_BENEFITS } from "@/lib/home-content";
 
 export function WhyChooseSection() {
   return (
-    <section className="landing-section border-t landing-section-alt">
+    <section className="landing-section border-b border-border">
       <div className="landing-container">
-        <HomeSectionHeader
-          label="Why us"
-          title={
-            <>
-              Why choose{" "}
-              <span className="lh-brand-gradient">Web3Listing?</span>
-            </>
-          }
-          className="mb-10 sm:mb-14"
-        />
-
-        <div className="mb-6 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-          {WHY_CHOOSE.map((item) => (
-            <div key={item.title} className="landing-card p-5">
-              <h3 className="text-sm font-bold text-foreground sm:text-base">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-            </div>
-          ))}
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="lh-label lh-accent">Partner program</p>
+          <h2 className="lh-display mt-3 text-foreground sm:mt-4">
+            Grow with{" "}
+            <span className="lh-brand-gradient">Web3Listing</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Earn recurring commissions by referring projects — with real-time tracking and a
+            dedicated partner dashboard.
+          </p>
         </div>
 
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-6 lg:grid-cols-2">
           <div className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-chart-2/10 p-6 sm:p-8">
-            <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-primary/20 blur-3xl" />
-            <p className="lh-label text-primary">Partner program</p>
-            <h3 className="mt-3 text-2xl font-bold text-foreground sm:mt-4">Become a partner & earn</h3>
-            <p className="mt-2 text-sm font-medium text-primary/90">Web3 Partner Program</p>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Earn recurring commissions by referring projects to our marketplace.
-            </p>
-            <p className="mt-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">Benefits</p>
-            <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div
+              className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-primary/20 blur-3xl"
+              aria-hidden
+            />
+            <p className="lh-label text-primary">Benefits</p>
+            <h3 className="mt-3 text-2xl font-bold text-foreground">Become a partner & earn</h3>
+            <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {PARTNER_BENEFITS.map((item) => (
                 <li key={item} className="flex items-center gap-2 text-sm text-foreground/90">
                   <CheckCircle2 className="size-4 shrink-0 text-primary" />
@@ -47,10 +36,10 @@ export function WhyChooseSection() {
               ))}
             </ul>
             <Button
-              className="mt-6 h-11 w-full rounded-xl bg-gradient-to-r from-primary to-chart-2 text-sm font-semibold text-white hover:opacity-90 sm:mt-8 sm:w-auto sm:rounded-full sm:px-8"
+              className="mt-6 h-11 w-full rounded-full bg-gradient-to-r from-primary to-chart-2 text-sm font-semibold text-white hover:opacity-90 sm:mt-8 sm:w-auto sm:px-8"
               asChild
             >
-              <Link href="/contact">
+              <Link href="/become-a-partner">
                 Become a partner <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

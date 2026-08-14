@@ -72,14 +72,14 @@ export function PartnerStrip() {
           <div className="partner-network-badge mx-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-zinc-900/80 px-3 py-1">
             <span className="size-1.5 rounded-full bg-chart-2 shadow-[0_0_8px_var(--chart-2)]" />
             <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-chart-2">
-              Our partners
+              Trusted by
             </span>
             <span className="size-1.5 rounded-full bg-chart-2 shadow-[0_0_8px_var(--chart-2)]" />
           </div>
 
           <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-white sm:mt-5 sm:text-3xl lg:text-4xl">
-            Partner Exchanges &{" "}
-            <span className="lh-brand-gradient">Launchpads</span>
+            Trusted by teams listing on{" "}
+            <span className="lh-brand-gradient">top platforms</span>
           </h2>
         </div>
 
