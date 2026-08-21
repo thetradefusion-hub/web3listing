@@ -156,11 +156,13 @@ export function ContactView() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                {CONTACT_CHANNELS.map((channel) => (
+                {CONTACT_CHANNELS.map((channel) => {
+                  const highlighted = "highlight" in channel && channel.highlight;
+                  return (
                   <div
                     key={channel.label}
                     className={`rounded-2xl border p-5 transition-colors ${
-                      channel.highlight
+                      highlighted
                         ? "border-primary/35 bg-gradient-to-br from-primary/10 via-card to-chart-2/5 shadow-[0_16px_48px_-24px_color-mix(in_srgb,var(--primary)_50%,transparent)]"
                         : "border-border/70 bg-card/60 hover:border-primary/25"
                     }`}
@@ -168,7 +170,7 @@ export function ContactView() {
                     <div className="flex items-start gap-3">
                       <span
                         className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
-                          channel.highlight
+                          highlighted
                             ? "bg-primary/15 text-primary"
                             : "bg-muted/60 text-muted-foreground"
                         }`}
@@ -189,7 +191,8 @@ export function ContactView() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="rounded-2xl border border-border/70 bg-muted/20 px-5 py-4">
