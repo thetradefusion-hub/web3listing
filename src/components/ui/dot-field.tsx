@@ -65,11 +65,13 @@ const DotField = memo(function DotField({
   const glowIdRef = useRef(`dot-field-glow-${Math.random().toString(36).slice(2, 9)}`);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvasEl = canvasRef.current;
     const glowEl = glowRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
+    if (!canvasEl) return;
+    const canvas: HTMLCanvasElement = canvasEl;
+    const rawCtx = canvas.getContext("2d", { alpha: true });
+    if (!rawCtx) return;
+    const ctx: CanvasRenderingContext2D = rawCtx;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let resizeTimer: ReturnType<typeof setTimeout>;
